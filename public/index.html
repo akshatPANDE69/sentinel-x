@@ -34,7 +34,7 @@
     <div class="header-actions">
       <div class="status-pill" id="appStatusPill">
         <div class="status-dot"></div>
-        <span id="appStatusText">PROTECTED</span>
+        <span id="appStatusText">AGENT ACTIVE (WAITING)</span>
       </div>
       <button class="btn-demo-start" id="btnStartDemoTop">
         <span>▶ Start Security Demo</span>
@@ -49,10 +49,10 @@
     <section class="threat-overlay" id="threatOverlay">
       <div class="threat-header">
         <div class="threat-badge">SECURITY ACTION REQUIRED</div>
-        <div style="font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.7);">SESSION #1842</div>
+        <div style="font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.7);" id="threatSessionLabel">ACTIVE SESSION</div>
       </div>
       <div class="threat-title" id="threatTitle">THREAT DETECTED: Unauthorized Client Modification</div>
-      <div class="threat-desc" id="threatDesc">Memory page hash mismatch & behavioral angular jerk detected. Session Trust: 31.4%.</div>
+      <div class="threat-desc" id="threatDesc">Memory page hash mismatch & behavioral angular jerk detected. Policy: QUARANTINE.</div>
       <div class="recovery-steps-box" id="recoveryBox">
         <div>⚠️ <strong>SESSION QUARANTINED</strong> (Client inputs isolated into sandbox ring)</div>
         <div>🔍 Locating last verified Merkle checkpoint...</div>
@@ -67,10 +67,10 @@
       <!-- Hero Status Card -->
       <section class="glass-card hero-status-card">
         <div>
-          <div class="hero-status-title">Your system is protected.</div>
-          <div class="hero-status-subtitle">Sentinel-X endpoint security agent is actively monitoring process integrity, platform calls, and server-authoritative game state.</div>
-          <div class="hero-session-badge">
-            <span style="color: var(--apple-green);">●</span> Active Target: <strong>Sentinel-X Cyber Arena #1842</strong> &nbsp;—&nbsp; Secure
+          <div class="hero-status-title" id="heroStatusTitle">Waiting for protected game...</div>
+          <div class="hero-status-subtitle" id="heroStatusSubtitle">Sentinel-X endpoint security agent is running. Launch a registered game integrating the Sentinel-X SDK to begin continuous attestation.</div>
+          <div class="hero-session-badge" id="heroSessionBadge">
+            <span style="color: var(--text-tertiary);">●</span> No active protected sessions
           </div>
         </div>
 
@@ -80,7 +80,7 @@
               <circle class="gauge-track" cx="85" cy="85" r="75"></circle>
               <circle class="gauge-fill" id="heroGaugeFill" cx="85" cy="85" r="75"></circle>
             </svg>
-            <div class="gauge-value" id="heroGaugeVal">98.7%</div>
+            <div class="gauge-value" id="heroGaugeVal">—</div>
           </div>
           <div class="gauge-label">Session Trust Score</div>
         </div>
@@ -90,8 +90,8 @@
       <div class="metrics-strip">
         <div class="metric-tile">
           <div class="metric-tile-title">Protected Sessions</div>
-          <div class="metric-tile-val">1</div>
-          <div class="metric-tile-note">Arena Engine (60 Hz)</div>
+          <div class="metric-tile-val" id="tileSessionsCount">0</div>
+          <div class="metric-tile-note">SDK Enrolled</div>
         </div>
         <div class="metric-tile">
           <div class="metric-tile-title">Threats Mitigated</div>
@@ -133,7 +133,7 @@
               <div class="check-label">Session Integrity</div>
               <div class="check-sub">Dynamic HMAC-SHA256 attestation tokens</div>
             </div>
-            <div class="check-status" id="chk-session-integrity">✓ Verified</div>
+            <div class="check-status" id="chk-session-integrity">⏳ Waiting for session</div>
           </div>
 
           <div class="checklist-item">
@@ -170,24 +170,10 @@
 
           <div id="recentActivityList">
             <div class="activity-item">
-              <div class="activity-icon">✓</div>
+              <div class="activity-icon">●</div>
               <div class="activity-content">
-                <div class="activity-title">Session Attested</div>
-                <div class="activity-time">Just now — Target session #1842 verified clean</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon">🔍</div>
-              <div class="activity-content">
-                <div class="activity-title">Integrity Verified</div>
-                <div class="activity-time">2 minutes ago — Binary .text hashes match authoritative baseline</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon">📊</div>
-              <div class="activity-content">
-                <div class="activity-title">Behavior Baseline Established</div>
-                <div class="activity-time">5 minutes ago — Operator aim angular jerk calibrated</div>
+                <div class="activity-title">Sentinel-X Agent Active</div>
+                <div class="activity-time">Just now — Process discovery daemon listening for registered games</div>
               </div>
             </div>
           </div>
@@ -248,7 +234,7 @@
               <div class="check-label">Lockless SPSC Telemetry Queue</div>
               <div class="check-sub">64-byte cache aligned ring buffer (15.14M ops/s)</div>
             </div>
-            <div class="check-status">✓ ZERO CONTETION</div>
+            <div class="check-status">✓ ZERO CONTENTION</div>
           </div>
         </section>
 
@@ -260,33 +246,13 @@
          ==================================================================== -->
     <div class="tab-content" id="tab-sessions">
       <section class="glass-card">
-        <div class="card-heading">Active Protected Session #1842</div>
+        <div class="card-heading">Active Protected Session Timeline</div>
         
-        <div class="timeline">
+        <div class="timeline" id="sessionTimeline">
           <div class="timeline-event">
             <div class="timeline-dot"></div>
-            <div class="timeline-time">12:41:02</div>
-            <div class="timeline-text">Target game process discovered (PID: 4420) — Sentinel-X Agent initiated</div>
-          </div>
-          <div class="timeline-event">
-            <div class="timeline-dot"></div>
-            <div class="timeline-time">12:41:03</div>
-            <div class="timeline-text">Platform attestation verified — Cryptographic session seed exchanged</div>
-          </div>
-          <div class="timeline-event">
-            <div class="timeline-dot"></div>
-            <div class="timeline-time">12:41:04</div>
-            <div class="timeline-text">Application binary verified — Authoritative baseline established</div>
-          </div>
-          <div class="timeline-event">
-            <div class="timeline-dot"></div>
-            <div class="timeline-time">12:41:05</div>
-            <div class="timeline-text">State Checkpoint Buffer armed (60 Hz Merkle root ring buffer)</div>
-          </div>
-          <div class="timeline-event">
-            <div class="timeline-dot"></div>
-            <div class="timeline-time">Ongoing</div>
-            <div class="timeline-text">Continuous multi-vector attestation active — Session Trust: 98.7%</div>
+            <div class="timeline-time">Agent Startup</div>
+            <div class="timeline-text">Process discovery engine armed — Monitoring system process table</div>
           </div>
         </div>
       </section>
@@ -296,9 +262,7 @@
          TAB 4: EVIDENCE (Technical Inspector for Judges)
          ==================================================================== -->
     <div class="tab-content" id="tab-evidence">
-      
       <div class="grid-2col">
-        
         <section class="glass-card">
           <div class="card-heading">Cryptographic Merkle State Ledger</div>
           <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
@@ -335,7 +299,6 @@
             <div class="check-status">1.33 ms [MEASURED]</div>
           </div>
         </section>
-
       </div>
     </div>
 
@@ -345,7 +308,7 @@
     <div class="tab-content" id="tab-game">
       <section class="glass-card" style="padding: 16px;">
         <div class="card-heading" style="padding: 0 8px 12px 8px;">
-          <span>Demonstration Target: Cyberpunk Arena #1842</span>
+          <span>Demonstration Target: Sentinel-X Cyber Arena</span>
           <span style="font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary);">WASD to Move | Mouse to Aim & Shoot</span>
         </div>
 
@@ -360,7 +323,18 @@
          ==================================================================== -->
     <div class="tab-content" id="tab-settings">
       <section class="glass-card">
-        <div class="card-heading">Agent Monitoring Profile</div>
+        <div class="card-heading">Registered Protected Games (Game Registry)</div>
+        <div id="registeredGamesList">
+          <div class="checklist-item">
+            <div>
+              <div class="check-label"><strong>Sentinel-X Arena</strong> (sx-arena)</div>
+              <div class="check-sub">Version: 1.0.0 | Hash: <code>d41d8cd98f00b204...</code></div>
+            </div>
+            <div class="check-status">✓ REGISTERED</div>
+          </div>
+        </div>
+
+        <div class="card-heading" style="margin-top: 24px;">Agent Monitoring Profile</div>
         <div style="display: flex; gap: 16px; align-items: center;">
           <label style="font-size: 14px; color: var(--text-secondary);">Active Profile:</label>
           <select id="profileSelector" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 14px; border-radius: 8px; font-family: var(--font-sans);">
@@ -384,7 +358,7 @@
 
           <div id="devSimulationSection">
             <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 12px;">
-              These controls are demonstration tools to inject synthetic anomalies and observe autonomous mitigation.
+              These controls inject synthetic anomalies into the <strong>active protected session</strong> to observe autonomous mitigation.
             </div>
 
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -409,6 +383,7 @@
   </main>
 
   <!-- Scripts -->
+  <script src="sdk/js/sentinel_x_sdk.js"></script>
   <script src="js/polymorphic_crypto.js"></script>
   <script src="js/security_agent.js"></script>
   <script src="js/exploit_console.js"></script>

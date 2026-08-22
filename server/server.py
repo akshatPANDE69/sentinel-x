@@ -9,14 +9,23 @@ from aiohttp import web
 
 from server.engine.game_server import AuthoritativeGameServer
 from server.security.crypto_engine import PolymorphicCryptoEngine
+from server.registry.game_registry import GameRegistry
+from server.session.session_manager import SessionManager, SessionState
+from agent.sentinel_agent import SentinelXAgent, AgentState
 
 class SentinelServer:
     def __init__(self, host="127.0.0.1", port=8080):
         self.host = host
         self.port = port
         self.app = web.Application()
+        
+        # Core Platform Modules
+        self.game_registry = GameRegistry()
+        self.session_manager = SessionManager(self.game_registry)
         self.game_engine = AuthoritativeGameServer(tick_rate=60)
         self.crypto_engine = PolymorphicCryptoEngine()
+        self.agent = SentinelXAgent(server_url=f"http://{host}:{port}")
+        
         self.connected_game_clients = set()
         self.connected_soc_clients = set()
         
@@ -30,7 +39,17 @@ class SentinelServer:
         self.app.router.add_get("/ws/game", self.handle_game_ws)
         self.app.router.add_get("/ws/soc", self.handle_soc_ws)
         
-        # REST API Endpoints
+        # Game Registration & Discovery REST APIs
+        self.app.router.add_post("/api/games/register", self.handle_game_register)
+        self.app.router.add_get("/api/games/list", self.handle_games_list)
+        
+        # Session Management & Attestation REST APIs
+        self.app.router.add_post("/api/sessions/create", self.handle_session_create)
+        self.app.router.add_post("/api/attest/verify", self.handle_attest_verify)
+        self.app.router.add_post("/api/sessions/heartbeat", self.handle_session_heartbeat)
+        self.app.router.add_get("/api/agent/status", self.handle_agent_status)
+        
+        # Security & Simulation APIs
         self.app.router.add_post("/api/exploit/inject", self.handle_exploit_inject)
         self.app.router.add_post("/api/recovery/trigger", self.handle_recovery_trigger)
         self.app.router.add_post("/api/kernel/scan_simd", self.handle_kernel_simd_scan)
@@ -48,6 +67,83 @@ class SentinelServer:
         public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public"))
         return web.FileResponse(os.path.join(public_dir, "index.html"))
 
+    async def handle_game_register(self, request):
+        body = await request.json()
+        game_id = body.get("game_id")
+        name = body.get("name")
+        version = body.get("version", "1.0.0")
+        platforms = body.get("platforms", ["macos", "windows"])
+        exe_hash = body.get("executable_hash", "")
+        pubkey = body.get("developer_public_key", "")
+        
+        if not game_id or not name:
+            return web.json_response({"success": False, "error": "MISSING_REQUIRED_FIELDS"}, status=400)
+            
+        reg = self.game_registry.register_game(game_id, name, version, platforms, exe_hash, developer_public_key=pubkey)
+        return web.json_response({"success": True, "game": reg.to_dict()})
+
+    async def handle_games_list(self, request):
+        games = self.game_registry.list_games()
+        return web.json_response({"success": True, "games": games})
+
+    async def handle_session_create(self, request):
+        body = await request.json()
+        game_id = body.get("game_id", "sx-arena")
+        proc_id = body.get("process_id", 4420)
+        
+        session, err = self.session_manager.create_session(game_id, proc_id)
+        if not session:
+            return web.json_response({"success": False, "error": err}, status=400)
+            
+        self.agent.bind_session(session.session_id)
+        
+        return web.json_response({
+            "success": True,
+            "session": session.to_dict(),
+            "session_key": session.session_key,
+            "challenge": {
+                "nonce": session.active_challenge_nonce
+            }
+        })
+
+    async def handle_attest_verify(self, request):
+        body = await request.json()
+        session_id = body.get("session_id")
+        bundle = body.get("measurement_bundle", {})
+        sig = body.get("signature", "")
+        
+        ok, reason = self.session_manager.attest_session(session_id, bundle, sig)
+        if not ok:
+            return web.json_response({"success": False, "error": reason}, status=403)
+            
+        sess = self.session_manager.get_session(session_id)
+        return web.json_response({"success": True, "session": sess.to_dict() if sess else {}})
+
+    async def handle_session_heartbeat(self, request):
+        body = await request.json()
+        session_id = body.get("session_id")
+        seq_id = body.get("seq_id", 0)
+        digest = body.get("integrity_digest", "")
+        
+        ok, reason = self.session_manager.record_heartbeat(session_id, seq_id, digest)
+        sess = self.session_manager.get_session(session_id)
+        policy_action = sess.policy_action if sess else "QUARANTINE"
+        
+        return web.json_response({
+            "success": ok,
+            "error": reason if not ok else None,
+            "policy_action": policy_action,
+            "trust_score": sess.trust_score if sess else 0.0
+        })
+
+    async def handle_agent_status(self, request):
+        active_sess = self.session_manager.get_active_session()
+        return web.json_response({
+            "agent_state": self.agent.state,
+            "active_session": active_sess.to_dict() if active_sess else None,
+            "registered_games_count": len(self.game_registry.list_games())
+        })
+
     async def broadcast_game_message(self, msg_dict):
         if not self.connected_game_clients:
             return
@@ -61,6 +157,17 @@ class SentinelServer:
     async def broadcast_soc_message(self, msg_dict):
         if not self.connected_soc_clients:
             return
+        # Append real session manager state
+        active_sess = self.session_manager.get_active_session()
+        if active_sess:
+            msg_dict["session_id"] = active_sess.session_id
+            msg_dict["game_id"] = active_sess.game_id
+            msg_dict["attestation_verified"] = active_sess.attestation_verified
+            msg_dict["policy_action"] = active_sess.policy_action
+        else:
+            msg_dict["session_id"] = None
+            msg_dict["game_id"] = None
+
         payload = json.dumps(msg_dict)
         for ws in list(self.connected_soc_clients):
             try:
@@ -72,6 +179,8 @@ class SentinelServer:
         ws = web.WebSocketResponse()
         await ws.prepare(request)
         
+        # Check active session or create binding
+        active_sess = self.session_manager.get_active_session()
         player_id = f"op-{id(ws) % 10000}"
         player = self.game_engine.add_player(player_id, name="CYBER_OPERATOR_01")
         self.connected_game_clients.add(ws)
@@ -79,6 +188,7 @@ class SentinelServer:
         await ws.send_str(json.dumps({
             "type": "HANDSHAKE_ACK",
             "player_id": player_id,
+            "session_id": active_sess.session_id if active_sess else None,
             "player": player.to_dict(),
             "arena": {
                 "width": self.game_engine.width,
@@ -104,6 +214,9 @@ class SentinelServer:
                                 pass
                     elif mtype == "RECOVERY_RESPONSE":
                         res = self.game_engine.recovery_engine.process_client_re_attestation(player, data.get("payload", {}))
+                        if active_sess:
+                            active_sess.state = SessionState.RESTORED
+                            active_sess.trust_score = 1.0
                         await ws.send_str(json.dumps({
                             "type": "RECOVERY_RESULT",
                             "payload": res
@@ -120,16 +233,22 @@ class SentinelServer:
         ws = web.WebSocketResponse()
         await ws.prepare(request)
         self.connected_soc_clients.add(ws)
-        
         try:
             async for msg in ws:
                 pass
         finally:
             self.connected_soc_clients.discard(ws)
-            
         return ws
 
     async def handle_exploit_inject(self, request):
+        active_sess = self.session_manager.get_active_session()
+        if not active_sess:
+            return web.json_response({
+                "success": False,
+                "error": "NO_ACTIVE_PROTECTED_SESSION",
+                "message": "Start a registered protected game session first."
+            }, status=400)
+
         body = await request.json()
         cheat_type = body.get("cheat_type")
         enabled = body.get("enabled", True)
@@ -139,19 +258,24 @@ class SentinelServer:
             self.game_engine.trigger_cheat_injection(human.id, cheat_type, enabled)
             return web.json_response({
                 "success": True,
+                "session_id": active_sess.session_id,
                 "player_id": human.id,
                 "cheat_type": cheat_type,
                 "enabled": enabled
             })
-        return web.json_response({"success": False, "error": "NO_ACTIVE_PLAYER"})
+        return web.json_response({"success": False, "error": "NO_ACTIVE_PLAYER"}, status=400)
 
     async def handle_recovery_trigger(self, request):
+        active_sess = self.session_manager.get_active_session()
         human = next((p for p in self.game_engine.players.values() if not p.is_bot), None)
         if human:
             rec = self.game_engine.recovery_engine.initiate_recovery(human, trigger_reason="MANUAL_SOC_OVERRIDE")
             res = self.game_engine.recovery_engine.process_client_re_attestation(human, {"auto_validate": True})
+            if active_sess:
+                active_sess.state = SessionState.RESTORED
+                active_sess.trust_score = 1.0
             return web.json_response({"success": True, "recovery_result": res})
-        return web.json_response({"success": False, "error": "NO_ACTIVE_PLAYER"})
+        return web.json_response({"success": False, "error": "NO_ACTIVE_PLAYER"}, status=400)
 
     async def handle_kernel_simd_scan(self, request):
         res = self.game_engine.run_simd_scan()
@@ -201,15 +325,18 @@ class SentinelServer:
         site = web.TCPSite(runner, self.host, self.port)
         await site.start()
         print(f"\n=======================================================")
-        print(f"  SENTINEL-X ZERO-TRUST GAME INTEGRITY PLATFORM ONLINE ")
+        print(f"  SENTINEL-X ZERO-TRUST GAME INTEGRITY SERVER ONLINE   ")
         print(f"  URL: http://{self.host}:{self.port}")
-        print(f"  Serving Game Arena, Exploit Suite & SOC Dashboard directly at /")
+        print(f"  Game Registry: Registered Games Loaded")
         print(f"=======================================================\n")
         
         asyncio.create_task(self.game_engine.run_loop())
+        asyncio.create_task(self.agent.start())
         
         while True:
-            await asyncio.sleep(3600)
+            # Check heartbeat timeouts
+            self.session_manager.check_timeouts()
+            await asyncio.sleep(1.0)
 
 if __name__ == "__main__":
     server = SentinelServer(host="127.0.0.1", port=8080)
