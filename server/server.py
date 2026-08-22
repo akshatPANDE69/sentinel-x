@@ -4,6 +4,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import asyncio
 import json
+import subprocess
 from aiohttp import web
 
 from server.engine.game_server import AuthoritativeGameServer
@@ -25,9 +26,11 @@ class SentinelServer:
         self.game_engine.soc_callbacks.append(self.broadcast_soc_message)
 
     def _setup_routes(self):
+        # WebSockets
         self.app.router.add_get("/ws/game", self.handle_game_ws)
         self.app.router.add_get("/ws/soc", self.handle_soc_ws)
         
+        # REST API Endpoints
         self.app.router.add_post("/api/exploit/inject", self.handle_exploit_inject)
         self.app.router.add_post("/api/recovery/trigger", self.handle_recovery_trigger)
         self.app.router.add_post("/api/kernel/scan_simd", self.handle_kernel_simd_scan)
@@ -36,8 +39,14 @@ class SentinelServer:
         self.app.router.add_get("/api/state/checkpoints", self.handle_get_checkpoints)
         self.app.router.add_get("/api/arena/obstacles", self.handle_get_obstacles)
         
+        # Root index route and static assets
         public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public"))
-        self.app.router.add_static("/", public_dir, show_index=True)
+        self.app.router.add_get("/", self.handle_index)
+        self.app.router.add_static("/", public_dir, show_index=False)
+
+    async def handle_index(self, request):
+        public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public"))
+        return web.FileResponse(os.path.join(public_dir, "index.html"))
 
     async def broadcast_game_message(self, msg_dict):
         if not self.connected_game_clients:
@@ -86,7 +95,6 @@ class SentinelServer:
                     if mtype == "PLAYER_INPUT":
                         self.game_engine.queue_input(player_id, data.get("payload", {}))
                     elif mtype == "ENCRYPTED_TELEMETRY":
-                        # Decrypt polymorphic wire packet
                         plain_json, status = self.crypto_engine.decrypt_payload(data)
                         if plain_json:
                             try:
@@ -145,23 +153,24 @@ class SentinelServer:
             return web.json_response({"success": True, "recovery_result": res})
         return web.json_response({"success": False, "error": "NO_ACTIVE_PLAYER"})
 
+    async def handle_kernel_simd_scan(self, request):
+        res = self.game_engine.run_simd_scan()
+        return web.json_response({"success": True, "simd_scan": res})
+
     async def handle_spsc_stress_test(self, request):
         spsc_bin = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "agent", "native", "spsc_benchmark"))
         result = {"status": "OK", "events_processed": 10000000, "elapsed_ms": 660.2, "throughput_m_ops": 15.14, "zero_dropped_frames": True}
         try:
             if os.path.exists(spsc_bin):
                 out = subprocess.check_output([spsc_bin], timeout=3.0)
-                import json
                 result = json.loads(out.decode('utf-8'))
         except Exception:
             pass
         return web.json_response({"success": True, "spsc_metrics": result})
 
     async def handle_crypto_test_tamper(self, request):
-        # Simulate an attacker sniffing wire traffic and tampering with encrypted bytes
         body = await request.json()
         raw_b64 = body.get("payload_b64", "QUJDREVGR0hJSktMTU5PUA==")
-        # Attempt decryption of tampered packet
         plain, err = self.crypto_engine.decrypt_payload({
             "seq": 999,
             "ts": 1700000000000,
@@ -170,7 +179,6 @@ class SentinelServer:
         })
         human = next((p for p in self.game_engine.players.values() if not p.is_bot), None)
         if human and plain is None:
-            # Penalize player for packet tampering
             self.game_engine.trigger_cheat_injection(human.id, "memory_tamper", True)
         return web.json_response({
             "success": (plain is not None),
@@ -178,10 +186,6 @@ class SentinelServer:
             "error": err,
             "sniffer_detected": (plain is None)
         })
-
-    async def handle_kernel_simd_scan(self, request):
-        res = self.game_engine.run_simd_scan()
-        return web.json_response({"success": True, "simd_scan": res})
 
     async def handle_get_checkpoints(self, request):
         recent = self.game_engine.checkpoint_buffer.get_recent_summaries(limit=20)
@@ -199,7 +203,7 @@ class SentinelServer:
         print(f"\n=======================================================")
         print(f"  SENTINEL-X ZERO-TRUST GAME INTEGRITY PLATFORM ONLINE ")
         print(f"  URL: http://{self.host}:{self.port}")
-        print(f"  Ring 0 Kernel Telemetry + SIMD Scanner Ready!")
+        print(f"  Serving Game Arena, Exploit Suite & SOC Dashboard directly at /")
         print(f"=======================================================\n")
         
         asyncio.create_task(self.game_engine.run_loop())
