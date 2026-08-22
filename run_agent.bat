@@ -8,12 +8,6 @@ echo =======================================================
 echo        STARTING SENTINEL-X SECURITY AGENT              
 echo =======================================================
 
-echo [+] Checking for stale processes on port 8080...
-for /f "tokens=5" %%a in ('netstat -aon 2^>nul ^| findstr :8080 ^| findstr LISTENING') do (
-    echo [+] Stopping stale server process PID %%a...
-    taskkill /F /PID %%a >nul 2>&1
-)
-
 echo.
 echo =======================================================
 echo   SELECT TARGET APPLICATION / GAME TO PROTECT:
@@ -37,8 +31,11 @@ if "%GAME_CHOICE%"=="4" (
 echo.
 echo [+] Target application confirmed!
 echo [+] Starting Local Authoritative Server and Security Console...
-echo [+] Opening http://127.0.0.1:8080/ in your default browser...
-
-start http://127.0.0.1:8080/
 
 python server\server.py
+
+if %ERRORLEVEL% neq 0 (
+    echo.
+    echo [!] Server encountered an issue.
+    pause
+)
