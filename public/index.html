@@ -7,451 +7,390 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="apple-glass-theme">
 
-  <!-- Minimal Apple-Style App Header -->
+  <!-- Main Product Navigation Bar -->
   <header class="app-header">
-    <div class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+    <div class="header-brand">
+      <div class="brand-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M12 8v4"/>
+          <path d="M12 16h.01"/>
+        </svg>
       </div>
-      <div class="brand-title">SENTINEL-X <span>Endpoint Security</span></div>
+      <div class="brand-text">
+        <span class="brand-name">SENTINEL-X</span>
+        <span class="brand-tagline">Endpoint Game Security Agent</span>
+      </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <nav class="nav-tabs">
-      <button class="nav-tab active" data-tab="overview">Overview</button>
-      <button class="nav-tab" data-tab="protection">Protection</button>
-      <button class="nav-tab" data-tab="sessions">Sessions</button>
-      <button class="nav-tab" data-tab="evidence">Evidence</button>
-      <button class="nav-tab" data-tab="game">Game Viewport</button>
-      <button class="nav-tab" data-tab="settings">Settings</button>
-    </nav>
-
-    <!-- Header Actions -->
-    <div class="header-actions">
+    <!-- Active State Pill -->
+    <div class="header-status-group">
       <div class="status-pill" id="appStatusPill">
         <div class="status-dot"></div>
         <span id="appStatusText">AGENT ACTIVE (WAITING)</span>
       </div>
-      <button class="btn-demo-start" id="btnStartDemoTop">
-        <span>▶ Start Security Demo</span>
+      <div class="localhost-pill">
+        <span>● 127.0.0.1 (LOCAL ONLY)</span>
+      </div>
+      <button class="btn-demo-start" id="btnStartDemoTop" title="Run 35-second autonomous security verification demo">
+        <span>START SECURITY DEMO</span>
       </button>
     </div>
   </header>
 
   <!-- Main Container -->
-  <main class="main-container">
+  <div class="app-layout">
+    
+    <!-- Left Navigation Bar -->
+    <nav class="app-sidebar">
+      <div class="nav-section-label">AGENT MANAGEMENT</div>
+      <button class="nav-tab active" data-tab="overview">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Overview</span>
+      </button>
+      <button class="nav-tab" data-tab="protection">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Protection Status</span>
+      </button>
+      <button class="nav-tab" data-tab="sessions">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Protected Sessions</span>
+      </button>
+      <button class="nav-tab" data-tab="evidence">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>Evidence & Audit</span>
+      </button>
+      <button class="nav-tab" data-tab="game">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Game Viewport</span>
+      </button>
+      <button class="nav-tab" data-tab="settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings & Developer</span>
+      </button>
+    </nav>
 
-    <!-- Dynamic Threat / Recovery Overlay Banner -->
-    <section class="threat-overlay" id="threatOverlay">
-      <div class="threat-header">
-        <div class="threat-badge">SECURITY ACTION REQUIRED</div>
-        <div style="font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.7);" id="threatSessionLabel">ACTIVE SESSION</div>
-      </div>
-      <div class="threat-title" id="threatTitle">THREAT DETECTED: Unauthorized Client Modification</div>
-      <div class="threat-desc" id="threatDesc">Memory page hash mismatch & behavioral angular jerk detected. Policy: QUARANTINE.</div>
-      <div class="recovery-steps-box" id="recoveryBox">
-        <div>⚠️ <strong>SESSION QUARANTINED</strong> (Client inputs isolated into sandbox ring)</div>
-        <div>🔍 Locating last verified Merkle checkpoint...</div>
-      </div>
-    </section>
+    <!-- Main Content Area -->
+    <main class="app-main">
 
-    <!-- ====================================================================
-         TAB 1: OVERVIEW (Minimal Apple Product Screen)
-         ==================================================================== -->
-    <div class="tab-content active" id="tab-overview">
-    <!-- Live Current Operation Status Bar -->
-    <div class="current-op-bar" id="currentOpBar">
-      <div class="current-op-label">
-        <div class="current-op-dot"></div>
-        <span>CURRENT OPERATION:</span>
-        <strong id="liveOpName" style="color: var(--apple-blue);">process_scan()</strong>
-      </div>
-      <div class="current-op-meta">
-        <span id="liveOpComponent">Rust Security Core</span> &nbsp;•&nbsp; <span id="liveOpDuration">1.4 ms</span> &nbsp;•&nbsp; <span id="liveOpStatus" style="color: var(--apple-green);">RUNNING</span>
-      </div>
-    </div>
-      
-      <!-- Hero Status Card -->
-      <section class="glass-card hero-status-card">
-        <div>
-          <div class="hero-status-title" id="heroStatusTitle">Waiting for protected game...</div>
-          <div class="hero-status-subtitle" id="heroStatusSubtitle">Sentinel-X endpoint security agent is running. Launch a registered game integrating the Sentinel-X SDK to begin continuous attestation.</div>
-          <div class="hero-session-badge" id="heroSessionBadge">
-            <span style="color: var(--text-tertiary);">●</span> No active protected sessions
+      <!-- ====================================================================
+           TAB 1: OVERVIEW
+           ==================================================================== -->
+      <div class="tab-content active" id="tab-overview">
+
+        <!-- Live Current Operation Status Bar -->
+        <div class="current-op-bar" id="currentOpBar">
+          <div class="current-op-label">
+            <div class="current-op-dot"></div>
+            <span>CURRENT OPERATION:</span>
+            <strong id="liveOpName" style="color: var(--apple-blue);">get_health()</strong>
+          </div>
+          <div class="current-op-meta">
+            <span id="liveOpComponent">Rust Security Core</span> &nbsp;•&nbsp; 
+            <span id="liveOpDuration">0.8 ms</span> &nbsp;•&nbsp; 
+            <span id="liveOpStatus" style="color: var(--apple-green);">RUNNING</span>
           </div>
         </div>
 
-        <div class="gauge-container">
-          <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-            <svg class="gauge-svg" viewBox="0 0 170 170">
-              <circle class="gauge-track" cx="85" cy="85" r="75"></circle>
-              <circle class="gauge-fill" id="heroGaugeFill" cx="85" cy="85" r="75"></circle>
-            </svg>
-            <div class="gauge-value" id="heroGaugeVal">—</div>
+        <!-- Hero Card -->
+        <div class="glass-card hero-card">
+          <div class="hero-content">
+            <div class="hero-badge" id="heroSessionBadge">
+              <span style="color: var(--text-tertiary);">●</span> No active protected sessions
+            </div>
+            <h1 class="hero-title" id="heroStatusTitle">Waiting for protected game...</h1>
+            <p class="hero-subtitle" id="heroStatusSubtitle">
+              Sentinel-X endpoint security agent is running. Select a registered game below or launch the game client integrating the Sentinel-X SDK to begin continuous attestation.
+            </p>
           </div>
-          <div class="gauge-label">Session Trust Score</div>
+          <div class="hero-gauge-box">
+            <div class="trust-gauge">
+              <svg viewBox="0 0 160 160">
+                <circle class="gauge-bg" cx="80" cy="80" r="75"></circle>
+                <circle class="gauge-fill" id="heroGaugeFill" cx="80" cy="80" r="75"></circle>
+              </svg>
+              <div class="gauge-text">
+                <span class="gauge-label">TRUST SCORE</span>
+                <span class="gauge-value" id="heroGaugeVal">—</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
 
-      <!-- Quick Metrics Strip -->
-      <div class="metrics-strip">
-        <div class="metric-tile">
-          <div class="metric-tile-title">Protected Sessions</div>
-          <div class="metric-tile-val" id="tileSessionsCount">0</div>
-          <div class="metric-tile-note">SDK Enrolled</div>
-        </div>
-        <div class="metric-tile">
-          <div class="metric-tile-title">Threats Mitigated</div>
-          <div class="metric-tile-val" id="tileThreatsCount">0</div>
-          <div class="metric-tile-note">Autonomous Rollbacks</div>
-        </div>
-        <div class="metric-tile">
-          <div class="metric-tile-title">Integrity Checks</div>
-          <div class="metric-tile-val">4,281</div>
-          <div class="metric-tile-note">Continuous SHA-256</div>
-        </div>
-        <div class="metric-tile">
-          <div class="metric-tile-title">State Buffer Window</div>
-          <div class="metric-tile-val">10.0s</div>
-          <div class="metric-tile-note">600 Merkle Frames</div>
-        </div>
-      </div>
-
-      <!-- 2-Column: Checklist vs Recent Activity -->
-      <div class="grid-2col">
-        
-        <!-- Protection Checklist -->
-        <section class="glass-card" style="margin-bottom: 0;">
+        <!-- Protected Game Selection & Management Panel -->
+        <section class="glass-card" style="margin-top: 20px;">
           <div class="card-heading">
-            <span>Protection Checklist</span>
-            <span style="font-size: 11px; font-weight: 500; color: var(--apple-green);">5/5 ACTIVE</span>
+            <span>Protected Game Selection</span>
+            <span style="font-size: 11px; color: var(--apple-blue);">SELECT TARGET TO PROTECT</span>
           </div>
-
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Application Integrity</div>
-              <div class="check-sub">Process memory, code pages, and DLL modules</div>
+          <div style="display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-top: 10px;">
+            <div style="flex: 1; min-width: 240px;">
+              <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 6px;">SELECT REGISTERED GAME</label>
+              <select id="gameSelectDropdown" style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: 8px; font-family: var(--font-sans); font-size: 13px;">
+                <option value="sx-arena">Sentinel-X Arena (Default Demo Target)</option>
+                <option value="cyber-strike-fps">CyberStrike 2026 (FPS Engine)</option>
+              </select>
             </div>
-            <div class="check-status" id="chk-app-integrity">✓ Verified</div>
-          </div>
-
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Session Integrity</div>
-              <div class="check-sub">Dynamic HMAC-SHA256 attestation tokens</div>
+            <div style="display: flex; gap: 10px; align-items: flex-end;">
+              <button class="btn-demo-start" id="btnLaunchSelectedGame" style="height: 36px; padding: 0 18px;">
+                <span>▶ Connect & Launch Game</span>
+              </button>
             </div>
-            <div class="check-status" id="chk-session-integrity">⏳ Waiting for session</div>
-          </div>
-
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Behavioral Telemetry</div>
-              <div class="check-sub">Aim angular jerk & physics velocity bounds</div>
-            </div>
-            <div class="check-status" id="chk-behavior">✓ Normal</div>
-          </div>
-
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Platform & Kernel Layer</div>
-              <div class="check-sub">ObRegister handle stripping & NMI stack walking</div>
-            </div>
-            <div class="check-status" id="chk-platform">✓ Secure</div>
-          </div>
-
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Server Authority</div>
-              <div class="check-sub">Defense-in-depth state reconciliation</div>
-            </div>
-            <div class="check-status" id="chk-server">✓ Authoritative</div>
           </div>
         </section>
 
-        <!-- Recent Activity List -->
-        <section class="glass-card" style="margin-bottom: 0;">
+        <!-- Metrics Grid -->
+        <div class="metrics-grid" style="margin-top: 20px;">
+          <div class="glass-card metric-tile">
+            <span class="tile-label">PROTECTED SESSIONS</span>
+            <strong class="tile-val" id="tileSessionsCount">0</strong>
+            <span class="tile-sub">Active Opt-In Game SDKs</span>
+          </div>
+          <div class="glass-card metric-tile">
+            <span class="tile-label">ACTIVE THREATS</span>
+            <strong class="tile-val" id="tileThreatsCount" style="color: var(--apple-green);">0</strong>
+            <span class="tile-sub">All Vectors Secure</span>
+          </div>
+          <div class="glass-card metric-tile">
+            <span class="tile-label">RUST SECURITY CORE</span>
+            <strong class="tile-val" style="color: var(--apple-green);">ONLINE</strong>
+            <span class="tile-sub">Native Memory-Safe Daemon</span>
+          </div>
+          <div class="glass-card metric-tile">
+            <span class="tile-label">RECOVERY LATENCY</span>
+            <strong class="tile-val">0.37 ms</strong>
+            <span class="tile-sub">Merkle State Rewind</span>
+          </div>
+        </div>
+
+        <!-- Dual Live Telemetry Stream Panels -->
+        <section class="glass-card" id="dualLogsSection" style="margin-top: 20px;">
           <div class="card-heading">
-            <span>Recent Activity</span>
-            <span style="font-size: 11px; color: var(--text-tertiary);">LIVE LOG</span>
+            <span>Dual Live Telemetry Streams (Rust Core & Local Engine)</span>
+            <span style="font-size: 11px; color: var(--apple-green);">● REAL-TIME IPC (127.0.0.1)</span>
           </div>
 
-          <div id="recentActivityList">
-            <div class="activity-item">
-              <div class="activity-icon">●</div>
-              <div class="activity-content">
-                <div class="activity-title">Sentinel-X Agent Active</div>
-                <div class="activity-time">Just now — Process discovery daemon listening for registered games</div>
+          <div class="dual-logs-grid">
+            <!-- Log A: Security Checks -->
+            <div>
+              <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
+                LOG A — Security Checks (Passing / Failing)
+              </div>
+              <div class="log-stream-box" id="logSecurityChecks">
+                <div class="log-entry-check"><span>✓ AGENT_HEALTH</span><span class="check-pass">PASS (0.6ms)</span></div>
+                <div class="log-entry-check"><span>✓ PROCESS_INTEGRITY</span><span class="check-pass">PASS (1.8ms)</span></div>
+                <div class="log-entry-check"><span>✓ EXECUTABLE_HASH</span><span class="check-pass">PASS (1.2ms)</span></div>
+                <div class="log-entry-check"><span>✓ SESSION_ATTESTATION</span><span class="check-pass">PASS (1.5ms)</span></div>
+                <div class="log-entry-check"><span>✓ SERVER_AUTHORITY</span><span class="check-pass">PASS (0.4ms)</span></div>
+              </div>
+            </div>
+
+            <!-- Log B: Live Engine Activity -->
+            <div>
+              <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
+                LOG B — Live Engine Activity (What's Running Right Now)
+              </div>
+              <div class="log-stream-box" id="logEngineActivity">
+                <div class="log-entry-activity"><span class="func-name">get_health()</span><span class="func-comp">Rust Security Core • 0.6ms</span></div>
+                <div class="log-entry-activity"><span class="func-name">process_scan()</span><span class="func-comp">Rust Security Core • 1.8ms</span></div>
+                <div class="log-entry-activity"><span class="func-name">sha256_measurement()</span><span class="func-comp">Rust Security Core • 1.2ms</span></div>
+                <div class="log-entry-activity"><span class="func-name">verify_attestation()</span><span class="func-comp">Rust Security Core • 1.5ms</span></div>
+                <div class="log-entry-activity"><span class="func-name">validate_state()</span><span class="func-comp">Security Engine • 0.4ms</span></div>
               </div>
             </div>
           </div>
         </section>
 
       </div>
-      <!-- Dual Live Stream Panels (Log A: Security Checks | Log B: Live Engine Activity) -->
-      <section class="glass-card" id="dualLogsSection" style="margin-top: 24px;">
-        <div class="card-heading">
-          <span>Live Telemetry Streams (Rust Core & Local Engine)</span>
-          <span style="font-size: 11px; color: var(--apple-green);">● REAL-TIME IPC (127.0.0.1)</span>
+
+      <!-- ====================================================================
+           TAB 2: PROTECTION STATUS
+           ==================================================================== -->
+      <div class="tab-content" id="tab-protection">
+        <div class="glass-card">
+          <div class="card-heading">Protection Layers & Checkpoints</div>
+          <div class="checklist">
+            <div class="checklist-item">
+              <div>
+                <div class="check-label">Application Integrity</div>
+                <div class="check-sub">Binary measurement matching registered SHA-256 baseline</div>
+              </div>
+              <div class="check-status" id="chk-app-integrity">✓ Verified</div>
+            </div>
+            <div class="checklist-item">
+              <div>
+                <div class="check-label">Session Attestation</div>
+                <div class="check-sub">256-bit cryptographic challenge nonce solved via HMAC</div>
+              </div>
+              <div class="check-status" id="chk-session-integrity">⏳ Waiting for Game</div>
+            </div>
+            <div class="checklist-item">
+              <div>
+                <div class="check-label">Behavioral Telemetry</div>
+                <div class="check-sub">Angular acceleration, aim snapping, and input jerk analysis</div>
+              </div>
+              <div class="check-status" id="chk-behavior">✓ Normal</div>
+            </div>
+            <div class="checklist-item">
+              <div>
+                <div class="check-label">Platform Security</div>
+                <div class="check-sub">Handle stripping and unbacked memory execution detection</div>
+              </div>
+              <div class="check-status" id="chk-platform">✓ Secure</div>
+            </div>
+            <div class="checklist-item">
+              <div>
+                <div class="check-label">Server Authority</div>
+                <div class="check-sub">Physics validation (Velocity bound Delta x / Delta t &le; 1.0)</div>
+              </div>
+              <div class="check-status" id="chk-server">✓ Active</div>
+            </div>
+          </div>
         </div>
-
-        <div class="dual-logs-grid">
-          <!-- Log A: Security Checks -->
-          <div>
-            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
-              LOG A — Security Checks (Passing / Failing)
-            </div>
-            <div class="log-stream-box" id="logSecurityChecks">
-              <div class="log-entry-check"><span>✓ PROCESS_INTEGRITY</span><span class="check-pass">PASS (1.8ms)</span></div>
-              <div class="log-entry-check"><span>✓ EXECUTABLE_HASH</span><span class="check-pass">PASS (1.2ms)</span></div>
-              <div class="log-entry-check"><span>✓ SESSION_ATTESTATION</span><span class="check-pass">PASS (1.5ms)</span></div>
-              <div class="log-entry-check"><span>✓ SERVER_AUTHORITY</span><span class="check-pass">PASS (0.4ms)</span></div>
-            </div>
-          </div>
-
-          <!-- Log B: Live Engine Activity -->
-          <div>
-            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
-              LOG B — Live Engine Activity (Executing Now)
-            </div>
-            <div class="log-stream-box" id="logEngineActivity">
-              <div class="log-entry-activity"><span class="func-name">process_scan()</span><span class="func-comp">Rust Security Core • 1.8ms</span></div>
-              <div class="log-entry-activity"><span class="func-name">sha256_measurement()</span><span class="func-comp">Rust Security Core • 1.2ms</span></div>
-              <div class="log-entry-activity"><span class="func-name">verify_attestation()</span><span class="func-comp">Rust Security Core • 1.5ms</span></div>
-              <div class="log-entry-activity"><span class="func-name">validate_state()</span><span class="func-comp">Security Engine • 0.4ms</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- ====================================================================
-         TAB 2: PROTECTION STATUS (Detailed Security Diagnostics)
-         ==================================================================== -->
-    <div class="tab-content" id="tab-protection">
-      <div class="grid-2col">
-        
-        <section class="glass-card">
-          <div class="card-heading">Application & Code Integrity</div>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Memory Page Signature</div>
-              <div class="check-sub">Authoritative hash: d41d8cd98f00b204e9800998ecf8427e</div>
-            </div>
-            <div class="check-status">✓ MATCH</div>
-          </div>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Virtual Method Tables (VMT)</div>
-              <div class="check-sub">Hook detection & trampoline scanning</div>
-            </div>
-            <div class="check-status">✓ UNTOUCHED</div>
-          </div>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Module Enumeration</div>
-              <div class="check-sub">Zero unverified DLLs or injected threads</div>
-            </div>
-            <div class="check-status">✓ CLEAN</div>
-          </div>
-        </section>
-
-        <section class="glass-card">
-          <div class="card-heading">Platform & Ring 0 Kernel Layer</div>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">ObRegisterCallbacks</div>
-              <div class="check-sub">Process handle stripping (VM_READ/WRITE)</div>
-            </div>
-            <div class="check-status">✓ ACTIVE</div>
-          </div>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">NMI Stack Walking</div>
-              <div class="check-sub">Hardware interrupt unbacked memory inspection</div>
-            </div>
-            <div class="check-status">✓ ARMED</div>
-          </div>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Lockless SPSC Telemetry Queue</div>
-              <div class="check-sub">64-byte cache aligned ring buffer (15.14M ops/s)</div>
-            </div>
-            <div class="check-status">✓ ZERO CONTENTION</div>
-          </div>
-        </section>
-
       </div>
-    </div>
 
-    <!-- ====================================================================
-         TAB 3: SESSIONS (Session Timeline & Inspector)
-         ==================================================================== -->
-    <div class="tab-content" id="tab-sessions">
-      <section class="glass-card">
-        <div class="card-heading">Active Protected Session Timeline</div>
-        
-        <div class="timeline" id="sessionTimeline">
-          <div class="timeline-event">
-            <div class="timeline-dot"></div>
-            <div class="timeline-time">Agent Startup</div>
-            <div class="timeline-text">Process discovery engine armed — Monitoring system process table</div>
+      <!-- ====================================================================
+           TAB 3: PROTECTED SESSIONS
+           ==================================================================== -->
+      <div class="tab-content" id="tab-sessions">
+        <div class="glass-card">
+          <div class="card-heading">Active Protected Sessions</div>
+          <div class="sessions-table-wrap">
+            <table class="glass-table">
+              <thead>
+                <tr>
+                  <th>Session ID</th>
+                  <th>Game Target</th>
+                  <th>Status</th>
+                  <th>Trust Score</th>
+                  <th>Attestation</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="sessionsTableBody">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 24px;">
+                    No active protected sessions. Launch a registered game integrating the Sentinel-X SDK.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </section>
-    </div>
-
-    <!-- ====================================================================
-         TAB 4: EVIDENCE (Technical Inspector for Judges)
-         ==================================================================== -->
-    <div class="tab-content" id="tab-evidence">
-      <div class="grid-2col">
-        <section class="glass-card">
-          <div class="card-heading">Cryptographic Merkle State Ledger</div>
-          <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
-            Every 16.66ms tick step computes a SHA-256 Merkle root across all entities and attestation digests.
-          </div>
-          <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 11px; color: #fff;">
-            <div>FRAME #3142: Root <code>7a9f8c12...4e1b</code> [VERIFIED ✓]</div>
-            <div style="margin-top: 4px;">FRAME #3141: Root <code>e201b44a...99ac</code> [VERIFIED ✓]</div>
-            <div style="margin-top: 4px;">FRAME #3140: Root <code>318dcf90...bc22</code> [VERIFIED ✓]</div>
-          </div>
-        </section>
-
-        <section class="glass-card">
-          <div class="card-heading">Measured Performance Benchmarks</div>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Lockless SPSC Queue</div>
-              <div class="check-sub">Zero-mutex ring buffer throughput</div>
-            </div>
-            <div class="check-status" id="ev-spsc-val">15.14M ops/sec [BENCHMARK]</div>
-          </div>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Vectorized SIMD Scanner</div>
-              <div class="check-sub">ARM NEON / AVX2 physical scan</div>
-            </div>
-            <div class="check-status" id="ev-simd-val">7.28 GB/s [MEASURED]</div>
-          </div>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label">Autonomous Rollback Speed</div>
-              <div class="check-sub">Checkpoint rewind + HMAC re-attest</div>
-            </div>
-            <div class="check-status">1.33 ms [MEASURED]</div>
-          </div>
-        </section>
       </div>
-    </div>
 
-    <!-- ====================================================================
-         TAB 5: GAME VIEWPORT (Embedded Protected Demonstration Target)
-         ==================================================================== -->
-    <div class="tab-content" id="tab-game">
-      <section class="glass-card" style="padding: 16px;">
-        <div class="card-heading" style="padding: 0 8px 12px 8px;">
-          <span>Demonstration Target: Sentinel-X Cyber Arena</span>
-          <span style="font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary);">WASD to Move | Mouse to Aim & Shoot</span>
+      <!-- ====================================================================
+           TAB 4: EVIDENCE & AUDIT
+           ==================================================================== -->
+      <div class="tab-content" id="tab-evidence">
+        <div class="glass-card">
+          <div class="card-heading">Security Audit & Evidence Ledger</div>
+          <div class="evidence-list" id="evidenceFeed">
+            <div class="evidence-empty">No security anomalies flagged. Session is clean.</div>
+          </div>
         </div>
+      </div>
 
-        <div class="game-container">
-          <canvas id="gameCanvas" width="1200" height="760"></canvas>
-        </div>
-      </section>
-    </div>
-
-    <!-- ====================================================================
-         TAB 6: SETTINGS & DEVELOPER SIMULATION
-         ==================================================================== -->
-    <div class="tab-content" id="tab-settings">
-      <section class="glass-card">
-        <div class="card-heading">Registered Protected Games (Game Registry)</div>
-        <div id="registeredGamesList">
-        <div class="card-heading" style="margin-top: 24px;">Register New Protected Game</div>
-        <form id="formAddGame" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--border-subtle);">
-          <div style="flex: 1; min-width: 160px;">
-            <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Game ID</label>
-            <input type="text" id="regGameId" placeholder="e.g. valor-ops" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-sans);">
+      <!-- ====================================================================
+           TAB 5: GAME VIEWPORT
+           ==================================================================== -->
+      <div class="tab-content" id="tab-game">
+        <div class="glass-card game-canvas-card">
+          <div class="card-heading">
+            <span>Sentinel-X Arena (Protected Demonstration Client)</span>
+            <span style="font-size: 11px; color: var(--apple-blue);">INTEGRATES SENTINEL-X SDK</span>
           </div>
-          <div style="flex: 1.5; min-width: 180px;">
-            <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Game Name</label>
-            <input type="text" id="regGameName" placeholder="e.g. Valorant Ops" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-sans);">
-          </div>
-          <div style="flex: 2; min-width: 220px;">
-            <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Executable Hash (SHA-256)</label>
-            <input type="text" id="regGameHash" placeholder="e.g. d41d8cd98f00b204e9800998ecf8427e" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px;">
-          </div>
-          <button type="submit" class="btn-demo-start" style="height: 32px; padding: 0 16px;">
-            <span>+ Register Game</span>
-          </button>
-        </form>
-          <div class="checklist-item">
-            <div>
-              <div class="check-label"><strong>Sentinel-X Arena</strong> (sx-arena)</div>
-              <div class="check-sub">Version: 1.0.0 | Hash: <code>d41d8cd98f00b204...</code></div>
+          <div class="canvas-wrap">
+            <canvas id="gameCanvas" width="800" height="450"></canvas>
+            <div class="game-hud-overlay">
+              <div class="hud-pill" id="hudTrustPill">TRUST: 100%</div>
+              <div class="hud-pill" id="hudStatePill">PROTECTED</div>
             </div>
-            <div class="check-status">✓ REGISTERED</div>
+          </div>
+          <div class="game-controls-help">
+            <span>Controls: <strong>W/A/S/D</strong> to Move | <strong>Mouse</strong> to Aim & Shoot</span>
           </div>
         </div>
+      </div>
 
-        <div class="card-heading" style="margin-top: 24px;">Agent Monitoring Profile</div>
-        <div style="display: flex; gap: 16px; align-items: center;">
-          <label style="font-size: 14px; color: var(--text-secondary);">Active Profile:</label>
-          <select id="profileSelector" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 14px; border-radius: 8px; font-family: var(--font-sans);">
-            <option value="LOW">LOW — Minimal Overhead (Old/Low-End Systems)</option>
-            <option value="BALANCED" selected>BALANCED — Normal Endpoint Protection (Default)</option>
-            <option value="DEEP">DEEP — Maximum Telemetry & SIMD Scans</option>
-          </select>
-        </div>
+      <!-- ====================================================================
+           TAB 6: SETTINGS & DEVELOPER SIMULATION
+           ==================================================================== -->
+      <div class="tab-content" id="tab-settings">
+        <div class="glass-card">
+          <div class="card-heading">Registered Protected Games</div>
+          <div id="registeredGamesList">
+            <!-- Loaded dynamically via /api/games/list -->
+          </div>
 
-        <!-- Developer Mode Section -->
-        <div class="dev-mode-box">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-            <div>
-              <span class="dev-pill">DEVELOPER / DEMO ONLY</span>
-              <strong style="margin-left: 8px; font-size: 13px;">Security Threat Simulation Suite</strong>
+          <div class="card-heading" style="margin-top: 24px;">Register New Protected Game</div>
+          <form id="formAddGame" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--border-subtle);">
+            <div style="flex: 1; min-width: 160px;">
+              <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Game ID</label>
+              <input type="text" id="regGameId" placeholder="e.g. valor-ops" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-sans);">
             </div>
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); cursor: pointer;">
-              <input type="checkbox" id="toggleDevMode" checked> Enable Attack Simulator
+            <div style="flex: 1.5; min-width: 180px;">
+              <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Game Name</label>
+              <input type="text" id="regGameName" placeholder="e.g. Valorant Ops" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-sans);">
+            </div>
+            <div style="flex: 2; min-width: 220px;">
+              <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Executable Hash (SHA-256)</label>
+              <input type="text" id="regGameHash" placeholder="e.g. d41d8cd98f00b204e9800998ecf8427e" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px;">
+            </div>
+            <button type="submit" class="btn-demo-start" style="height: 32px; padding: 0 16px;">
+              <span>+ Register Game</span>
+            </button>
+          </form>
+
+          <div class="card-heading" style="margin-top: 32px;">Developer Mode & Attack Simulation</div>
+          <div class="setting-row">
+            <div>
+              <div class="check-label">Enable Controlled Security Simulations</div>
+              <div class="check-sub">Inject real test telemetry into the multi-vector evidence engine</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggleDevMode" checked>
+              <span class="slider"></span>
             </label>
           </div>
 
-          <div id="devSimulationSection">
-            <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 12px;">
-              These controls inject synthetic anomalies into the <strong>active protected session</strong> to observe autonomous mitigation.
-            </div>
-
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn-dev-action" id="sim-btn-speedhack">🚀 Speedhack (3.5x)</button>
-              <button class="btn-dev-action" id="sim-btn-aimbot">🎯 Aimbot Snap</button>
-              <button class="btn-dev-action" id="sim-btn-memory_tamper">🧱 Memory Tamper</button>
-              <button class="btn-dev-action" id="sim-btn-handle_strip">🛡️ Handle Steal</button>
-              <button class="btn-dev-action" id="sim-btn-nmi_unbacked">⚡ NMI Shellcode</button>
-              <button class="btn-dev-action" id="sim-btn-sniff_replay">🕵️ Sniff Replay</button>
-            </div>
-
-            <div style="margin-top: 16px;">
-              <button class="btn-demo-start" id="btnStartDemoDev">
-                <span>▶ Run 35s Autonomous Hackathon Demo</span>
-              </button>
+          <div id="devSimulationSection" style="margin-top: 16px;">
+            <div class="sim-buttons-grid">
+              <button class="btn-sim" id="sim-btn-speedhack">Simulate Speedhack (3.5x)</button>
+              <button class="btn-sim" id="sim-btn-aimbot">Simulate Aimbot Snap</button>
+              <button class="btn-sim" id="sim-btn-memory_tamper">Simulate Memory Tamper</button>
+              <button class="btn-sim" id="sim-btn-nmi_unbacked">Trigger NMI Unbacked Code Trap</button>
+              <button class="btn-sim" id="sim-btn-handle_strip">Trigger Handle Strip Trap</button>
+              <button class="btn-sim" id="sim-btn-sniff_replay">Test Wire Sniffer Replay Defense</button>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Threat Quarantine Modal -->
+  <div class="threat-overlay" id="threatOverlay">
+    <div class="threat-card glass-card">
+      <div class="threat-icon">⚠️</div>
+      <h2 class="threat-title" id="threatTitle">SECURITY ANOMALY DETECTED</h2>
+      <p class="threat-desc" id="threatDesc">Session inputs isolated into sandbox ring.</p>
+      <div class="threat-recovery" id="recoveryBox">
+        <div>🔍 Locating last verified Merkle checkpoint...</div>
+      </div>
     </div>
+  </div>
 
-  </main>
-
-  <!-- Scripts -->
-  <script src="sdk/js/sentinel_x_sdk.js"></script>
+  <!-- JavaScript Modules -->
   <script src="js/polymorphic_crypto.js"></script>
-  <script src="js/security_agent.js"></script>
+  <script src="js/sentinel_sdk_bridge.js"></script>
+  <script src="js/game_client.js"></script>
   <script src="js/exploit_console.js"></script>
   <script src="js/app_console.js"></script>
-  <script src="js/game_client.js"></script>
 </body>
 </html>

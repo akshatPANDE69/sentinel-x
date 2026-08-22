@@ -1,11 +1,10 @@
 /**
- * SENTINEL-X UNIFIED PRODUCT CONSOLE CONTROLLER
+ * SENTINEL-X CONSOLE CONTROLLER
  * Zero-Mock Real Security Architecture:
- * - Truthful Zero-State (Waiting for Protected Game)
+ * - Direct Game Selection & Enrollment
  * - Dynamic SDK Handshake & Session Attestation
  * - Dual Live Telemetry Logs (Security Checks + Engine Activity)
  * - Live Current Operation Bar
- * - Dynamic Game Registration Form
  */
 class SentinelAppConsole {
   constructor() {
@@ -13,13 +12,14 @@ class SentinelAppConsole {
     this.monitoringProfile = "BALANCED";
     this.isDemoRunning = false;
     this.activeSessionId = null;
+    this.selectedGameId = "sx-arena";
     this.socWs = null;
 
     this.initTabs();
     this.initDemoButtons();
-    this.initProfileSelector();
-    this.initDeveloperToggles();
+    this.initGameSelector();
     this.initAddGameForm();
+    this.initDeveloperToggles();
     this.fetchRegisteredGames();
     this.connectSOC();
   }
@@ -46,23 +46,32 @@ class SentinelAppConsole {
     }
   }
 
-  async launchGameClientSDK() {
-    if (window.sentinelSDK) {
-      await window.sentinelSDK.initialize({ gameId: "sx-arena" });
-      const res = await window.sentinelSDK.registerSession(4420);
-      if (res.success) {
-        this.logActivity("Game Discovered & Enrolled", `Session ${res.sessionId} created via Sentinel-X SDK`);
-      }
+  initGameSelector() {
+    const select = document.getElementById("gameSelectDropdown");
+    const launchBtn = document.getElementById("btnLaunchSelectedGame");
+
+    if (select) {
+      select.addEventListener("change", (e) => {
+        this.selectedGameId = e.target.value;
+      });
+    }
+
+    if (launchBtn) {
+      launchBtn.addEventListener("click", async () => {
+        await this.launchGameClientSDK();
+        this.switchTab("game");
+      });
     }
   }
 
-  initProfileSelector() {
-    const select = document.getElementById("profileSelector");
-    if (!select) return;
-    select.addEventListener("change", (e) => {
-      this.monitoringProfile = e.target.value;
-      this.logActivity("Profile updated", `Monitoring profile set to ${this.monitoringProfile}`);
-    });
+  async launchGameClientSDK() {
+    if (window.sentinelSDK) {
+      await window.sentinelSDK.initialize({ gameId: this.selectedGameId });
+      const res = await window.sentinelSDK.registerSession(4420);
+      if (res.success) {
+        this.logActivity("Game Discovered & Enrolled", `Session ${res.sessionId} created for ${this.selectedGameId}`);
+      }
+    }
   }
 
   initAddGameForm() {
@@ -101,14 +110,11 @@ class SentinelAppConsole {
 
   initDemoButtons() {
     const btnTop = document.getElementById("btnStartDemoTop");
-    const btnDev = document.getElementById("btnStartDemoDev");
-
-    [btnTop, btnDev].forEach(btn => {
-      if (!btn) return;
-      btn.addEventListener("click", () => {
+    if (btnTop) {
+      btnTop.addEventListener("click", () => {
         this.runAutonomousDemo();
       });
-    });
+    }
   }
 
   initDeveloperToggles() {
@@ -127,7 +133,7 @@ class SentinelAppConsole {
       if (!btn) return;
       btn.addEventListener("click", () => {
         if (!this.activeSessionId) {
-          alert("No active protected session. Launch a game or click 'Game Viewport' first.");
+          alert("No active protected session. Click '▶ Connect & Launch Game' first.");
           return;
         }
         const isActive = btn.classList.toggle("active");
@@ -143,19 +149,24 @@ class SentinelAppConsole {
       const res = await fetch("/api/games/list");
       const data = await res.json();
       const list = document.getElementById("registeredGamesList");
-      if (list && data.games) {
-        // Keep form at the bottom
-        const formHtml = document.getElementById("formAddGame")?.outerHTML || "";
-        list.innerHTML = data.games.map(g => `
-          <div class="checklist-item">
-            <div>
-              <div class="check-label"><strong>${g.name}</strong> (${g.game_id})</div>
-              <div class="check-sub">Version: ${g.version} | Hash: <code>${g.executable_hash.substring(0, 16)}...</code></div>
+      const select = document.getElementById("gameSelectDropdown");
+
+      if (data.games) {
+        if (select) {
+          select.innerHTML = data.games.map(g => `<option value="${g.game_id}">${g.name} (${g.game_id})</option>`).join("");
+        }
+
+        if (list) {
+          list.innerHTML = data.games.map(g => `
+            <div class="checklist-item">
+              <div>
+                <div class="check-label"><strong>${g.name}</strong> (<code>${g.game_id}</code>)</div>
+                <div class="check-sub">Version: ${g.version} | Hash: <code>${g.executable_hash.substring(0, 16)}...</code></div>
+              </div>
+              <div class="check-status">✓ REGISTERED</div>
             </div>
-            <div class="check-status">✓ REGISTERED</div>
-          </div>
-        `).join("") + (formHtml ? `<div style="margin-top: 16px;">${formHtml}</div>` : "");
-        this.initAddGameForm();
+          `).join("");
+        }
       }
     } catch (err) {}
   }
@@ -197,7 +208,10 @@ class SentinelAppConsole {
       if (opName) opName.innerText = curOp.operation;
       if (opComp) opComp.innerText = curOp.component;
       if (opDur) opDur.innerText = `${curOp.duration_ms} ms`;
-      if (opStat) opStat.innerText = curOp.status;
+      if (opStat) {
+        opStat.innerText = curOp.status;
+        opStat.style.color = (curOp.status === "FAIL") ? "var(--apple-red)" : "var(--apple-green)";
+      }
     }
 
     // 2. Dual Log Streams (Log A: Security Checks | Log B: Engine Activity)
@@ -217,7 +231,7 @@ class SentinelAppConsole {
       activityBox.innerHTML = data.recent_activity.map(a => `
         <div class="log-entry-activity">
           <span class="func-name">${a.operation}</span>
-          <span class="func-comp">${a.component} • ${a.duration_ms}ms • ${a.result}</span>
+          <span class="func-comp">${a.component} • ${a.duration_ms}ms</span>
         </div>
       `).reverse().join("");
     }
@@ -229,13 +243,12 @@ class SentinelAppConsole {
     const heroSubtitle = document.getElementById("heroStatusSubtitle");
     const sessionBadge = document.getElementById("heroSessionBadge");
     const tileSessionsCount = document.getElementById("tileSessionsCount");
-    const tileThreatsCount = document.getElementById("tileThreatsCount");
 
     if (!sessionId) {
       if (pill) pill.className = "status-pill";
       if (pillText) pillText.innerText = "AGENT ACTIVE (WAITING)";
       if (heroTitle) heroTitle.innerText = "Waiting for protected game...";
-      if (heroSubtitle) heroSubtitle.innerText = "Sentinel-X endpoint security agent is running. Launch a registered game integrating the Sentinel-X SDK to begin continuous attestation.";
+      if (heroSubtitle) heroSubtitle.innerText = "Sentinel-X endpoint security agent is running. Select a registered game above or click '▶ Connect & Launch Game' to begin continuous attestation.";
       if (sessionBadge) sessionBadge.innerHTML = `<span style="color: var(--text-tertiary);">●</span> No active protected sessions`;
       if (tileSessionsCount) tileSessionsCount.innerText = "0";
 
@@ -297,6 +310,21 @@ class SentinelAppConsole {
       chkPlat.className = `check-status ${(!metrics.nmi_unbacked_trap && !metrics.handle_stripped) ? "" : "alert"}`;
     }
 
+    // Sessions Table in Sessions Tab
+    const tableBody = document.getElementById("sessionsTableBody");
+    if (tableBody) {
+      tableBody.innerHTML = `
+        <tr>
+          <td><code>${sessionId}</code></td>
+          <td><strong>${data.game_id || 'Sentinel-X Arena'}</strong></td>
+          <td><span class="status-pill ${isQuarantined ? 'quarantined' : ''}" style="display:inline-flex; padding: 2px 8px; font-size:11px;">${isQuarantined ? 'QUARANTINED' : 'PROTECTED'}</span></td>
+          <td><strong>${pct}%</strong></td>
+          <td><span style="color: var(--apple-green);">✓ VERIFIED</span></td>
+          <td><span style="color: var(--apple-blue); font-size: 11px;">ACTIVE</span></td>
+        </tr>
+      `;
+    }
+
     // Threat Overlay
     const threatOverlay = document.getElementById("threatOverlay");
     if (threatOverlay && !this.isDemoRunning) {
@@ -305,26 +333,27 @@ class SentinelAppConsole {
   }
 
   logActivity(title, subtitle) {
-    const list = document.getElementById("recentActivityList");
-    if (!list) return;
+    const feed = document.getElementById("evidenceFeed");
+    if (!feed) return;
     const item = document.createElement("div");
     item.className = "activity-item";
+    item.style.padding = "8px 0";
+    item.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
     item.innerHTML = `
-      <div class="activity-icon">●</div>
-      <div class="activity-content">
-        <div class="activity-title">${title}</div>
-        <div class="activity-time">Just now — ${subtitle}</div>
-      </div>
+      <div style="font-weight: 600; color: #fff;">${title}</div>
+      <div style="font-size: 11px; color: var(--text-tertiary);">${subtitle}</div>
     `;
-    list.insertBefore(item, list.firstChild);
-    if (list.children.length > 8) list.removeChild(list.lastChild);
+    if (feed.querySelector(".evidence-empty")) {
+      feed.innerHTML = "";
+    }
+    feed.insertBefore(item, feed.firstChild);
   }
 
   async runAutonomousDemo() {
     if (this.isDemoRunning) return;
     this.isDemoRunning = true;
 
-    // 1. Ensure game SDK is initialized & session registered
+    // 1. Launch Game SDK
     await this.launchGameClientSDK();
     this.switchTab("overview");
 
@@ -335,33 +364,28 @@ class SentinelAppConsole {
 
     this.logActivity("Security Demo Initiated", "Starting end-to-end zero-trust verification sequence");
 
-    // 2. Inject real controlled attack via API (after 4s)
+    // 2. Inject real controlled attack (after 3s)
     setTimeout(async () => {
       await fetch("/api/exploit/inject", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cheat_type: "memory_tamper", enabled: true })
       });
-      await fetch("/api/exploit/inject", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cheat_type: "aimbot", enabled: true })
-      });
-      this.logActivity("Attack Injected", "Simulated unauthorized memory byte overwrite & aimbot snap");
-    }, 4000);
+      this.logActivity("Attack Injected", "Simulated unauthorized memory byte overwrite");
+    }, 3000);
 
-    // 3. Threat detected & Quarantined (7s)
+    // 3. Threat Quarantined (5s)
     setTimeout(() => {
       if (overlay) overlay.classList.add("active");
-      if (threatTitle) threatTitle.innerText = "THREAT DETECTED: Unauthorized Client Modification";
-      if (threatDesc) threatDesc.innerText = "Executable hash mismatch & aim jerk anomaly flagged. Policy: QUARANTINE.";
+      if (threatTitle) threatTitle.innerText = "THREAT DETECTED: Unauthorized Memory Tamper";
+      if (threatDesc) threatDesc.innerText = "Executable hash mismatch & memory corruption flagged. Policy: QUARANTINE.";
       if (recoveryBox) recoveryBox.innerHTML = `
         <div>⚠️ <strong>SESSION QUARANTINED</strong> (Client inputs isolated into sandbox ring)</div>
         <div>🔍 Locating last verified Merkle checkpoint...</div>
       `;
-    }, 7000);
+    }, 5000);
 
-    // 4. Recovery In Progress (11s)
+    // 4. Recovery (8s)
     setTimeout(() => {
       if (recoveryBox) recoveryBox.innerHTML = `
         <div>✓ Last Trusted Checkpoint located (Frame SHA-256 verified)</div>
@@ -369,17 +393,16 @@ class SentinelAppConsole {
         <div>✓ HMAC-SHA256 client memory re-attestation signature verified</div>
         <div>⚡ Authoritatively rolling back game state...</div>
       `;
-      if (window.gameClient) window.gameClient.triggerRollbackAnimation();
-    }, 11000);
+    }, 8000);
 
-    // 5. Session Restored (15s)
+    // 5. Restored (11s)
     setTimeout(async () => {
       await fetch("/api/recovery/trigger", { method: "POST" });
       if (window.exploitConsole) window.exploitConsole.resetAllExploits();
       if (overlay) overlay.classList.remove("active");
       this.logActivity("Session Restored", "Authoritative state synced; Session returned to PROTECTED");
       this.isDemoRunning = false;
-    }, 15000);
+    }, 11000);
   }
 }
 

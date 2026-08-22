@@ -5,7 +5,7 @@ Write-Host "=======================================================" -Foreground
 Write-Host "   INSTALLING SENTINEL-X SECURITY AGENT (WINDOWS)      " -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 
-# 1. Check if running inside cloned repo or standalone one-liner
+# 1. Download repo if running standalone one-liner
 if (-not (Test-Path "server\server.py")) {
     Write-Host "[+] Downloading Sentinel-X repository..." -ForegroundColor Yellow
     if (Get-Command git -ErrorAction SilentlyContinue) {
@@ -23,7 +23,7 @@ if (-not (Test-Path "server\server.py")) {
 
 # 2. Check Python
 if (-not (Get-Command python -ErrorAction SilentlyContinue) -and -not (Get-Command py -ErrorAction SilentlyContinue)) {
-    Write-Host "[-] Python 3 is required. Please download from https://python.org or Microsoft Store." -ForegroundColor Red
+    Write-Host "[-] Python 3 is required. Please install from https://python.org or Microsoft Store." -ForegroundColor Red
     exit 1
 }
 
@@ -32,10 +32,8 @@ $PYTHON = if (Get-Command python -ErrorAction SilentlyContinue) { "python" } els
 Write-Host "[+] Setting up Python Virtual Environment..." -ForegroundColor Green
 & $PYTHON -m venv .venv
 $VENV_PYTHON = ".\.venv\Scripts\python.exe"
-$VENV_PIP = ".\.venv\Scripts\pip.exe"
 
-& $VENV_PIP install --upgrade pip --quiet
-& $VENV_PIP install aiohttp psutil --quiet
+& $VENV_PYTHON -m pip install aiohttp psutil --quiet
 
 # 3. Compile Rust Core if Cargo is available
 if (Get-Command cargo -ErrorAction SilentlyContinue) {
