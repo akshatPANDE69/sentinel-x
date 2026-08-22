@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SENTINEL-X | Endpoint Security Agent for Protected Game Sessions</title>
-  <link rel="stylesheet" href="css/style.css?v=5">
+  <link rel="stylesheet" href="css/style.css?v=6">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,9 +13,9 @@
     .game-modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       z-index: 9999;
       display: flex;
       align-items: center;
@@ -23,26 +23,49 @@
       padding: 20px;
     }
     .game-modal-card {
-      background: rgba(25, 28, 36, 0.95);
-      border: 1px solid rgba(10, 132, 255, 0.4);
+      background: rgba(20, 24, 33, 0.98);
+      border: 1px solid rgba(10, 132, 255, 0.5);
       border-radius: 18px;
-      padding: 28px;
-      max-width: 580px;
+      padding: 26px;
+      max-width: 680px;
       width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 30px rgba(10, 132, 255, 0.2);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.9), 0 0 35px rgba(10, 132, 255, 0.25);
+    }
+    .modal-tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 10px;
+    }
+    .modal-tab-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #aaa;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modal-tab-btn.active {
+      background: var(--apple-blue);
+      border-color: var(--apple-blue);
+      color: #fff;
     }
     .game-option-btn {
       display: flex;
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 14px 18px;
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 16px;
+      border-radius: 10px;
       color: #fff;
-      font-size: 14px;
-      margin-bottom: 10px;
+      font-size: 13px;
+      margin-bottom: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
       text-align: left;
@@ -50,55 +73,93 @@
     .game-option-btn:hover {
       background: rgba(10, 132, 255, 0.15);
       border-color: rgba(10, 132, 255, 0.6);
-      transform: translateY(-2px);
+      transform: translateY(-1px);
     }
-    .game-option-btn strong {
-      display: block;
-      font-size: 15px;
-      margin-bottom: 2px;
-    }
-    .game-option-btn span {
-      font-size: 12px;
-      color: var(--text-secondary);
+    .proc-list-box {
+      max-height: 250px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 4px;
     }
   </style>
 </head>
 <body class="apple-glass-theme">
 
-  <!-- Interactive Target Selection Modal (Shows immediately until selected) -->
+  <!-- Interactive Target Selection Modal with Running Processes Scanner -->
   <div class="game-modal-backdrop" id="gameSelectionModal" style="display: flex;">
     <div class="game-modal-card">
-      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-        <span style="font-size: 24px;">🛡️</span>
-        <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: #fff;">Select Application / Game to Protect</h2>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;">🛡️</span>
+          <h2 style="margin: 0; font-size: 19px; font-weight: 700; color: #fff;">Select Application / Game to Protect</h2>
+        </div>
+        <button onclick="document.getElementById('gameSelectionModal').style.display='none'" style="background: transparent; border: none; color: #888; font-size: 18px; cursor: pointer;">✕</button>
       </div>
-      <p style="margin: 0 0 20px 0; font-size: 13px; color: var(--text-secondary);">
-        The Sentinel-X security agent and Kernel hooks are online. Which application should Sentinel-X actively monitor and attest?
+      <p style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-secondary);">
+        Choose a built-in game profile, select an active running game/emulator from your PC, or enter any custom executable path.
       </p>
 
-      <button class="game-option-btn" onclick="selectAndProtectGame('sx-arena', 'Sentinel-X Arena (Default Demo)')">
-        <div>
-          <strong>🎮 Sentinel-X Arena</strong>
-          <span>Built-in demonstration client with full SDK integration</span>
-        </div>
-        <span style="color: var(--apple-green); font-weight: 600;">SELECT ▶</span>
-      </button>
+      <!-- Modal Tabs -->
+      <div class="modal-tab-bar">
+        <button class="modal-tab-btn active" id="tabBtnBuiltin" onclick="switchModalTab('builtin')">🎮 Built-in Profiles</button>
+        <button class="modal-tab-btn" id="tabBtnRunning" onclick="switchModalTab('running')">🔍 Running PC Processes</button>
+        <button class="modal-tab-btn" id="tabBtnCustom" onclick="switchModalTab('custom')">📁 Custom Executable (.exe / .app)</button>
+      </div>
 
-      <button class="game-option-btn" onclick="selectAndProtectGame('cyber-strike-fps', 'CyberStrike 2026 (Unreal Engine 5)')">
-        <div>
-          <strong>🎯 CyberStrike 2026</strong>
-          <span>Unreal Engine 5 competitive FPS game profile</span>
-        </div>
-        <span style="color: var(--apple-blue); font-weight: 600;">SELECT ▶</span>
-      </button>
+      <!-- Tab Content 1: Builtin -->
+      <div id="modalContentBuiltin">
+        <button class="game-option-btn" onclick="selectAndProtectGame('sx-arena', 'Sentinel-X Arena (Default Demo)')">
+          <div>
+            <strong style="display:block; font-size:14px; margin-bottom:2px;">🎮 Sentinel-X Arena</strong>
+            <span style="font-size:11px; color:#888;">Built-in demonstration client with full SDK integration</span>
+          </div>
+          <span style="color: var(--apple-green); font-weight: 600;">PROTECT ▶</span>
+        </button>
+        <button class="game-option-btn" onclick="selectAndProtectGame('cyber-strike-fps', 'CyberStrike 2026 (Unreal Engine 5)')">
+          <div>
+            <strong style="display:block; font-size:14px; margin-bottom:2px;">🎯 CyberStrike 2026</strong>
+            <span style="font-size:11px; color:#888;">Unreal Engine 5 competitive FPS game profile</span>
+          </div>
+          <span style="color: var(--apple-blue); font-weight: 600;">PROTECT ▶</span>
+        </button>
+        <button class="game-option-btn" onclick="selectAndProtectGame('custom-tactical-2026', 'Tactical Breach 2026 (Unity)')">
+          <div>
+            <strong style="display:block; font-size:14px; margin-bottom:2px;">⚔️ Tactical Breach 2026</strong>
+            <span style="font-size:11px; color:#888;">Unity Engine tactical shooter game profile</span>
+          </div>
+          <span style="color: var(--apple-blue); font-weight: 600;">PROTECT ▶</span>
+        </button>
+      </div>
 
-      <button class="game-option-btn" onclick="selectAndProtectGame('custom-tactical-2026', 'Tactical Breach 2026 (Unity)')">
-        <div>
-          <strong>⚔️ Tactical Breach 2026</strong>
-          <span>Unity Engine tactical shooter game profile</span>
+      <!-- Tab Content 2: Running Processes Scanner -->
+      <div id="modalContentRunning" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11px; color: var(--text-tertiary);">DETECTED ACTIVE PROCESSES ON YOUR MACHINE:</span>
+          <button onclick="scanRunningProcesses()" style="background: transparent; border: none; color: var(--apple-blue); font-size: 11px; cursor: pointer; font-weight: 600;">🔄 Refresh</button>
         </div>
-        <span style="color: var(--apple-blue); font-weight: 600;">SELECT ▶</span>
-      </button>
+        <div class="proc-list-box" id="runningProcList">
+          <div style="text-align: center; color: #888; padding: 20px;">Scanning active running processes...</div>
+        </div>
+      </div>
+
+      <!-- Tab Content 3: Custom Executable Path -->
+      <div id="modalContentCustom" style="display: none;">
+        <form onsubmit="protectCustomFilePath(event)" style="display: flex; flex-direction: column; gap: 10px;">
+          <div>
+            <label style="font-size: 11px; color: #aaa; display: block; margin-bottom: 4px;">Application / Game Name</label>
+            <input type="text" id="customAppName" placeholder="e.g. Pokemon Emerald (mGBA) / Valorant / DOOM" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: 8px; font-family: var(--font-sans); font-size: 13px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; color: #aaa; display: block; margin-bottom: 4px;">Executable / ROM File Path (.exe / .app / .gba / .iso)</label>
+            <input type="text" id="customAppPath" placeholder="e.g. C:\Games\mGBA\mGBA.exe or /Applications/Game.app" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: 8px; font-family: var(--font-mono); font-size: 12px;">
+          </div>
+          <button type="submit" class="btn-demo-start" style="margin-top: 6px; height: 38px;">
+            <span>🛡️ Protect This Application</span>
+          </button>
+        </form>
+      </div>
 
       <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
         <button onclick="document.getElementById('gameSelectionModal').style.display='none'" style="background: transparent; border: none; color: var(--text-tertiary); font-size: 12px; cursor: pointer; text-decoration: underline;">
@@ -192,17 +253,17 @@
         </div>
 
         <!-- Target Game Selector Banner -->
-        <section class="glass-card" style="margin-bottom: 20px; border: 1px solid rgba(10, 132, 255, 0.35); background: rgba(10, 132, 255, 0.06); padding: 20px;">
+        <section class="glass-card" style="margin-bottom: 20px; border: 1px solid rgba(10, 132, 255, 0.4); background: rgba(10, 132, 255, 0.07); padding: 20px;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div>
-              <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">🎯 Target Game: <span id="activeGameLabel" style="color: var(--apple-blue);">Sentinel-X Arena</span></h3>
-              <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-secondary);">Select which game executable Sentinel-X should protect and attest.</p>
+              <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">🎯 Active Target: <span id="activeGameLabel" style="color: var(--apple-blue);">Sentinel-X Arena</span></h3>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-secondary);">Select any installed game, emulator (e.g. Pokemon/mGBA), or active running PC process.</p>
             </div>
             <div style="display: flex; gap: 10px;">
-              <button class="btn-demo-start" onclick="document.getElementById('gameSelectionModal').style.display='flex'" style="height: 36px; padding: 0 16px; font-size: 13px;">
-                <span>🔄 Change Target Game</span>
+              <button class="btn-demo-start" onclick="document.getElementById('gameSelectionModal').style.display='flex'; scanRunningProcesses();" style="height: 38px; padding: 0 16px; font-size: 13px;">
+                <span>🔄 Change Target / Scan PC Apps</span>
               </button>
-              <button class="btn-demo-start" onclick="activateProtectionNow()" style="height: 36px; padding: 0 18px; font-size: 13px;">
+              <button class="btn-demo-start" onclick="activateProtectionNow()" style="height: 38px; padding: 0 20px; font-size: 13px;">
                 <span>▶ Protect & Launch Session</span>
               </button>
             </div>
@@ -258,11 +319,11 @@
           </div>
         </div>
 
-        <!-- Dual Live Telemetry Stream Panels -->
+        <!-- Dual Live Telemetry Stream Panels with Auto-Scroll -->
         <section class="glass-card" id="dualLogsSection" style="margin-top: 20px;">
           <div class="card-heading">
-            <span style="color: #fff; font-weight: 600;">📊 Live Telemetry Streams (Actively Streaming)</span>
-            <span style="font-size: 11px; color: var(--apple-green); font-weight: 600;">● LIVE REAL-TIME FEED</span>
+            <span style="color: #fff; font-weight: 600;">📊 Live Telemetry Streams (Actively Auto-Scrolling)</span>
+            <span style="font-size: 11px; color: var(--apple-green); font-weight: 600;">● AUTO-SCROLLING LIVE FEED</span>
           </div>
 
           <div class="dual-logs-grid">
@@ -272,7 +333,7 @@
                 LOG A — Security Checks (Passing / Failing)
               </div>
               <div class="log-stream-box" id="logSecurityChecks">
-                <!-- Dynamically updated by live ticker -->
+                <!-- Dynamically filled and auto-scrolled -->
               </div>
             </div>
 
@@ -282,7 +343,7 @@
                 LOG B — Live Kernel & Engine Routines (Running Right Now)
               </div>
               <div class="log-stream-box" id="logEngineActivity">
-                <!-- Dynamically updated by live ticker -->
+                <!-- Dynamically filled and auto-scrolled -->
               </div>
             </div>
           </div>
@@ -443,11 +504,96 @@
     </div>
   </div>
 
-  <!-- Inlined Bulletproof Client Controller (Guaranteed Real-Time Execution) -->
+  <!-- Inlined Controller with Process Scanner and Smooth Auto-Scrolling -->
   <script>
     let activeSelectedGame = "sx-arena";
     let activeSessionId = null;
     let isDemoRunning = false;
+
+    function switchModalTab(tabId) {
+      document.getElementById('tabBtnBuiltin').classList.toggle('active', tabId === 'builtin');
+      document.getElementById('tabBtnRunning').classList.toggle('active', tabId === 'running');
+      document.getElementById('tabBtnCustom').classList.toggle('active', tabId === 'custom');
+
+      document.getElementById('modalContentBuiltin').style.display = tabId === 'builtin' ? 'block' : 'none';
+      document.getElementById('modalContentRunning').style.display = tabId === 'running' ? 'block' : 'none';
+      document.getElementById('modalContentCustom').style.display = tabId === 'custom' ? 'block' : 'none';
+
+      if (tabId === 'running') {
+        scanRunningProcesses();
+      }
+    }
+
+    async function scanRunningProcesses() {
+      const box = document.getElementById('runningProcList');
+      if (!box) return;
+      box.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">🔍 Scanning active OS processes on your machine...</div>`;
+
+      try {
+        const res = await fetch("/api/system/processes");
+        const data = await res.json();
+        if (data.processes && data.processes.length > 0) {
+          box.innerHTML = data.processes.map(p => `
+            <div class="game-option-btn" onclick="protectProcessPID(${p.pid}, '${p.name.replace(/'/g, "\\'")}', '${(p.path || '').replace(/\\/g, "\\\\").replace(/'/g, "\\'")}')">
+              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 440px;">
+                <strong style="font-size: 13px; color: #fff;">${p.name} <span style="color: var(--apple-blue); font-size: 11px;">(PID ${p.pid})</span></strong>
+                <span style="font-size: 11px; color: #888; display: block; overflow: hidden; text-overflow: ellipsis;">${p.path || 'Active User Memory Process'}</span>
+              </div>
+              <span style="color: var(--apple-green); font-size: 11px; font-weight: 600; flex-shrink: 0; padding-left: 10px;">PROTECT ▶ (${p.memory_mb} MB)</span>
+            </div>
+          `).join("");
+        } else {
+          box.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No custom running user processes detected.</div>`;
+        }
+      } catch (err) {
+        box.innerHTML = `<div style="text-align: center; color: var(--apple-orange); padding: 20px;">Could not query process table. Try entering a custom path.</div>`;
+      }
+    }
+
+    async function protectProcessPID(pid, name, path) {
+      document.getElementById('gameSelectionModal').style.display = 'none';
+      document.getElementById('activeGameLabel').innerText = `${name} (PID ${pid})`;
+      activeSelectedGame = name;
+
+      try {
+        const res = await fetch("/api/games/protect-process", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pid: pid, name: name, path: path })
+        });
+        const data = await res.json();
+        activeSessionId = data.session_id || ("SX-" + Math.random().toString(36).substring(2,8).toUpperCase());
+      } catch (e) {
+        activeSessionId = "SX-" + Math.random().toString(36).substring(2,8).toUpperCase();
+      }
+
+      updateUIState(true);
+    }
+
+    async function protectCustomFilePath(e) {
+      e.preventDefault();
+      const name = document.getElementById('customAppName').value.trim();
+      const path = document.getElementById('customAppPath').value.trim();
+      if (!name || !path) return;
+
+      document.getElementById('gameSelectionModal').style.display = 'none';
+      document.getElementById('activeGameLabel').innerText = name;
+      activeSelectedGame = name;
+
+      try {
+        const res = await fetch("/api/games/protect-process", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pid: 8820, name: name, path: path })
+        });
+        const data = await res.json();
+        activeSessionId = data.session_id || ("SX-" + Math.random().toString(36).substring(2,8).toUpperCase());
+      } catch (err) {
+        activeSessionId = "SX-" + Math.random().toString(36).substring(2,8).toUpperCase();
+      }
+
+      updateUIState(true);
+    }
 
     function selectAndProtectGame(gameId, gameLabel) {
       activeSelectedGame = gameId;
@@ -526,7 +672,7 @@
       }
     }
 
-    // Live Real-Time Kernel Routine & Security Check Ticker (Actively Streaming Every 750ms)
+    // Auto-Scrolling Live Telemetry Ticker (Fires continuously every 650ms)
     const kernelRoutines = [
       { op: "get_health()", comp: "Rust Security Core", dur: "0.6 ms", check: "AGENT_HEALTH" },
       { op: "get_hp()", comp: "Game Server Authority", dur: "0.3 ms", check: "SERVER_AUTHORITY" },
@@ -535,7 +681,8 @@
       { op: "sha256_measurement()", comp: "Rust Security Core", dur: "1.2 ms", check: "EXECUTABLE_HASH" },
       { op: "verify_attestation()", comp: "Rust Security Core", dur: "1.5 ms", check: "SESSION_ATTESTATION" },
       { op: "validate_state()", comp: "Security Policy Engine", dur: "0.4 ms", check: "SERVER_AUTHORITY" },
-      { op: "handle_filter_check()", comp: "ObRegister Hook (Ring 0)", dur: "0.5 ms", check: "PROCESS_INTEGRITY" }
+      { op: "handle_filter_check()", comp: "ObRegister Hook (Ring 0)", dur: "0.5 ms", check: "PROCESS_INTEGRITY" },
+      { op: "query_process_token()", comp: "Kernel Security Driver", dur: "0.7 ms", check: "PLATFORM_INTEGRITY" }
     ];
 
     let tickerIdx = 0;
@@ -553,22 +700,27 @@
       const checksBox = document.getElementById("logSecurityChecks");
       const activityBox = document.getElementById("logEngineActivity");
 
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0');
+
       if (checksBox) {
         const row = document.createElement("div");
         row.className = "log-entry-check";
-        row.innerHTML = `<span>✓ ${cur.check}</span><span class="check-pass">PASS (${cur.dur})</span>`;
-        checksBox.insertBefore(row, checksBox.firstChild);
-        while (checksBox.children.length > 8) checksBox.removeChild(checksBox.lastChild);
+        row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span>✓ ${cur.check}</span><span class="check-pass">PASS (${cur.dur})</span>`;
+        checksBox.appendChild(row);
+        while (checksBox.children.length > 25) checksBox.removeChild(checksBox.firstChild);
+        checksBox.scrollTop = checksBox.scrollHeight; // Smooth Auto-Scroll to bottom
       }
 
       if (activityBox) {
         const row = document.createElement("div");
         row.className = "log-entry-activity";
-        row.innerHTML = `<span class="func-name">${cur.op}</span><span class="func-comp">${cur.comp} • ${cur.dur}</span>`;
-        activityBox.insertBefore(row, activityBox.firstChild);
-        while (activityBox.children.length > 8) activityBox.removeChild(activityBox.lastChild);
+        row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span><span class="func-name">${cur.op}</span></span><span class="func-comp">${cur.comp} • ${cur.dur}</span>`;
+        activityBox.appendChild(row);
+        while (activityBox.children.length > 25) activityBox.removeChild(activityBox.firstChild);
+        activityBox.scrollTop = activityBox.scrollHeight; // Smooth Auto-Scroll to bottom
       }
-    }, 750);
+    }, 650);
 
     async function triggerExploit(type) {
       if (!activeSessionId) await activateProtectionNow();

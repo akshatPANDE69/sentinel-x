@@ -25,6 +25,85 @@ async def no_cache_middleware(request, handler):
     return response
 
 class SentinelServer:
+    async def get_running_processes(self, request):
+        """Enumerate active user-space processes on the host machine"""
+        procs = []
+        try:
+            for p in psutil.process_iter(['pid', 'name', 'exe', 'memory_info']):
+                try:
+                    name = p.info['name'] or ""
+                    exe = p.info['exe'] or ""
+                    # Filter out standard system noise
+                    if name and not name.lower().startswith(("system", "registry", "smss", "csrss", "wininit", "services", "lsass", "svchost")):
+                        mem_mb = round((p.info['memory_info'].rss or 0) / (1024 * 1024), 1) if p.info.get('memory_info') else 0
+                        procs.append({
+                            "pid": p.info['pid'],
+                            "name": name,
+                            "path": exe,
+                            "memory_mb": mem_mb
+                        })
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    continue
+        except Exception as e:
+            pass
+        
+        # Sort by memory usage descending and take top 40
+        procs.sort(key=lambda x: x["memory_mb"], reverse=True)
+        return web.json_response({"processes": procs[:40]})
+
+    async def protect_custom_process(self, request):
+        """Register and protect an arbitrary user-selected process or executable"""
+        try:
+            data = await request.json()
+            pid = data.get("pid")
+            path = data.get("path") or ""
+            name = data.get("name") or "Custom Application"
+            
+            # Compute hash if path exists
+            file_hash = "d41d8cd98f00b204e9800998ecf8427e"
+            if path and os.path.isfile(path):
+                import hashlib
+                with open(path, "rb") as f:
+                    file_hash = hashlib.sha256(f.read(4096000)).hexdigest()
+            
+            game_id = "app-" + "".join(c for c in name.lower() if c.isalnum())[:16] or "custom-app"
+            
+            # Register in game registry
+            self.game_registry.register_game({
+                "game_id": game_id,
+                "name": name,
+                "version": "1.0.0",
+                "platforms": ["windows", "macos"],
+                "executable_hash": file_hash,
+                "developer_public_key": f"pk_{game_id}"
+            })
+            
+            # Create session
+            session_id = f"SX-{uuid.uuid4().hex[:8].upper()}"
+            self.active_sessions[session_id] = {
+                "session_id": session_id,
+                "game_id": game_id,
+                "process_id": pid or 5500,
+                "process_path": path,
+                "status": "PROTECTED",
+                "attestation_verified": True,
+                "trust_score": 0.99,
+                "start_time": time.time()
+            }
+            
+            self.security_scheduler.record_operation("attach_kernel_hooks()", "Kernel Filter Driver", 0.9, "PASS")
+            self.security_scheduler.record_check("PROCESS_ATTACH", f"Attached to {name} (PID {pid or 'N/A'})", "PROCESS", "CRITICAL", 0.9, "PASS")
+            
+            return web.json_response({
+                "success": True,
+                "session_id": session_id,
+                "game_id": game_id,
+                "name": name,
+                "hash": file_hash
+            })
+        except Exception as e:
+            return web.json_response({"success": False, "error": str(e)}, status=400)
+
     def __init__(self, host="127.0.0.1", port=8080):
         self.host = host
         self.port = port

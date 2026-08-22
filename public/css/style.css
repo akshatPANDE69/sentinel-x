@@ -756,3 +756,41 @@ body {
   font-size: 10px;
   margin-left: 6px;
 }
+
+
+.log-stream-box {
+  height: 220px;
+  max-height: 220px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.log-stream-box::-webkit-scrollbar {
+  width: 6px;
+}
+.log-stream-box::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+.log-entry-check, .log-entry-activity {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border-left: 2px solid var(--apple-blue);
+  animation: fadeInLog 0.3s ease;
+}
+@keyframes fadeInLog {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
