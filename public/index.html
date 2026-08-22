@@ -19,11 +19,14 @@
       </div>
       <div>
         <div class="brand-title">SENTINEL-<span>X</span></div>
-        <div class="brand-tagline">Zero-Trust Game Integrity & Autonomous Session Recovery</div>
+        <div class="brand-tagline">Ring 0 Kernel Telemetry & Autonomous Session Recovery</div>
       </div>
     </div>
 
     <div class="header-status">
+      <div class="kernel-badge">
+        <span class="pulse-dot"></span> RING 0 DRIVER ACTIVE
+      </div>
       <div class="status-pill" id="headerStatusPill">
         <div class="status-indicator"></div>
         <span id="headerStatusText">SESSION TRUSTED</span>
@@ -71,11 +74,15 @@
       </div>
 
       <div class="exploit-panel">
+        
+        <!-- Tab selector / Section Header -->
+        <div class="exploit-section-title">RING 3 (USERMODE) ATTACKS</div>
+
         <!-- Exploit 1: Speedhack -->
         <div class="exploit-card" id="card-speedhack">
           <div class="exploit-info">
             <div class="exploit-name">🚀 Speedhack 3.5×</div>
-            <div class="exploit-desc">Skews local physics tick clock multiplier</div>
+            <div class="exploit-desc">Skews local physics clock delta</div>
           </div>
           <label class="switch">
             <input type="checkbox" id="toggleSpeedhack">
@@ -87,7 +94,7 @@
         <div class="exploit-card" id="card-aimbot">
           <div class="exploit-info">
             <div class="exploit-name">🎯 Aimbot Micro-Snap</div>
-            <div class="exploit-desc">Instantaneous 0ms angular jerk target lock</div>
+            <div class="exploit-desc">0ms instantaneous angular jerk lock</div>
           </div>
           <label class="switch">
             <input type="checkbox" id="toggleAimbot">
@@ -119,22 +126,54 @@
           </label>
         </div>
 
-        <!-- Exploit 5: VMT Hook -->
-        <div class="exploit-card" id="card-vmt_hook">
+        <div class="exploit-section-title" style="margin-top: 6px; color: var(--neon-purple);">RING 0 (KERNEL) ATTACKS</div>
+
+        <!-- Exploit 5: Handle Stripping (ObRegisterCallbacks) -->
+        <div class="exploit-card" id="card-handle_strip">
           <div class="exploit-info">
-            <div class="exploit-name">💉 VMT Trampoline Hook</div>
-            <div class="exploit-desc">Injects unverified memory hook pointer</div>
+            <div class="exploit-name">🛡️ OpenProcess Handle Steal</div>
+            <div class="exploit-desc">ObRegister strips VM_READ/WRITE</div>
           </div>
           <label class="switch">
-            <input type="checkbox" id="toggleVMTHook">
+            <input type="checkbox" id="toggleHandleStrip">
             <span class="slider"></span>
           </label>
         </div>
 
-        <!-- The Hero Demo Action Button -->
-        <button class="btn-hero-recovery" id="btnTriggerRecovery">
-          <span>⚡ TRIGGER AUTONOMOUS RECOVERY</span>
-        </button>
+        <!-- Exploit 6: Remote Thread Injection -->
+        <div class="exploit-card" id="card-remote_thread">
+          <div class="exploit-info">
+            <div class="exploit-name">🧵 CreateRemoteThread DLL</div>
+            <div class="exploit-desc">PsSetCreateThread detects cross-PID injection</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleRemoteThread">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Exploit 7: NMI Stack Walk Unbacked Execution -->
+        <div class="exploit-card" id="card-nmi_unbacked">
+          <div class="exploit-info">
+            <div class="exploit-name">⚡ Unbacked Memory Shellcode</div>
+            <div class="exploit-desc">NMI hardware interrupt traps unbacked RIP</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleNMIUnbacked">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Action Trigger Buttons -->
+        <div style="display: flex; gap: 8px; margin-top: 4px;">
+          <button class="btn-secondary-action" id="btnRunSIMDScan" style="flex: 1;">
+            <span>🏎️ RUN SIMD SCAN</span>
+          </button>
+          <button class="btn-hero-recovery" id="btnTriggerRecovery" style="flex: 1.6;">
+            <span>⚡ AUTONOMOUS RECOVERY</span>
+          </button>
+        </div>
+
       </div>
     </aside>
 
@@ -172,14 +211,35 @@
         </div>
       </div>
 
-      <!-- 2. Recovery State Machine & Merkle Checkpoints -->
-      <div class="stepper-container">
+      <!-- 2. Ring 0 Kernel Telemetry Monitor -->
+      <div class="kernel-telemetry-panel">
         <div class="panel-header" style="padding: 0 0 8px 0; background: transparent; border: none;">
-          <span>// AUTONOMOUS RECOVERY PIPELINE</span>
+          <span>// RING 0 KERNEL TELEMETRY MATRIX</span>
+        </div>
+
+        <div class="kernel-grid">
+          <div class="kernel-card">
+            <div class="k-title">ObRegisterCallbacks (Handle Stripping)</div>
+            <div class="k-val" id="kObRegisterVal" style="color: var(--neon-green);">PROTECTED (VM_READ/WRITE STRIPPED)</div>
+          </div>
+          <div class="kernel-card">
+            <div class="k-title">PsSetCreateThread (Thread Injection)</div>
+            <div class="k-val" id="kThreadVal" style="color: var(--neon-green);">CLEAN (0 INJECTED THREADS)</div>
+          </div>
+          <div class="kernel-card">
+            <div class="k-title">NMI Stack Walk (Unbacked Memory)</div>
+            <div class="k-val" id="kNmiVal" style="color: var(--neon-green);">RIP BACKED (ntdll.dll)</div>
+            <div class="k-sub" id="kNmiRipAddr">0x00007FF689AB1200</div>
+          </div>
+          <div class="kernel-card">
+            <div class="k-title">Vectorized SIMD Memory Scanner</div>
+            <div class="k-val" id="kSimdVal" style="color: var(--neon-cyan);">5.79 GB/s (ARM NEON / AVX2)</div>
+            <div class="k-sub" id="kSimdDetails">128 MB in 21.6 ms (0 Signatures)</div>
+          </div>
         </div>
 
         <!-- Stepper Nodes -->
-        <div class="stepper-steps">
+        <div class="stepper-steps" style="margin-top: 14px;">
           <div class="stepper-line"></div>
           <div class="step-node active" id="step-observe">
             <div class="step-dot">01</div>
@@ -206,25 +266,19 @@
             <div class="step-label">RESTORED</div>
           </div>
         </div>
-
-        <!-- Checkpoints Tree List -->
-        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-          CRYPTOGRAPHIC MERKLE CHECKPOINT RING BUFFER (LAST 600 FRAMES)
-        </div>
-        <div class="checkpoint-list" id="checkpointList"></div>
       </div>
 
       <!-- 3. Real-Time Cybernetic Security Audit Log -->
       <div style="display: flex; flex-direction: column;">
         <div class="panel-header" style="background: rgba(0, 240, 255, 0.03);">
           <span>// SECURITY AUDIT STREAM</span>
-          <span class="badge">LIVE WEBSOCKET</span>
+          <span class="badge">RING 0 + RING 3 TELEMETRY</span>
         </div>
         <div class="audit-log" id="socAuditLog">
           <div class="log-entry">
             <span class="log-time">--:--:--</span>
             <span class="log-tag clean">INITIALIZE</span>
-            <span class="log-msg">Sentinel-X Multi-Vector Attestation Engine armed</span>
+            <span class="log-msg">Sentinel-X Ring 0 Kernel & Multi-Vector Engine armed</span>
           </div>
         </div>
       </div>

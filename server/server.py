@@ -1,10 +1,9 @@
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import asyncio
 import json
-import os
-import sys
 from aiohttp import web
 
 from server.engine.game_server import AuthoritativeGameServer
@@ -18,25 +17,21 @@ class SentinelServer:
         self.connected_game_clients = set()
         self.connected_soc_clients = set()
         
-        # Setup routes
         self._setup_routes()
         
-        # Hook up engine broadcasters
         self.game_engine.broadcast_callbacks.append(self.broadcast_game_message)
         self.game_engine.soc_callbacks.append(self.broadcast_soc_message)
 
     def _setup_routes(self):
-        # WebSockets
         self.app.router.add_get("/ws/game", self.handle_game_ws)
         self.app.router.add_get("/ws/soc", self.handle_soc_ws)
         
-        # REST API endpoints for exploit console
         self.app.router.add_post("/api/exploit/inject", self.handle_exploit_inject)
         self.app.router.add_post("/api/recovery/trigger", self.handle_recovery_trigger)
+        self.app.router.add_post("/api/kernel/scan_simd", self.handle_kernel_simd_scan)
         self.app.router.add_get("/api/state/checkpoints", self.handle_get_checkpoints)
         self.app.router.add_get("/api/arena/obstacles", self.handle_get_obstacles)
         
-        # Static files
         public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public"))
         self.app.router.add_static("/", public_dir, show_index=True)
 
@@ -64,12 +59,10 @@ class SentinelServer:
         ws = web.WebSocketResponse()
         await ws.prepare(request)
         
-        # Register new player
         player_id = f"op-{id(ws) % 10000}"
         player = self.game_engine.add_player(player_id, name="CYBER_OPERATOR_01")
         self.connected_game_clients.add(ws)
         
-        # Send initial handshake
         await ws.send_str(json.dumps({
             "type": "HANDSHAKE_ACK",
             "player_id": player_id,
@@ -120,7 +113,6 @@ class SentinelServer:
         cheat_type = body.get("cheat_type")
         enabled = body.get("enabled", True)
         
-        # Apply to human player
         human = next((p for p in self.game_engine.players.values() if not p.is_bot), None)
         if human:
             self.game_engine.trigger_cheat_injection(human.id, cheat_type, enabled)
@@ -136,10 +128,13 @@ class SentinelServer:
         human = next((p for p in self.game_engine.players.values() if not p.is_bot), None)
         if human:
             rec = self.game_engine.recovery_engine.initiate_recovery(human, trigger_reason="MANUAL_SOC_OVERRIDE")
-            # Auto-complete re-attestation for high-impact demo button
             res = self.game_engine.recovery_engine.process_client_re_attestation(human, {"auto_validate": True})
             return web.json_response({"success": True, "recovery_result": res})
         return web.json_response({"success": False, "error": "NO_ACTIVE_PLAYER"})
+
+    async def handle_kernel_simd_scan(self, request):
+        res = self.game_engine.run_simd_scan()
+        return web.json_response({"success": True, "simd_scan": res})
 
     async def handle_get_checkpoints(self, request):
         recent = self.game_engine.checkpoint_buffer.get_recent_summaries(limit=20)
@@ -157,13 +152,11 @@ class SentinelServer:
         print(f"\n=======================================================")
         print(f"  SENTINEL-X ZERO-TRUST GAME INTEGRITY PLATFORM ONLINE ")
         print(f"  URL: http://{self.host}:{self.port}")
-        print(f"  Game Arena + Attack Suite + SOC Dashboard live!")
+        print(f"  Ring 0 Kernel Telemetry + SIMD Scanner Ready!")
         print(f"=======================================================\n")
         
-        # Start game engine background loop
         asyncio.create_task(self.game_engine.run_loop())
         
-        # Keep running
         while True:
             await asyncio.sleep(3600)
 

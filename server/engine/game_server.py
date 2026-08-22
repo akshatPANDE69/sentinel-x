@@ -1,6 +1,8 @@
 import asyncio
 import math
+import os
 import random
+import subprocess
 import time
 import uuid
 
@@ -35,18 +37,26 @@ class AuthoritativeGameServer:
         self.soc_callbacks = []
         self.pending_inputs = {} # player_id -> list of input packets
         
+        # Native Vector Scanner Path
+        self.scanner_bin = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "agent", "native", "vector_scanner"))
+        self.last_simd_scan_result = {
+            "status": "READY",
+            "throughput_gbs": 5.8,
+            "simd_engine": "ARM_NEON_128 / AVX2_256",
+            "matches": 0,
+            "scanned_mb": 128
+        }
+        
         # Spawn some friendly/enemy AI Sentinel Bots
         self._spawn_ai_sentinels()
 
     def _init_arena_obstacles(self):
         obs = [
-            # Outer boundary walls
             Obstacle(0, 0, 1200, 20, "wall", "#0f172a"),
             Obstacle(0, 740, 1200, 20, "wall", "#0f172a"),
             Obstacle(0, 0, 20, 760, "wall", "#0f172a"),
             Obstacle(1180, 0, 20, 760, "wall", "#0f172a"),
             
-            # Central Cybernetic Vault & Cover Pillars
             Obstacle(520, 280, 160, 200, "vault", "#1e293b"),
             Obstacle(240, 160, 120, 40, "cover", "#334155"),
             Obstacle(840, 160, 120, 40, "cover", "#334155"),
@@ -69,7 +79,6 @@ class AuthoritativeGameServer:
             self.trust_engine.register_player(bid)
 
     def add_player(self, player_id, name="CYBER_OPERATOR"):
-        # Spawn near left quadrant
         px = random.uniform(100, 220)
         py = random.uniform(200, 500)
         p = Player(player_id, name, px, py, color="#00ffcc", is_bot=False)
@@ -94,7 +103,6 @@ class AuthoritativeGameServer:
             player.speed_multiplier = 3.5 if enabled else 1.0
             player.clock_drift_factor = 3.5 if enabled else 1.0
         elif cheat_type == "aimbot":
-            # Handled in packet flow with extreme jerk
             pass
         elif cheat_type == "memory_tamper":
             player.simulated_memory_hash = "DEADBEEF_CORRUPTED_HASH" if enabled else "d41d8cd98f00b204e9800998ecf8427e"
@@ -104,7 +112,28 @@ class AuthoritativeGameServer:
             player.has_dll_injected = enabled
         elif cheat_type == "wallhack":
             player.wallhack_active = enabled
+        elif cheat_type == "handle_strip":
+            player.handle_stripped = enabled
+        elif cheat_type == "remote_thread":
+            player.remote_thread_injected = enabled
+        elif cheat_type == "nmi_unbacked":
+            player.nmi_unbacked_trap = enabled
+            player.last_nmi_rip_address = "0x00007FF7DEADBEEF [UNBACKED_SHELLCODE]" if enabled else "0x00007FF689AB1200 [ntdll.dll]"
+        elif cheat_type == "simd_scan":
+            player.simd_signature_match = enabled
+            if enabled:
+                self.run_simd_scan()
         return True
+
+    def run_simd_scan(self):
+        try:
+            if os.path.exists(self.scanner_bin):
+                out = subprocess.check_output([self.scanner_bin], timeout=2.0)
+                import json
+                self.last_simd_scan_result = json.loads(out.decode('utf-8'))
+        except Exception:
+            pass
+        return self.last_simd_scan_result
 
     async def run_loop(self):
         self.running = True
@@ -126,16 +155,16 @@ class AuthoritativeGameServer:
             # 3. Update projectiles & collisions
             self._update_projectiles(dt)
             
-            # 4. Security Attestation & Evidence Correlation
+            # 4. Security Attestation & Multi-Vector Evidence
             self._evaluate_security()
             
             # 5. Record Authoritative Merkle Checkpoint
             self._record_checkpoint()
             
             # 6. Broadcast World State & SOC Telemetry
-            if self.frame_id % 2 == 0:  # 30 Hz broadcast for network efficiency
+            if self.frame_id % 2 == 0:  # 30 Hz
                 await self._broadcast_world_state()
-            if self.frame_id % 3 == 0:  # 20 Hz SOC telemetry
+            if self.frame_id % 3 == 0:  # 20 Hz
                 await self._broadcast_soc_telemetry()
                 
             elapsed = time.time() - now
@@ -151,7 +180,6 @@ class AuthoritativeGameServer:
             self.pending_inputs[pid] = []
             
             if player.is_quarantined:
-                # Discard movement inputs during quarantine
                 continue
                 
             if inputs:
@@ -160,7 +188,7 @@ class AuthoritativeGameServer:
                 dy = latest.get("dy", 0)
                 player.angle = latest.get("angle", player.angle)
                 
-                # Ingest client telemetry from signed attestation packet
+                # Ingest client telemetry from signed packet
                 if "memory_hash" in latest:
                     player.simulated_memory_hash = latest["memory_hash"]
                 if "has_vmt_hook" in latest:
@@ -175,21 +203,28 @@ class AuthoritativeGameServer:
                     player.aim_jerk_history.append(float(latest["aim_jerk"]))
                     if len(player.aim_jerk_history) > 15:
                         player.aim_jerk_history.pop(0)
-                
+                        
+                # Ring 0 Kernel telemetry fields
+                if "handle_stripped" in latest:
+                    player.handle_stripped = bool(latest["handle_stripped"])
+                if "remote_thread_injected" in latest:
+                    player.remote_thread_injected = bool(latest["remote_thread_injected"])
+                if "nmi_unbacked_trap" in latest:
+                    player.nmi_unbacked_trap = bool(latest["nmi_unbacked_trap"])
+                if "simd_signature_match" in latest:
+                    player.simd_signature_match = bool(latest["simd_signature_match"])
+
                 # Apply speed
                 speed = 220.0 * player.speed_multiplier
                 player.vx = dx * speed
                 player.vy = dy * speed
                 
-                # Shooting
                 if latest.get("shoot", False):
                     self._fire_projectile(player)
 
-            # Move and resolve collisions
             new_x = player.x + player.vx * dt
             new_y = player.y + player.vy * dt
             
-            # Bounding box / obstacle check
             if not self._check_obstacle_collision(new_x, player.y, player.radius):
                 player.x = max(player.radius, min(self.width - player.radius, new_x))
             if not self._check_obstacle_collision(player.x, new_y, player.radius):
@@ -200,7 +235,6 @@ class AuthoritativeGameServer:
         for player in self.players.values():
             if not player.is_bot:
                 continue
-            # Simple AI patrol & aim towards human players
             human = next((p for p in self.players.values() if not p.is_bot and not p.is_quarantined), None)
             if human:
                 dx = human.x - player.x
@@ -208,21 +242,17 @@ class AuthoritativeGameServer:
                 dist = math.hypot(dx, dy)
                 player.angle = math.atan2(dy, dx)
                 
-                # Move closer or strafe
                 if dist > 250:
                     player.vx = (dx / dist) * 120.0
                     player.vy = (dy / dist) * 120.0
                 else:
-                    # Strafe
                     player.vx = (-dy / dist) * 90.0
                     player.vy = (dx / dist) * 90.0
                     
-                # Shoot occasionally if line of sight is clear
                 has_los = not any(obs.intersects_ray(player.x, player.y, human.x, human.y) for obs in self.obstacles)
                 if has_los and (now - player.last_shot_time) > 1.8:
                     self._fire_projectile(player)
             else:
-                # Random patrol
                 player.vx = math.cos(now + float(hash(player.id) % 10)) * 60.0
                 player.vy = math.sin(now + float(hash(player.id) % 10)) * 60.0
                 
@@ -244,7 +274,6 @@ class AuthoritativeGameServer:
         vx = math.cos(player.angle) * speed
         vy = math.sin(player.angle) * speed
         
-        # Spawn just in front of player
         sx = player.x + math.cos(player.angle) * (player.radius + 6)
         sy = player.y + math.sin(player.angle) * (player.radius + 6)
         
@@ -254,32 +283,26 @@ class AuthoritativeGameServer:
     def _update_projectiles(self, dt):
         for pid, proj in list(self.projectiles.items()):
             proj.update(dt)
-            
-            # Check map bounds
             if proj.x < 0 or proj.x > self.width or proj.y < 0 or proj.y > self.height or proj.is_expired():
                 self.projectiles.pop(pid, None)
                 continue
                 
-            # Check obstacle hit
             hit_obs = any(obs.collides_with_circle(proj.x, proj.y, proj.radius) for obs in self.obstacles)
             if hit_obs:
                 self.projectiles.pop(pid, None)
                 continue
                 
-            # Check player hit
             for pl in self.players.values():
                 if pl.id != proj.owner_id and not pl.is_quarantined:
                     dx = pl.x - proj.x
                     dy = pl.y - proj.y
                     if (dx*dx + dy*dy) < ((pl.radius + proj.radius)**2):
-                        # Hit!
                         pl.health = max(0, pl.health - proj.damage)
                         owner = self.players.get(proj.owner_id)
                         if owner:
                             owner.score += 10
                         self.projectiles.pop(pid, None)
                         
-                        # Respawn if killed
                         if pl.health == 0:
                             pl.health = 100
                             pl.x = random.uniform(100, 1100)
@@ -294,7 +317,6 @@ class AuthoritativeGameServer:
             if player.is_bot:
                 continue
                 
-            # Construct synthetic or received telemetry packet
             packet = {
                 "memory_hash": player.simulated_memory_hash,
                 "has_vmt_hook": player.has_vmt_hook,
@@ -304,13 +326,17 @@ class AuthoritativeGameServer:
                 "angle": player.angle,
                 "aim_jerk": player.aim_jerk_history[-1] if player.aim_jerk_history else 0.0,
                 "wallhack_active": player.wallhack_active,
-                "health": player.health
+                "health": player.health,
+                # Kernel telemetry
+                "handle_stripped": player.handle_stripped,
+                "remote_thread_injected": player.remote_thread_injected,
+                "nmi_unbacked_trap": player.nmi_unbacked_trap,
+                "simd_signature_match": player.simd_signature_match
             }
             
             ev = self.evidence_engine.evaluate_telemetry(player, packet, self.obstacles, self.players)
             new_score, state, event = self.trust_engine.update_with_evidence(player.id, ev)
             
-            # Check if Quarantine must trigger
             if state == TrustState.COMPROMISED and not player.is_quarantined:
                 self.recovery_engine.initiate_recovery(player, trigger_reason="TRUST_SCORE_COLLAPSE")
 
@@ -320,7 +346,6 @@ class AuthoritativeGameServer:
         pr_snaps = [pr.to_dict() for pr in self.projectiles.values()]
         t_scores = {pid: self.trust_engine.get_trust_score(pid) for pid in self.players}
         
-        # Checkpoint is verified if human player trust is healthy
         human_p = next((p for p in self.players.values() if not p.is_bot), None)
         is_verified = True
         if human_p:
@@ -374,7 +399,15 @@ class AuthoritativeGameServer:
                 "clock_drift": round(human_p.clock_drift_factor, 2),
                 "speed_multiplier": round(human_p.speed_multiplier, 2),
                 "aim_jerk": human_p.aim_jerk_history[-1] if human_p.aim_jerk_history else 0.0,
-                "wallhack_active": human_p.wallhack_active
+                "wallhack_active": human_p.wallhack_active,
+                # Ring 0 Kernel Metrics
+                "handle_stripped": human_p.handle_stripped,
+                "remote_thread_injected": human_p.remote_thread_injected,
+                "nmi_unbacked_trap": human_p.nmi_unbacked_trap,
+                "nmi_rip_address": human_p.last_nmi_rip_address,
+                "simd_signature_match": human_p.simd_signature_match,
+                "simd_throughput_gbs": self.last_simd_scan_result.get("throughput_gbs", 5.8),
+                "simd_engine": self.last_simd_scan_result.get("simd_engine", "ARM_NEON_128")
             }
         }
         for cb in self.soc_callbacks:

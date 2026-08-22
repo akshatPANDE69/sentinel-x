@@ -1,7 +1,5 @@
 /**
  * SENTINEL-X CLIENT SECURITY & ATTESTATION AGENT
- * Continuously measures memory page digests, mouse aim jerk, clock drift,
- * and signs dynamic attestation envelopes.
  */
 class SentinelSecurityAgent {
   constructor() {
@@ -11,6 +9,12 @@ class SentinelSecurityAgent {
     this.hasDLLInjected = false;
     this.clockDriftMultiplier = 1.0;
     this.wallhackActive = false;
+    
+    // Ring 0 Kernel state
+    this.handleStripped = false;
+    this.remoteThreadInjected = false;
+    this.nmiUnbackedTrap = false;
+    this.simdSignatureMatch = false;
     
     this.lastFrameTime = performance.now();
     this.lastAimAngle = 0.0;
@@ -23,13 +27,12 @@ class SentinelSecurityAgent {
     const dt = Math.max(0.001, (now - this.lastFrameTime) / 1000.0);
     this.lastFrameTime = now;
 
-    // Angular delta (degrees)
     let deltaAngle = (currentAngle - this.lastAimAngle) * (180.0 / Math.PI);
     while (deltaAngle > 180) deltaAngle -= 360;
     while (deltaAngle < -180) deltaAngle += 360;
 
-    const angularVelocity = Math.abs(deltaAngle) / dt; // deg/sec
-    const angularJerk = Math.abs(angularVelocity - this.lastAimAngularVelocity) / dt; // deg/sec^2
+    const angularVelocity = Math.abs(deltaAngle) / dt;
+    const angularJerk = Math.abs(angularVelocity - this.lastAimAngularVelocity) / dt;
 
     this.lastAimAngle = currentAngle;
     this.lastAimAngularVelocity = angularVelocity;
@@ -53,7 +56,11 @@ class SentinelSecurityAgent {
       has_dll_injected: this.hasDLLInjected,
       clock_drift: this.clockDriftMultiplier,
       wallhack_active: this.wallhackActive,
-      aim_jerk: Math.round(this.getPeakJerk())
+      aim_jerk: Math.round(this.getPeakJerk()),
+      handle_stripped: this.handleStripped,
+      remote_thread_injected: this.remoteThreadInjected,
+      nmi_unbacked_trap: this.nmiUnbackedTrap,
+      simd_signature_match: this.simdSignatureMatch
     };
   }
 
@@ -63,6 +70,10 @@ class SentinelSecurityAgent {
     this.hasDLLInjected = false;
     this.clockDriftMultiplier = 1.0;
     this.wallhackActive = false;
+    this.handleStripped = false;
+    this.remoteThreadInjected = false;
+    this.nmiUnbackedTrap = false;
+    this.simdSignatureMatch = false;
     this.recentJerkSamples = [];
   }
 }

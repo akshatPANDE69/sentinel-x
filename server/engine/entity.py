@@ -26,6 +26,13 @@ class Player:
         self.has_dll_injected = False
         self.clock_drift_factor = 1.0
         self.wallhack_active = False
+        
+        # Ring 0 Kernel Telemetry State
+        self.handle_stripped = False
+        self.remote_thread_injected = False
+        self.nmi_unbacked_trap = False
+        self.simd_signature_match = False
+        self.last_nmi_rip_address = "0x00007FF689AB1200"
 
     def to_dict(self):
         return {
@@ -74,6 +81,10 @@ class Player:
         self.has_dll_injected = False
         self.clock_drift_factor = 1.0
         self.wallhack_active = False
+        self.handle_stripped = False
+        self.remote_thread_injected = False
+        self.nmi_unbacked_trap = False
+        self.simd_signature_match = False
 
 
 class Projectile:
@@ -138,13 +149,10 @@ class Obstacle:
         return (dx * dx + dy * dy) < (r * r)
 
     def intersects_ray(self, x1, y1, x2, y2):
-        # AABB ray intersection
         dx = x2 - x1
         dy = y2 - y1
-        if dx == 0:
-            dx = 1e-6
-        if dy == 0:
-            dy = 1e-6
+        if dx == 0: dx = 1e-6
+        if dy == 0: dy = 1e-6
 
         t1 = (self.x - x1) / dx
         t2 = (self.x + self.w - x1) / dx

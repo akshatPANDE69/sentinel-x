@@ -1,5 +1,5 @@
 /**
- * SENTINEL-X SOC REAL-TIME TELEMETRY & MERKLE LEDGER DASHBOARD
+ * SENTINEL-X SOC TELEMETRY & RING 0 KERNEL MONITOR
  */
 class SOCDashboard {
   constructor() {
@@ -30,7 +30,7 @@ class SOCDashboard {
     const state = data.trust_state || "TRUSTED";
     const isQuarantined = data.is_quarantined || false;
 
-    // 1. Update Header Status Pill
+    // 1. Header Status Pill
     const pill = document.getElementById("headerStatusPill");
     const pillText = document.getElementById("headerStatusText");
     if (pill && pillText) {
@@ -38,14 +38,12 @@ class SOCDashboard {
       pillText.innerText = isQuarantined ? "QUARANTINED" : state;
     }
 
-    // 2. Update Trust Gauge
+    // 2. Trust Dial
     const dialBar = document.getElementById("trustDialBar");
     const dialVal = document.getElementById("trustDialValue");
     if (dialBar && dialVal) {
       const percentage = Math.round(score * 100);
       dialVal.innerText = `${percentage}%`;
-
-      // 440 is the perimeter
       const offset = 440 - (440 * score);
       dialBar.style.strokeDashoffset = offset;
 
@@ -61,7 +59,7 @@ class SOCDashboard {
       }
     }
 
-    // 3. Update Subsystem Matrix
+    // 3. Ring 3 Subsystem Metrics
     const metrics = data.telemetry_metrics || {};
     document.getElementById("metricMemIntegrity").innerText = metrics.memory_intact ? "MATCH (SHA-256)" : "TAMPER DETECTED";
     document.getElementById("metricMemIntegrity").style.color = metrics.memory_intact ? "var(--neon-green)" : "var(--neon-crimson)";
@@ -75,13 +73,34 @@ class SOCDashboard {
     document.getElementById("metricVMTHooks").innerText = metrics.has_vmt_hook ? "HOOK DETECTED" : "CLEAN (VMT)";
     document.getElementById("metricVMTHooks").style.color = metrics.has_vmt_hook ? "var(--neon-crimson)" : "var(--neon-green)";
 
-    // 4. Update Stepper Nodes
-    this.updateStepper(state, isQuarantined, data.recovery_active);
-
-    // 5. Update Checkpoints List
-    if (data.recent_checkpoints) {
-      this.renderCheckpoints(data.recent_checkpoints);
+    // 4. Ring 0 Kernel Telemetry Cards
+    const kOb = document.getElementById("kObRegisterVal");
+    if (kOb) {
+      kOb.innerText = metrics.handle_stripped ? "UNAUTHORIZED OPENPROCESS (STRIPPED)" : "PROTECTED (VM_READ/WRITE STRIPPED)";
+      kOb.style.color = metrics.handle_stripped ? "var(--neon-crimson)" : "var(--neon-green)";
     }
+
+    const kTh = document.getElementById("kThreadVal");
+    if (kTh) {
+      kTh.innerText = metrics.remote_thread_injected ? "REMOTE INJECTION THREAD DETECTED" : "CLEAN (0 INJECTED THREADS)";
+      kTh.style.color = metrics.remote_thread_injected ? "var(--neon-crimson)" : "var(--neon-green)";
+    }
+
+    const kNmi = document.getElementById("kNmiVal");
+    const kNmiAddr = document.getElementById("kNmiRipAddr");
+    if (kNmi && kNmiAddr) {
+      kNmi.innerText = metrics.nmi_unbacked_trap ? "TRAPPED (UNBACKED PRIVATE PAGE)" : "RIP BACKED (ntdll.dll)";
+      kNmi.style.color = metrics.nmi_unbacked_trap ? "var(--neon-crimson)" : "var(--neon-green)";
+      kNmiAddr.innerText = metrics.nmi_rip_address || "0x00007FF689AB1200";
+    }
+
+    const kSimd = document.getElementById("kSimdVal");
+    if (kSimd) {
+      kSimd.innerText = `${metrics.simd_throughput_gbs || 5.8} GB/s (${metrics.simd_engine || "ARM_NEON / AVX2"})`;
+    }
+
+    // 5. Stepper
+    this.updateStepper(state, isQuarantined, data.recovery_active);
   }
 
   updateStepper(state, isQuarantined, recoveryActive) {
@@ -112,26 +131,6 @@ class SOCDashboard {
     }
   }
 
-  renderCheckpoints(checkpoints) {
-    const list = document.getElementById("checkpointList");
-    if (!list) return;
-
-    list.innerHTML = "";
-    checkpoints.slice(0, 6).forEach(cp => {
-      const card = document.createElement("div");
-      card.className = `checkpoint-card ${cp.is_verified ? "verified" : "compromised"}`;
-      card.innerHTML = `
-        <div>
-          <span>FRAME #${cp.frame_id}</span>
-          <span style="color: var(--text-muted); margin-left: 8px;">${cp.player_count} Entities</span>
-        </div>
-        <div class="merkle-hash">${cp.merkle_root.substring(0, 14)}...</div>
-        <div><span class="log-tag ${cp.is_verified ? "clean" : "alert"}">${cp.is_verified ? "VERIFIED" : "TAMPERED"}</span></div>
-      `;
-      list.appendChild(card);
-    });
-  }
-
   logEvent(tag, tagType, message) {
     const logEl = document.getElementById("socAuditLog");
     if (!logEl) return;
@@ -146,7 +145,7 @@ class SOCDashboard {
     `;
 
     logEl.insertBefore(entry, logEl.firstChild);
-    if (logEl.children.length > 50) {
+    if (logEl.children.length > 60) {
       logEl.removeChild(logEl.lastChild);
     }
   }
