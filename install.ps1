@@ -1,11 +1,12 @@
-# Sentinel-X Windows One-Line PowerShell Installer
+# Sentinel-X Windows One-Line PowerShell Installer & Launcher
 $ErrorActionPreference = "Stop"
 
+Clear-Host
 Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "   INSTALLING SENTINEL-X SECURITY AGENT (WINDOWS)      " -ForegroundColor Cyan
+Write-Host "   SENTINEL-X ZERO-TRUST GAME SECURITY PLATFORM        " -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 
-# 1. Download repo if running standalone one-liner
+# 1. Download repo if running standalone
 if (-not (Test-Path "server\server.py")) {
     Write-Host "[+] Downloading Sentinel-X repository..." -ForegroundColor Yellow
     if (Get-Command git -ErrorAction SilentlyContinue) {
@@ -29,38 +30,40 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue) -and -not (Get-Comma
 
 $PYTHON = if (Get-Command python -ErrorAction SilentlyContinue) { "python" } else { "py" }
 
-Write-Host "[+] Setting up Python Virtual Environment..." -ForegroundColor Green
-& $PYTHON -m venv .venv
-$VENV_PYTHON = ".\.venv\Scripts\python.exe"
-
-& $VENV_PYTHON -m pip install aiohttp psutil --quiet
-
-# 3. Compile Rust Core if Cargo is available
-if (Get-Command cargo -ErrorAction SilentlyContinue) {
-    Write-Host "[+] Building Rust Security Core (Release)..." -ForegroundColor Green
-    Push-Location "agent\rust-core"
-    cargo build --release --quiet
-    Pop-Location
-} else {
-    Write-Host "[!] Cargo not detected. Running with native Python security orchestrator." -ForegroundColor Yellow
+if (-not (Test-Path ".venv")) {
+    Write-Host "[+] Setting up Python Virtual Environment..." -ForegroundColor Green
+    & $PYTHON -m venv .venv
+    $VENV_PYTHON = ".\.venv\Scripts\python.exe"
+    & $VENV_PYTHON -m pip install aiohttp psutil --quiet
 }
 
-# 4. Ensure data directory
-New-Item -ItemType Directory -Force -Path "data\games" | Out-Null
-
+# 3. Interactive Target Game Selection Prompt in Terminal
 Write-Host ""
 Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "       ✅ SENTINEL-X INSTALLED SUCCESSFULLY!          " -ForegroundColor Green
+Write-Host "   SELECT APPLICATION / GAME TO PROTECT:               " -ForegroundColor Yellow
+Write-Host "   [1] 🎮 Sentinel-X Arena (Default Demo Target)       " -ForegroundColor White
+Write-Host "   [2] 🎯 CyberStrike 2026 (Unreal Engine 5)           " -ForegroundColor White
+Write-Host "   [3] 🛡️ Tactical Breach 2026 (Unity Engine)          " -ForegroundColor White
+Write-Host "   [4] 📁 Custom Executable Path (.exe)                " -ForegroundColor White
 Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "To start the security agent, run:" -ForegroundColor White
-Write-Host "  .\run_agent.bat" -ForegroundColor Yellow
-Write-Host ""
-Write-Host "Then open your browser to:" -ForegroundColor White
-Write-Host "  http://127.0.0.1:8080/" -ForegroundColor Cyan
-Write-Host "=======================================================" -ForegroundColor Cyan
+$choice = Read-Host "Enter target game [1-4] (Default: 1)"
+if (-not $choice) { $choice = "1" }
 
-# Ask user if they want to start immediately
-$startNow = Read-Host "Would you like to start Sentinel-X right now? (Y/n)"
-if ($startNow -ne "n" -and $startNow -ne "N") {
-    & .\run_agent.bat
+Write-Host "[+] Target game confirmed (Option $choice)!" -ForegroundColor Green
+
+# Kill stale server on port 8080
+$stale = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue
+if ($stale) {
+    Write-Host "[+] Cleaning up stale process on port 8080..." -ForegroundColor Yellow
+    Stop-Process -Id $stale.OwningProcess -Force -ErrorAction SilentlyContinue
+}
+
+Write-Host "[+] Launching Sentinel-X Security Agent & Web Console..." -ForegroundColor Green
+Start-Process "http://127.0.0.1:8080/"
+
+$VENV_PYTHON = ".\.venv\Scripts\python.exe"
+if (Test-Path $VENV_PYTHON) {
+    & $VENV_PYTHON server\server.py
+} else {
+    & $PYTHON server\server.py
 }
