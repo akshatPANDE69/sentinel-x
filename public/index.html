@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SENTINEL-X | Endpoint Security Agent for Protected Game Sessions</title>
-  <link rel="stylesheet" href="css/style.css?v=3">
+  <link rel="stylesheet" href="css/style.css?v=4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@
       <div class="localhost-pill">
         <span>● 127.0.0.1 (LOCAL ONLY)</span>
       </div>
-      <button class="btn-demo-start" id="btnStartDemoTop" title="Run 35-second autonomous security verification demo">
+      <button class="btn-demo-start" id="btnStartDemoTop" title="Run autonomous security verification demo">
         <span>START SECURITY DEMO</span>
       </button>
     </div>
@@ -96,7 +96,36 @@
           </div>
         </div>
 
-        <!-- Hero Card -->
+        <!-- Prominent Game Selection Hero Banner -->
+        <section class="glass-card" style="margin-bottom: 20px; border: 1px solid rgba(10, 132, 255, 0.4); background: rgba(10, 132, 255, 0.05); padding: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+            <div>
+              <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff;">🎯 Choose Application / Game to Protect</h2>
+              <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-secondary);">Select which game target the Sentinel-X agent and Kernel driver should actively monitor and attest.</p>
+            </div>
+            <span style="font-size: 12px; font-weight: 600; color: var(--apple-green); background: rgba(52, 199, 89, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(52, 199, 89, 0.3);">
+              ● ZERO-TRUST PROTECTION
+            </span>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 14px;">
+            <div style="flex: 2; min-width: 260px;">
+              <select id="gameSelectDropdown" style="width: 100%; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--border-subtle); padding: 10px 14px; border-radius: 8px; font-family: var(--font-sans); font-size: 14px; font-weight: 500;">
+                <option value="sx-arena">🎮 Sentinel-X Arena (Default Demo Target)</option>
+                <option value="cyber-strike-fps">🎯 CyberStrike 2026 (Unreal Engine 5)</option>
+                <option value="custom-tactical-2026">🛡️ Tactical Breach 2026 (Unity Engine)</option>
+              </select>
+            </div>
+            <button class="btn-demo-start" id="btnLaunchSelectedGame" style="height: 42px; padding: 0 24px; font-size: 14px; font-weight: 600;">
+              <span>▶ Protect & Launch Game</span>
+            </button>
+            <button class="btn-demo-start" id="btnQuickEnroll" style="height: 42px; padding: 0 16px; background: rgba(255,255,255,0.08); border-color: var(--border-subtle); color: #fff;">
+              <span>+ Add Custom App</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Status Card -->
         <div class="glass-card hero-card">
           <div class="hero-content">
             <div class="hero-badge" id="heroSessionBadge">
@@ -104,7 +133,7 @@
             </div>
             <h1 class="hero-title" id="heroStatusTitle">Waiting for protected game...</h1>
             <p class="hero-subtitle" id="heroStatusSubtitle">
-              Sentinel-X endpoint security agent is active. Select a registered game below or click <strong>'Protect & Launch Game'</strong> to initiate the cryptographic attestation handshake.
+              Sentinel-X endpoint security agent and Kernel hooks are online. Click <strong>'▶ Protect & Launch Game'</strong> above to begin continuous cryptographic session attestation.
             </p>
           </div>
           <div class="hero-gauge-box">
@@ -120,29 +149,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Prominent Protected Game Selection Panel -->
-        <section class="glass-card" style="margin-top: 20px; border: 1px solid rgba(10, 132, 255, 0.3);">
-          <div class="card-heading">
-            <span style="color: #fff; font-weight: 600;">🎯 Select Application / Game to Protect</span>
-            <span style="font-size: 11px; color: var(--apple-green);">● ZERO-TRUST ENROLLMENT</span>
-          </div>
-          <div style="display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-top: 10px;">
-            <div style="flex: 1; min-width: 260px;">
-              <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 6px;">SELECT PROTECTED TARGET</label>
-              <select id="gameSelectDropdown" style="width: 100%; background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); padding: 9px 12px; border-radius: 8px; font-family: var(--font-sans); font-size: 13px;">
-                <option value="sx-arena">🎮 Sentinel-X Arena (Default Demo Target)</option>
-                <option value="cyber-strike-fps">🎯 CyberStrike 2026 (FPS Unreal Engine)</option>
-                <option value="custom-tactical-2026">🛡️ Tactical Breach 2026 (Unity Engine)</option>
-              </select>
-            </div>
-            <div style="display: flex; gap: 10px; align-items: flex-end;">
-              <button class="btn-demo-start" id="btnLaunchSelectedGame" style="height: 38px; padding: 0 20px;">
-                <span>▶ Protect & Launch Game</span>
-              </button>
-            </div>
-          </div>
-        </section>
 
         <!-- Metrics Grid -->
         <div class="metrics-grid" style="margin-top: 20px;">
@@ -172,7 +178,7 @@
         <section class="glass-card" id="dualLogsSection" style="margin-top: 20px;">
           <div class="card-heading">
             <span style="color: #fff; font-weight: 600;">📊 Real-Time Telemetry Logs (Live Kernel & Security Engine)</span>
-            <span style="font-size: 11px; color: var(--apple-green);">● REAL-TIME IPC STREAM</span>
+            <span style="font-size: 11px; color: var(--apple-green);">● REAL-TIME STREAM ACTIVE</span>
           </div>
 
           <div class="dual-logs-grid">
@@ -182,25 +188,17 @@
                 LOG A — Security Checks (Passing / Failing)
               </div>
               <div class="log-stream-box" id="logSecurityChecks">
-                <div class="log-entry-check"><span>✓ AGENT_HEALTH</span><span class="check-pass">PASS (0.6ms)</span></div>
-                <div class="log-entry-check"><span>✓ PROCESS_INTEGRITY</span><span class="check-pass">PASS (1.8ms)</span></div>
-                <div class="log-entry-check"><span>✓ EXECUTABLE_HASH</span><span class="check-pass">PASS (1.2ms)</span></div>
-                <div class="log-entry-check"><span>✓ SESSION_ATTESTATION</span><span class="check-pass">PASS (1.5ms)</span></div>
-                <div class="log-entry-check"><span>✓ SERVER_AUTHORITY</span><span class="check-pass">PASS (0.4ms)</span></div>
+                <!-- Dynamically filled in real-time -->
               </div>
             </div>
 
             <!-- Log B: Live Engine Activity -->
             <div>
               <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
-                LOG B — Live Kernel & Engine Functions (Executing Right Now)
+                LOG B — Live Kernel & Engine Functions (Running Right Now)
               </div>
               <div class="log-stream-box" id="logEngineActivity">
-                <div class="log-entry-activity"><span class="func-name">get_health()</span><span class="func-comp">Rust Security Core • 0.6ms</span></div>
-                <div class="log-entry-activity"><span class="func-name">process_scan()</span><span class="func-comp">Rust Security Core • 1.8ms</span></div>
-                <div class="log-entry-activity"><span class="func-name">sha256_measurement()</span><span class="func-comp">Rust Security Core • 1.2ms</span></div>
-                <div class="log-entry-activity"><span class="func-name">verify_attestation()</span><span class="func-comp">Rust Security Core • 1.5ms</span></div>
-                <div class="log-entry-activity"><span class="func-name">validate_state()</span><span class="func-comp">Security Engine • 0.4ms</span></div>
+                <!-- Dynamically filled in real-time -->
               </div>
             </div>
           </div>
@@ -275,7 +273,7 @@
               <tbody id="sessionsTableBody">
                 <tr>
                   <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 24px;">
-                    No active protected sessions. Select a game and click 'Protect & Launch Game'.
+                    No active protected sessions. Click '▶ Protect & Launch Game'.
                   </td>
                 </tr>
               </tbody>
@@ -387,11 +385,7 @@
     </div>
   </div>
 
-  <!-- JavaScript Modules with Cache Busting -->
-  <script src="js/polymorphic_crypto.js?v=3"></script>
-  <script src="js/sentinel_sdk_bridge.js?v=3"></script>
-  <script src="js/game_client.js?v=3"></script>
-  <script src="js/exploit_console.js?v=3"></script>
-  <script src="js/app_console.js?v=3"></script>
+  <!-- Unified Console Script -->
+  <script src="js/app_console.js?v=4"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
 cd /d "%~dp0"
 
@@ -18,6 +18,17 @@ if exist agent\rust-core\target\release\sentinel-core.exe (
     start /B agent\rust-core\target\release\sentinel-core.exe
 )
 
+echo.
+echo =======================================================
+echo   SELECT TARGET APPLICATION / GAME TO PROTECT:
+echo   [1] Sentinel-X Arena (Default Demo Target)
+echo   [2] CyberStrike 2026 (Unreal Engine 5)
+echo   [3] Tactical Breach 2026 (Unity Engine)
+echo =======================================================
+set /p GAME_CHOICE="Enter target game [1-3] (Default: 1): "
+if "%GAME_CHOICE%"=="" set GAME_CHOICE=1
+
+echo [+] Target application confirmed!
 echo [+] Starting Local Authoritative Server and Security Console...
 echo [+] Opening http://127.0.0.1:8080/ in your default browser...
 
