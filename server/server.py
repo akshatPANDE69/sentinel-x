@@ -1,3 +1,4 @@
+import ssl
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -322,8 +323,24 @@ class SentinelServer:
     async def start(self):
         runner = web.AppRunner(self.app)
         await runner.setup()
+        
+        # Primary HTTP site
         site = web.TCPSite(runner, self.host, self.port)
         await site.start()
+        
+        # Optional HTTPS site if SSL certificates exist
+        ssl_ctx = None
+        cert_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "cert.pem"))
+        key_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "key.pem"))
+        if os.path.exists(cert_path) and os.path.exists(key_path):
+            try:
+                ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                ssl_ctx.load_cert_chain(cert_path, key_path)
+                https_site = web.TCPSite(runner, self.host, 8443, ssl_context=ssl_ctx)
+                await https_site.start()
+                print(f"  HTTPS URL: https://{self.host}:8443")
+            except Exception as e:
+                pass
         print(f"\n=======================================================")
         print(f"  SENTINEL-X ZERO-TRUST GAME INTEGRITY SERVER ONLINE   ")
         print(f"  URL: http://{self.host}:{self.port}")
