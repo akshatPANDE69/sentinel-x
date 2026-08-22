@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENTINEL-X | Zero-Trust Game Integrity Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation / Brand Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">
+        <div class="brand-icon-inner"></div>
+      </div>
+      <div>
+        <div class="brand-title">SENTINEL-<span>X</span></div>
+        <div class="brand-tagline">Zero-Trust Game Integrity & Autonomous Session Recovery</div>
+      </div>
+    </div>
+
+    <div class="header-status">
+      <div class="status-pill" id="headerStatusPill">
+        <div class="status-indicator"></div>
+        <span id="headerStatusText">SESSION TRUSTED</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Multi-Panel Layout -->
+  <main class="main-layout">
+
+    <!-- Left Panel: 60 FPS Arena Game Viewport -->
+    <section class="glass-panel">
+      <div class="panel-header">
+        <span>// CYBERPUNK ARENA // AUTHORITATIVE 60HZ</span>
+        <span class="badge">WASD to Move | Mouse to Aim & Shoot</span>
+      </div>
+      
+      <div class="game-viewport">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Dynamic Overlay HUD -->
+        <div class="arena-hud">
+          <div class="hud-player-stats">
+            <div id="playerScoreText">SCORE: 0</div>
+            <div id="playerHealthText" style="color: var(--neon-cyan); font-weight: 700; margin-top: 2px;">100 HP</div>
+            <div class="health-bar-container">
+              <div class="health-bar-fill" id="playerHealthBar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quarantine Isolation Alert Banner -->
+        <div class="quarantine-banner" id="quarantineBanner">
+          <div>⚠️ SESSION COMPROMISED</div>
+          <div class="subtext">CLIENT QUARANTINED — ROLLING BACK TO LAST TRUSTED CHECKPOINT</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Panel: Interactive Cheat Injection Suite -->
+    <aside class="glass-panel">
+      <div class="panel-header">
+        <span>// EXPLOIT INJECTION SUITE</span>
+        <span class="badge" style="color: var(--neon-crimson); border: 1px solid var(--neon-crimson);">ATTACK CONSOLE</span>
+      </div>
+
+      <div class="exploit-panel">
+        <!-- Exploit 1: Speedhack -->
+        <div class="exploit-card" id="card-speedhack">
+          <div class="exploit-info">
+            <div class="exploit-name">🚀 Speedhack 3.5×</div>
+            <div class="exploit-desc">Skews local physics tick clock multiplier</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleSpeedhack">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Exploit 2: Aimbot -->
+        <div class="exploit-card" id="card-aimbot">
+          <div class="exploit-info">
+            <div class="exploit-name">🎯 Aimbot Micro-Snap</div>
+            <div class="exploit-desc">Instantaneous 0ms angular jerk target lock</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleAimbot">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Exploit 3: Memory Tamper -->
+        <div class="exploit-card" id="card-memory_tamper">
+          <div class="exploit-info">
+            <div class="exploit-name">🧱 Memory Hash Tamper</div>
+            <div class="exploit-desc">Corrupts `.text` code section checksum</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleMemTamper">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Exploit 4: Wallhack ESP -->
+        <div class="exploit-card" id="card-wallhack">
+          <div class="exploit-info">
+            <div class="exploit-name">👻 Wallhack (ESP)</div>
+            <div class="exploit-desc">Occluded raycast barrier violation</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleWallhack">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Exploit 5: VMT Hook -->
+        <div class="exploit-card" id="card-vmt_hook">
+          <div class="exploit-info">
+            <div class="exploit-name">💉 VMT Trampoline Hook</div>
+            <div class="exploit-desc">Injects unverified memory hook pointer</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleVMTHook">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- The Hero Demo Action Button -->
+        <button class="btn-hero-recovery" id="btnTriggerRecovery">
+          <span>⚡ TRIGGER AUTONOMOUS RECOVERY</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Bottom Full-Width: Sentinel-X SOC Dashboard -->
+    <section class="glass-panel soc-container">
+      
+      <!-- 1. Trust Dial & Subsystem Metrics -->
+      <div class="trust-gauge-panel">
+        <div class="dial-label">SESSION TRUST SCORE</div>
+        <div class="dial-wrapper">
+          <svg class="dial-circle" viewBox="0 0 160 160">
+            <circle class="dial-bg" cx="80" cy="80" r="70"></circle>
+            <circle class="dial-bar" id="trustDialBar" cx="80" cy="80" r="70"></circle>
+          </svg>
+          <div class="dial-value" id="trustDialValue">100%</div>
+        </div>
+
+        <div class="subsystem-metrics">
+          <div class="metric-box">
+            <div class="metric-title">Integrity Hash</div>
+            <div class="metric-val" id="metricMemIntegrity" style="color: var(--neon-green);">MATCH</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-title">Aim Jerk</div>
+            <div class="metric-val" id="metricAimJerk">0 deg/s²</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-title">Clock Skew</div>
+            <div class="metric-val" id="metricClockDrift">1.0x Delta</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-title">VMT Hooks</div>
+            <div class="metric-val" id="metricVMTHooks" style="color: var(--neon-green);">CLEAN</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Recovery State Machine & Merkle Checkpoints -->
+      <div class="stepper-container">
+        <div class="panel-header" style="padding: 0 0 8px 0; background: transparent; border: none;">
+          <span>// AUTONOMOUS RECOVERY PIPELINE</span>
+        </div>
+
+        <!-- Stepper Nodes -->
+        <div class="stepper-steps">
+          <div class="stepper-line"></div>
+          <div class="step-node active" id="step-observe">
+            <div class="step-dot">01</div>
+            <div class="step-label">OBSERVE</div>
+          </div>
+          <div class="step-node" id="step-degraded">
+            <div class="step-dot">02</div>
+            <div class="step-label">DEGRADED</div>
+          </div>
+          <div class="step-node" id="step-quarantine">
+            <div class="step-dot">03</div>
+            <div class="step-label">QUARANTINE</div>
+          </div>
+          <div class="step-node" id="step-rewind">
+            <div class="step-dot">04</div>
+            <div class="step-label">REWIND</div>
+          </div>
+          <div class="step-node" id="step-reattest">
+            <div class="step-dot">05</div>
+            <div class="step-label">RE-ATTEST</div>
+          </div>
+          <div class="step-node completed" id="step-restored">
+            <div class="step-dot">06</div>
+            <div class="step-label">RESTORED</div>
+          </div>
+        </div>
+
+        <!-- Checkpoints Tree List -->
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+          CRYPTOGRAPHIC MERKLE CHECKPOINT RING BUFFER (LAST 600 FRAMES)
+        </div>
+        <div class="checkpoint-list" id="checkpointList"></div>
+      </div>
+
+      <!-- 3. Real-Time Cybernetic Security Audit Log -->
+      <div style="display: flex; flex-direction: column;">
+        <div class="panel-header" style="background: rgba(0, 240, 255, 0.03);">
+          <span>// SECURITY AUDIT STREAM</span>
+          <span class="badge">LIVE WEBSOCKET</span>
+        </div>
+        <div class="audit-log" id="socAuditLog">
+          <div class="log-entry">
+            <span class="log-time">--:--:--</span>
+            <span class="log-tag clean">INITIALIZE</span>
+            <span class="log-msg">Sentinel-X Multi-Vector Attestation Engine armed</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Client-side Scripts -->
+  <script src="js/security_agent.js"></script>
+  <script src="js/exploit_console.js"></script>
+  <script src="js/soc_dashboard.js"></script>
+  <script src="js/game_client.js"></script>
+</body>
+</html>
