@@ -63,6 +63,17 @@
          TAB 1: OVERVIEW (Minimal Apple Product Screen)
          ==================================================================== -->
     <div class="tab-content active" id="tab-overview">
+    <!-- Live Current Operation Status Bar -->
+    <div class="current-op-bar" id="currentOpBar">
+      <div class="current-op-label">
+        <div class="current-op-dot"></div>
+        <span>CURRENT OPERATION:</span>
+        <strong id="liveOpName" style="color: var(--apple-blue);">process_scan()</strong>
+      </div>
+      <div class="current-op-meta">
+        <span id="liveOpComponent">Rust Security Core</span> &nbsp;•&nbsp; <span id="liveOpDuration">1.4 ms</span> &nbsp;•&nbsp; <span id="liveOpStatus" style="color: var(--apple-green);">RUNNING</span>
+      </div>
+    </div>
       
       <!-- Hero Status Card -->
       <section class="glass-card hero-status-card">
@@ -180,6 +191,41 @@
         </section>
 
       </div>
+      <!-- Dual Live Stream Panels (Log A: Security Checks | Log B: Live Engine Activity) -->
+      <section class="glass-card" id="dualLogsSection" style="margin-top: 24px;">
+        <div class="card-heading">
+          <span>Live Telemetry Streams (Rust Core & Local Engine)</span>
+          <span style="font-size: 11px; color: var(--apple-green);">● REAL-TIME IPC (127.0.0.1)</span>
+        </div>
+
+        <div class="dual-logs-grid">
+          <!-- Log A: Security Checks -->
+          <div>
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
+              LOG A — Security Checks (Passing / Failing)
+            </div>
+            <div class="log-stream-box" id="logSecurityChecks">
+              <div class="log-entry-check"><span>✓ PROCESS_INTEGRITY</span><span class="check-pass">PASS (1.8ms)</span></div>
+              <div class="log-entry-check"><span>✓ EXECUTABLE_HASH</span><span class="check-pass">PASS (1.2ms)</span></div>
+              <div class="log-entry-check"><span>✓ SESSION_ATTESTATION</span><span class="check-pass">PASS (1.5ms)</span></div>
+              <div class="log-entry-check"><span>✓ SERVER_AUTHORITY</span><span class="check-pass">PASS (0.4ms)</span></div>
+            </div>
+          </div>
+
+          <!-- Log B: Live Engine Activity -->
+          <div>
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
+              LOG B — Live Engine Activity (Executing Now)
+            </div>
+            <div class="log-stream-box" id="logEngineActivity">
+              <div class="log-entry-activity"><span class="func-name">process_scan()</span><span class="func-comp">Rust Security Core • 1.8ms</span></div>
+              <div class="log-entry-activity"><span class="func-name">sha256_measurement()</span><span class="func-comp">Rust Security Core • 1.2ms</span></div>
+              <div class="log-entry-activity"><span class="func-name">verify_attestation()</span><span class="func-comp">Rust Security Core • 1.5ms</span></div>
+              <div class="log-entry-activity"><span class="func-name">validate_state()</span><span class="func-comp">Security Engine • 0.4ms</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <!-- ====================================================================
@@ -325,6 +371,24 @@
       <section class="glass-card">
         <div class="card-heading">Registered Protected Games (Game Registry)</div>
         <div id="registeredGamesList">
+        <div class="card-heading" style="margin-top: 24px;">Register New Protected Game</div>
+        <form id="formAddGame" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--border-subtle);">
+          <div style="flex: 1; min-width: 160px;">
+            <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Game ID</label>
+            <input type="text" id="regGameId" placeholder="e.g. valor-ops" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-sans);">
+          </div>
+          <div style="flex: 1.5; min-width: 180px;">
+            <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Game Name</label>
+            <input type="text" id="regGameName" placeholder="e.g. Valorant Ops" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-sans);">
+          </div>
+          <div style="flex: 2; min-width: 220px;">
+            <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Executable Hash (SHA-256)</label>
+            <input type="text" id="regGameHash" placeholder="e.g. d41d8cd98f00b204e9800998ecf8427e" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px;">
+          </div>
+          <button type="submit" class="btn-demo-start" style="height: 32px; padding: 0 16px;">
+            <span>+ Register Game</span>
+          </button>
+        </form>
           <div class="checklist-item">
             <div>
               <div class="check-label"><strong>Sentinel-X Arena</strong> (sx-arena)</div>

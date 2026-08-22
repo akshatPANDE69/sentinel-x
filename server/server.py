@@ -12,6 +12,7 @@ from server.engine.game_server import AuthoritativeGameServer
 from server.security.crypto_engine import PolymorphicCryptoEngine
 from server.registry.game_registry import GameRegistry
 from server.session.session_manager import SessionManager, SessionState
+from server.security.checks import UnifiedSecurityScheduler
 from agent.sentinel_agent import SentinelXAgent, AgentState
 
 class SentinelServer:
@@ -26,6 +27,7 @@ class SentinelServer:
         self.game_engine = AuthoritativeGameServer(tick_rate=60)
         self.crypto_engine = PolymorphicCryptoEngine()
         self.agent = SentinelXAgent(server_url=f"http://{host}:{port}")
+        self.scheduler = UnifiedSecurityScheduler()
         
         self.connected_game_clients = set()
         self.connected_soc_clients = set()
@@ -158,8 +160,17 @@ class SentinelServer:
     async def broadcast_soc_message(self, msg_dict):
         if not self.connected_soc_clients:
             return
-        # Append real session manager state
+        # Append real session manager state and security check streams
         active_sess = self.session_manager.get_active_session()
+        is_compromised = (msg_dict.get("trust_score", 1.0) < 0.50)
+        self.scheduler.run_scheduled_checks(is_session_active=(active_sess is not None), is_compromised=is_compromised)
+        
+        telemetry_stream = self.scheduler.get_telemetry_payload()
+        msg_dict["current_operation"] = telemetry_stream["current_operation"]
+        msg_dict["recent_checks"] = telemetry_stream["recent_checks"]
+        msg_dict["recent_activity"] = telemetry_stream["recent_activity"]
+        msg_dict["operation_counters"] = telemetry_stream["operation_counters"]
+
         if active_sess:
             msg_dict["session_id"] = active_sess.session_id
             msg_dict["game_id"] = active_sess.game_id

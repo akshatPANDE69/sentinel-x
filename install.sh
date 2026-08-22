@@ -29,6 +29,21 @@ source .venv/bin/activate
 pip install --upgrade pip --quiet
 pip install aiohttp psutil --quiet
 
+# Ensure Rust Toolchain & Build Rust Core
+if [ -f "$HOME/.cargo/env" ]; then
+    source "$HOME/.cargo/env"
+fi
+
+if command -v cargo &> /dev/null; then
+    echo "Building Sentinel-X Rust Security Core (Release Mode)..."
+    (cd agent/rust-core && cargo build --release --quiet)
+else
+    echo "Notice: Cargo not found in current PATH. Installing standalone minimal toolchain..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain stable
+    source "$HOME/.cargo/env"
+    (cd agent/rust-core && cargo build --release --quiet)
+fi
+
 # Compile native lockless SPSC queue and SIMD scanner
 if command -v clang++ &> /dev/null; then
     echo "Compiling native SPSC Queue & SIMD Vector Scanner..."
@@ -41,6 +56,9 @@ if command -v openssl &> /dev/null && [ ! -f "server/cert.pem" ]; then
     echo "Generating local SSL certificate for HTTPS..."
     openssl req -x509 -newkey rsa:2048 -keyout server/key.pem -out server/cert.pem -days 365 -nodes -subj "/CN=localhost" 2>/dev/null || true
 fi
+
+# Ensure game registry directory
+mkdir -p data/games
 
 echo ""
 echo "======================================================="

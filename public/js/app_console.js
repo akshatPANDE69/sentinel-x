@@ -3,7 +3,9 @@
  * Zero-Mock Real Security Architecture:
  * - Truthful Zero-State (Waiting for Protected Game)
  * - Dynamic SDK Handshake & Session Attestation
- * - Real Multi-Tier Policy Engine & Nonce Challenge Verification
+ * - Dual Live Telemetry Logs (Security Checks + Engine Activity)
+ * - Live Current Operation Bar
+ * - Dynamic Game Registration Form
  */
 class SentinelAppConsole {
   constructor() {
@@ -17,6 +19,7 @@ class SentinelAppConsole {
     this.initDemoButtons();
     this.initProfileSelector();
     this.initDeveloperToggles();
+    this.initAddGameForm();
     this.fetchRegisteredGames();
     this.connectSOC();
   }
@@ -39,7 +42,6 @@ class SentinelAppConsole {
       c.classList.toggle("active", c.id === `tab-${tabId}`);
     });
     if (tabId === "game" && !window.sentinelSDK?.isAttested) {
-      // Auto-initialize game client SDK if opening game tab
       this.launchGameClientSDK();
     }
   }
@@ -60,6 +62,40 @@ class SentinelAppConsole {
     select.addEventListener("change", (e) => {
       this.monitoringProfile = e.target.value;
       this.logActivity("Profile updated", `Monitoring profile set to ${this.monitoringProfile}`);
+    });
+  }
+
+  initAddGameForm() {
+    const form = document.getElementById("formAddGame");
+    if (!form) return;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const gameId = document.getElementById("regGameId")?.value.trim();
+      const name = document.getElementById("regGameName")?.value.trim();
+      const hash = document.getElementById("regGameHash")?.value.trim();
+
+      if (!gameId || !name || !hash) return;
+
+      try {
+        const res = await fetch("/api/games/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            game_id: gameId,
+            name: name,
+            version: "1.0.0",
+            platforms: ["macos", "windows"],
+            executable_hash: hash,
+            developer_public_key: `pk_${gameId}_dev`
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          this.logActivity("Game Registered", `Added '${name}' (${gameId}) to Game Registry`);
+          form.reset();
+          this.fetchRegisteredGames();
+        }
+      } catch (err) {}
     });
   }
 
@@ -108,6 +144,8 @@ class SentinelAppConsole {
       const data = await res.json();
       const list = document.getElementById("registeredGamesList");
       if (list && data.games) {
+        // Keep form at the bottom
+        const formHtml = document.getElementById("formAddGame")?.outerHTML || "";
         list.innerHTML = data.games.map(g => `
           <div class="checklist-item">
             <div>
@@ -116,7 +154,8 @@ class SentinelAppConsole {
             </div>
             <div class="check-status">✓ REGISTERED</div>
           </div>
-        `).join("");
+        `).join("") + (formHtml ? `<div style="margin-top: 16px;">${formHtml}</div>` : "");
+        this.initAddGameForm();
       }
     } catch (err) {}
   }
@@ -148,7 +187,42 @@ class SentinelAppConsole {
 
     this.activeSessionId = sessionId;
 
-    // 1. Status Pill & Hero Text
+    // 1. Current Operation Bar
+    const curOp = data.current_operation;
+    if (curOp) {
+      const opName = document.getElementById("liveOpName");
+      const opComp = document.getElementById("liveOpComponent");
+      const opDur = document.getElementById("liveOpDuration");
+      const opStat = document.getElementById("liveOpStatus");
+      if (opName) opName.innerText = curOp.operation;
+      if (opComp) opComp.innerText = curOp.component;
+      if (opDur) opDur.innerText = `${curOp.duration_ms} ms`;
+      if (opStat) opStat.innerText = curOp.status;
+    }
+
+    // 2. Dual Log Streams (Log A: Security Checks | Log B: Engine Activity)
+    const checksBox = document.getElementById("logSecurityChecks");
+    const activityBox = document.getElementById("logEngineActivity");
+
+    if (checksBox && data.recent_checks) {
+      checksBox.innerHTML = data.recent_checks.map(c => `
+        <div class="log-entry-check">
+          <span>${c.status === "PASS" ? "✓" : "✕"} ${c.check_id}</span>
+          <span class="${c.status === "PASS" ? "check-pass" : "check-fail"}">${c.status} (${c.duration_ms}ms)</span>
+        </div>
+      `).reverse().join("");
+    }
+
+    if (activityBox && data.recent_activity) {
+      activityBox.innerHTML = data.recent_activity.map(a => `
+        <div class="log-entry-activity">
+          <span class="func-name">${a.operation}</span>
+          <span class="func-comp">${a.component} • ${a.duration_ms}ms • ${a.result}</span>
+        </div>
+      `).reverse().join("");
+    }
+
+    // 3. Status Pill & Hero Text
     const pill = document.getElementById("appStatusPill");
     const pillText = document.getElementById("appStatusText");
     const heroTitle = document.getElementById("heroStatusTitle");
@@ -158,11 +232,10 @@ class SentinelAppConsole {
     const tileThreatsCount = document.getElementById("tileThreatsCount");
 
     if (!sessionId) {
-      // Zero State
       if (pill) pill.className = "status-pill";
       if (pillText) pillText.innerText = "AGENT ACTIVE (WAITING)";
       if (heroTitle) heroTitle.innerText = "Waiting for protected game...";
-      if (heroSubtitle) heroSubtitle.innerText = "Sentinel-X endpoint security agent is running. Launch a registered game integrating the Sentinel-X SDK to begin protection.";
+      if (heroSubtitle) heroSubtitle.innerText = "Sentinel-X endpoint security agent is running. Launch a registered game integrating the Sentinel-X SDK to begin continuous attestation.";
       if (sessionBadge) sessionBadge.innerHTML = `<span style="color: var(--text-tertiary);">●</span> No active protected sessions`;
       if (tileSessionsCount) tileSessionsCount.innerText = "0";
 
@@ -173,7 +246,7 @@ class SentinelAppConsole {
       return;
     }
 
-    // Active Protected Session State
+    // Active Protected Session
     if (tileSessionsCount) tileSessionsCount.innerText = "1";
     if (pill) {
       pill.className = `status-pill ${isQuarantined ? "quarantined" : (policyAction === "MONITOR" ? "degraded" : "")}`;
