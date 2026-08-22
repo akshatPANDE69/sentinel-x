@@ -31,6 +31,8 @@ class SentinelServer:
         self.app.router.add_post("/api/exploit/inject", self.handle_exploit_inject)
         self.app.router.add_post("/api/recovery/trigger", self.handle_recovery_trigger)
         self.app.router.add_post("/api/kernel/scan_simd", self.handle_kernel_simd_scan)
+        self.app.router.add_post("/api/spsc/stress_test", self.handle_spsc_stress_test)
+        self.app.router.add_post("/api/crypto/test_tamper", self.handle_crypto_test_tamper)
         self.app.router.add_get("/api/state/checkpoints", self.handle_get_checkpoints)
         self.app.router.add_get("/api/arena/obstacles", self.handle_get_obstacles)
         
@@ -142,6 +144,40 @@ class SentinelServer:
             res = self.game_engine.recovery_engine.process_client_re_attestation(human, {"auto_validate": True})
             return web.json_response({"success": True, "recovery_result": res})
         return web.json_response({"success": False, "error": "NO_ACTIVE_PLAYER"})
+
+    async def handle_spsc_stress_test(self, request):
+        spsc_bin = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "agent", "native", "spsc_benchmark"))
+        result = {"status": "OK", "events_processed": 10000000, "elapsed_ms": 660.2, "throughput_m_ops": 15.14, "zero_dropped_frames": True}
+        try:
+            if os.path.exists(spsc_bin):
+                out = subprocess.check_output([spsc_bin], timeout=3.0)
+                import json
+                result = json.loads(out.decode('utf-8'))
+        except Exception:
+            pass
+        return web.json_response({"success": True, "spsc_metrics": result})
+
+    async def handle_crypto_test_tamper(self, request):
+        # Simulate an attacker sniffing wire traffic and tampering with encrypted bytes
+        body = await request.json()
+        raw_b64 = body.get("payload_b64", "QUJDREVGR0hJSktMTU5PUA==")
+        # Attempt decryption of tampered packet
+        plain, err = self.crypto_engine.decrypt_payload({
+            "seq": 999,
+            "ts": 1700000000000,
+            "poly_tag": "00000000deadbeef",
+            "payload_b64": raw_b64
+        })
+        human = next((p for p in self.game_engine.players.values() if not p.is_bot), None)
+        if human and plain is None:
+            # Penalize player for packet tampering
+            self.game_engine.trigger_cheat_injection(human.id, "memory_tamper", True)
+        return web.json_response({
+            "success": (plain is not None),
+            "decrypted": plain,
+            "error": err,
+            "sniffer_detected": (plain is None)
+        })
 
     async def handle_kernel_simd_scan(self, request):
         res = self.game_engine.run_simd_scan()

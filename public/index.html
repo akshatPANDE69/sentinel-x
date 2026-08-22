@@ -164,17 +164,30 @@
           </label>
         </div>
 
-        <!-- Action Trigger Buttons -->
-        <div style="display: flex; gap: 8px; margin-top: 4px;">
-          <button class="btn-secondary-action" id="btnRunSIMDScan" style="flex: 1;">
-            <span>🏎️ RUN SIMD SCAN</span>
-          </button>
-          <button class="btn-hero-recovery" id="btnTriggerRecovery" style="flex: 1.6;">
-            <span>⚡ AUTONOMOUS RECOVERY</span>
-          </button>
+                <!-- Exploit 8: Packet Sniffing / Emulator Replay -->
+        <div class="exploit-card" id="card-sniff_replay">
+          <div class="exploit-info">
+            <div class="exploit-name">🕵️ Sniffed Packet Replay</div>
+            <div class="exploit-desc">Polymorphic engine traps HMAC mismatch</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleSniffReplay">
+            <span class="slider"></span>
+          </label>
         </div>
 
-      </div>
+                <!-- Action Trigger Buttons -->
+        <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+          <button class="btn-secondary-action" id="btnStressSPSC" style="flex: 1; font-size: 10px;">
+            <span>⚡ SPSC 10M QUEUE</span>
+          </button>
+          <button class="btn-secondary-action" id="btnRunSIMDScan" style="flex: 1; font-size: 10px;">
+            <span>🏎️ SIMD SCAN</span>
+          </button>
+          <button class="btn-hero-recovery" id="btnTriggerRecovery" style="flex: 1.8; font-size: 10px;">
+            <span>⚡ RECOVERY</span>
+          </button>
+        </div></div>
     </aside>
 
     <!-- Bottom Full-Width: Sentinel-X SOC Dashboard -->
