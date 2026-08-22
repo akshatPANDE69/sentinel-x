@@ -41,8 +41,4 @@ echo [+] Opening http://127.0.0.1:8080/ in your default browser...
 
 start http://127.0.0.1:8080/
 
-if exist .venv\Scripts\python.exe (
-    .venv\Scripts\python.exe server\server.py
-) else (
-    python server\server.py
-)
+python server\server.py

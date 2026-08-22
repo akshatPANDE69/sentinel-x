@@ -1,17 +1,17 @@
-# Sentinel-X Universal Zero-Crash Windows Installer & Launcher
+# Sentinel-X Universal Zero-Dependency Windows Launcher
 $ErrorActionPreference = "SilentlyContinue"
 
 Clear-Host
 Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "   SENTINEL-X UNIVERSAL ZERO-TRUST GAME SECURITY       " -ForegroundColor Cyan
+Write-Host "   SENTINEL-X ZERO-TRUST GAME SECURITY PLATFORM        " -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 
-# 1. Update / Clone Repo safely
+# 1. Update / Clone Repo
 if (Test-Path "sentinel-x") {
     Set-Location sentinel-x
     git pull *>$null
 } elseif (-not (Test-Path "server\server.py")) {
-    Write-Host "[+] Fetching Sentinel-X release..." -ForegroundColor Yellow
+    Write-Host "[+] Fetching Sentinel-X repository..." -ForegroundColor Yellow
     if (Get-Command git -ErrorAction SilentlyContinue) {
         git clone https://github.com/akshatPANDE69/sentinel-x.git sentinel-x *>$null
         if (Test-Path "sentinel-x") { Set-Location sentinel-x }
@@ -25,7 +25,7 @@ if (Test-Path "sentinel-x") {
     }
 }
 
-# 2. Universal Python Check
+# 2. Check Python
 $PYTHON = if (Get-Command python -ErrorAction SilentlyContinue) { "python" } elseif (Get-Command py -ErrorAction SilentlyContinue) { "py" } else { "" }
 
 if (-not $PYTHON) {
@@ -33,20 +33,14 @@ if (-not $PYTHON) {
     exit 1
 }
 
-if (-not (Test-Path ".venv")) {
-    Write-Host "[+] Initializing security dependencies..." -ForegroundColor Green
-    & $PYTHON -m venv .venv *>$null
-    .\.venv\Scripts\python.exe -m pip install aiohttp psutil --quiet *>$null
-}
-
-# 3. Interactive Target Game Selection Prompt (Universal for ANY Game / App)
+# 3. Interactive Target Game Selection Prompt
 Write-Host ""
 Write-Host "=======================================================" -ForegroundColor Cyan
 Write-Host "   SELECT APPLICATION / GAME TO PROTECT:               " -ForegroundColor Yellow
 Write-Host "   [1] 🎮 Sentinel-X Arena (Default Demo Target)       " -ForegroundColor White
 Write-Host "   [2] 🎯 CyberStrike 2026 (Unreal Engine 5)           " -ForegroundColor White
 Write-Host "   [3] 🛡️ Tactical Breach 2026 (Unity Engine)          " -ForegroundColor White
-Write-Host "   [4] 📁 ANY Installed Game / Folder / Emulator / App " -ForegroundColor White
+Write-Host "   [4] 📁 Custom Executable (.exe), Roblox, or Pokemon " -ForegroundColor White
 Write-Host "=======================================================" -ForegroundColor Cyan
 $choice = Read-Host "Enter target game [1-4] (Default: 1)"
 if (-not $choice) { $choice = "1" }
@@ -54,9 +48,8 @@ if (-not $choice) { $choice = "1" }
 if ($choice -eq "4") {
     Write-Host ""
     Write-Host "-------------------------------------------------------" -ForegroundColor Yellow
-    $customAppName = Read-Host "Enter Game / App Name (e.g. Roblox / Pokemon / Valorant)"
+    $customAppName = Read-Host "Enter Game / App Name (e.g. Roblox / Pokemon)"
     if (-not $customAppName) { $customAppName = "Custom Game" }
-    
     $customExePath = Read-Host "Paste full path to game .exe or folder (or press Enter to auto-scan)"
     Write-Host "-------------------------------------------------------" -ForegroundColor Yellow
     Write-Host "[+] Target '$customAppName' registered with Sentinel-X!" -ForegroundColor Green
@@ -72,12 +65,9 @@ try {
     }
 } catch {}
 
-Write-Host "[+] Starting Sentinel-X Endpoint Security Agent & Console..." -ForegroundColor Green
+Write-Host ""
+Write-Host "[+] Starting Sentinel-X Security Agent & Web Console..." -ForegroundColor Green
 Start-Process "http://127.0.0.1:8080/"
 
-$VENV_PYTHON = ".\.venv\Scripts\python.exe"
-if (Test-Path $VENV_PYTHON) {
-    & $VENV_PYTHON server\server.py
-} else {
-    & $PYTHON server\server.py
-}
+# Launch zero-dependency server directly with Python
+& $PYTHON server\server.py
