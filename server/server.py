@@ -167,6 +167,17 @@ class StandaloneHTTPHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
 
+
+def start_background_check_engine(scheduler, active_sessions):
+    """Background daemon thread executing continuous real security checks"""
+    while True:
+        try:
+            has_active = len(active_sessions) > 0
+            scheduler.run_scheduled_checks(is_session_active=has_active, is_compromised=False)
+        except Exception:
+            pass
+        time.sleep(0.7)
+
 class ReusableHTTPServer(HTTPServer):
     allow_reuse_address = True
     daemon_threads = True

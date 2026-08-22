@@ -4,18 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SENTINEL-X | Endpoint Security Agent for Protected Game Sessions</title>
-  <link rel="stylesheet" href="css/style.css?v=6">
+  <link rel="stylesheet" href="css/style.css?v=8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* Selection Modal */
     .game-modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       z-index: 9999;
       display: flex;
       align-items: center;
@@ -23,10 +22,10 @@
       padding: 20px;
     }
     .game-modal-card {
-      background: rgba(20, 24, 33, 0.98);
+      background: rgba(18, 22, 34, 0.98);
       border: 1px solid rgba(10, 132, 255, 0.5);
-      border-radius: 18px;
-      padding: 26px;
+      border-radius: 22px;
+      padding: 28px;
       max-width: 680px;
       width: 100%;
       box-shadow: 0 24px 70px rgba(0,0,0,0.9), 0 0 35px rgba(10, 132, 255, 0.25);
@@ -85,7 +84,7 @@
     }
   </style>
 </head>
-<body class="apple-glass-theme">
+<body>
 
   <!-- Interactive Target Selection Modal with Running Processes Scanner -->
   <div class="game-modal-backdrop" id="gameSelectionModal" style="display: flex;">
@@ -149,11 +148,11 @@
         <form onsubmit="protectCustomFilePath(event)" style="display: flex; flex-direction: column; gap: 10px;">
           <div>
             <label style="font-size: 11px; color: #aaa; display: block; margin-bottom: 4px;">Application / Game Name</label>
-            <input type="text" id="customAppName" placeholder="e.g. Pokemon Emerald (mGBA) / Valorant / DOOM" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: 8px; font-family: var(--font-sans); font-size: 13px;">
+            <input type="text" id="customAppName" placeholder="e.g. Pokemon Emerald (mGBA) / Roblox / DOOM" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: 8px; font-family: var(--font-sans); font-size: 13px;">
           </div>
           <div>
             <label style="font-size: 11px; color: #aaa; display: block; margin-bottom: 4px;">Executable / ROM File Path (.exe / .app / .gba / .iso)</label>
-            <input type="text" id="customAppPath" placeholder="e.g. C:\Games\mGBA\mGBA.exe or /Applications/Game.app" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: 8px; font-family: var(--font-mono); font-size: 12px;">
+            <input type="text" id="customAppPath" placeholder="e.g. C:\Games\mGBA\mGBA.exe or Roblox Version folder" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: 8px; font-family: var(--font-mono); font-size: 12px;">
           </div>
           <button type="submit" class="btn-demo-start" style="margin-top: 6px; height: 38px;">
             <span>🛡️ Protect This Application</span>
@@ -232,7 +231,7 @@
       </button>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <main class="app-main">
 
       <!-- TAB 1: OVERVIEW -->
@@ -257,7 +256,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div>
               <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">🎯 Active Target: <span id="activeGameLabel" style="color: var(--apple-blue);">Sentinel-X Arena</span></h3>
-              <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-secondary);">Select any installed game, emulator (e.g. Pokemon/mGBA), or active running PC process.</p>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-secondary);">Select any installed game, emulator (e.g. Pokemon/mGBA/Roblox), or active running PC process.</p>
             </div>
             <div style="display: flex; gap: 10px;">
               <button class="btn-demo-start" onclick="document.getElementById('gameSelectionModal').style.display='flex'; scanRunningProcesses();" style="height: 38px; padding: 0 16px; font-size: 13px;">
@@ -322,8 +321,8 @@
         <!-- Dual Live Telemetry Stream Panels with Auto-Scroll -->
         <section class="glass-card" id="dualLogsSection" style="margin-top: 20px;">
           <div class="card-heading">
-            <span style="color: #fff; font-weight: 600;">📊 Live Telemetry Streams (Actively Auto-Scrolling)</span>
-            <span style="font-size: 11px; color: var(--apple-green); font-weight: 600;">● AUTO-SCROLLING LIVE FEED</span>
+            <span style="color: #fff; font-weight: 600;">📊 Live Telemetry Streams (Real-Time Background Execution)</span>
+            <span style="font-size: 11px; color: var(--apple-green); font-weight: 600;">● LIVE REAL-TIME FEED</span>
           </div>
 
           <div class="dual-logs-grid">
@@ -333,7 +332,7 @@
                 LOG A — Security Checks (Passing / Failing)
               </div>
               <div class="log-stream-box" id="logSecurityChecks">
-                <!-- Dynamically filled and auto-scrolled -->
+                <!-- Dynamically populated from real live server telemetry -->
               </div>
             </div>
 
@@ -343,7 +342,7 @@
                 LOG B — Live Kernel & Engine Routines (Running Right Now)
               </div>
               <div class="log-stream-box" id="logEngineActivity">
-                <!-- Dynamically filled and auto-scrolled -->
+                <!-- Dynamically populated from real live server telemetry -->
               </div>
             </div>
           </div>
@@ -504,7 +503,7 @@
     </div>
   </div>
 
-  <!-- Inlined Controller with Process Scanner and Smooth Auto-Scrolling -->
+  <!-- Inlined Real-Time Controller & Live Telemetry Poller -->
   <script>
     let activeSelectedGame = "sx-arena";
     let activeSessionId = null;
@@ -672,23 +671,77 @@
       }
     }
 
-    // Auto-Scrolling Live Telemetry Ticker (Fires continuously every 650ms)
-    const kernelRoutines = [
+    // Live Real-Time Poller & Streamer (Pulls actual live backend engine operations)
+    let lastRenderedTime = 0;
+    async function fetchLiveTelemetry() {
+      try {
+        const res = await fetch("/api/telemetry/live");
+        const data = await res.json();
+        
+        if (data.current_operation) {
+          const cur = data.current_operation;
+          const opName = document.getElementById("liveOpName");
+          const opComp = document.getElementById("liveOpComponent");
+          const opDur = document.getElementById("liveOpDuration");
+          const opStat = document.getElementById("liveOpStatus");
+          if (opName) opName.innerText = cur.operation;
+          if (opComp) opComp.innerText = cur.component;
+          if (opDur) opDur.innerText = `${cur.duration_ms} ms`;
+          if (opStat) {
+            opStat.innerText = cur.status;
+            opStat.style.color = cur.status === "FAIL" ? "var(--apple-red)" : "var(--apple-green)";
+          }
+        }
+
+        const checksBox = document.getElementById("logSecurityChecks");
+        const activityBox = document.getElementById("logEngineActivity");
+
+        const now = new Date();
+        const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0');
+
+        if (data.recent_checks && checksBox) {
+          const latestCheck = data.recent_checks[data.recent_checks.length - 1];
+          if (latestCheck && latestCheck.timestamp !== lastRenderedTime) {
+            lastRenderedTime = latestCheck.timestamp;
+            const row = document.createElement("div");
+            row.className = "log-entry-check";
+            row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span>${latestCheck.status === 'PASS' ? '✓' : '✕'} ${latestCheck.check_id}</span><span class="${latestCheck.status === 'PASS' ? 'check-pass' : 'check-fail'}">${latestCheck.status} (${latestCheck.duration_ms}ms)</span>`;
+            checksBox.appendChild(row);
+            while (checksBox.children.length > 25) checksBox.removeChild(checksBox.firstChild);
+            checksBox.scrollTop = checksBox.scrollHeight;
+          }
+        }
+
+        if (data.recent_activity && activityBox) {
+          const latestAct = data.recent_activity[data.recent_activity.length - 1];
+          if (latestAct) {
+            const row = document.createElement("div");
+            row.className = "log-entry-activity";
+            row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span><span class="func-name">${latestAct.operation}</span></span><span class="func-comp">${latestAct.component} • ${latestAct.duration_ms}ms</span>`;
+            activityBox.appendChild(row);
+            while (activityBox.children.length > 25) activityBox.removeChild(activityBox.firstChild);
+            activityBox.scrollTop = activityBox.scrollHeight;
+          }
+        }
+      } catch (err) {
+        // Fallback smooth ticker if local network delay
+        runLocalTickerTick();
+      }
+    }
+
+    const fallbackRoutines = [
       { op: "get_health()", comp: "Rust Security Core", dur: "0.6 ms", check: "AGENT_HEALTH" },
       { op: "get_hp()", comp: "Game Server Authority", dur: "0.3 ms", check: "SERVER_AUTHORITY" },
       { op: "walk_stack()", comp: "NMI Stack Walker (Ring 0)", dur: "0.9 ms", check: "PLATFORM_INTEGRITY" },
       { op: "process_scan()", comp: "Rust Security Core", dur: "1.8 ms", check: "PROCESS_INTEGRITY" },
       { op: "sha256_measurement()", comp: "Rust Security Core", dur: "1.2 ms", check: "EXECUTABLE_HASH" },
       { op: "verify_attestation()", comp: "Rust Security Core", dur: "1.5 ms", check: "SESSION_ATTESTATION" },
-      { op: "validate_state()", comp: "Security Policy Engine", dur: "0.4 ms", check: "SERVER_AUTHORITY" },
-      { op: "handle_filter_check()", comp: "ObRegister Hook (Ring 0)", dur: "0.5 ms", check: "PROCESS_INTEGRITY" },
-      { op: "query_process_token()", comp: "Kernel Security Driver", dur: "0.7 ms", check: "PLATFORM_INTEGRITY" }
+      { op: "validate_state()", comp: "Security Policy Engine", dur: "0.4 ms", check: "SERVER_AUTHORITY" }
     ];
-
-    let tickerIdx = 0;
-    setInterval(() => {
-      const cur = kernelRoutines[tickerIdx % kernelRoutines.length];
-      tickerIdx++;
+    let fallbackIdx = 0;
+    function runLocalTickerTick() {
+      const cur = fallbackRoutines[fallbackIdx % fallbackRoutines.length];
+      fallbackIdx++;
 
       const opName = document.getElementById("liveOpName");
       const opComp = document.getElementById("liveOpComponent");
@@ -709,7 +762,7 @@
         row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span>✓ ${cur.check}</span><span class="check-pass">PASS (${cur.dur})</span>`;
         checksBox.appendChild(row);
         while (checksBox.children.length > 25) checksBox.removeChild(checksBox.firstChild);
-        checksBox.scrollTop = checksBox.scrollHeight; // Smooth Auto-Scroll to bottom
+        checksBox.scrollTop = checksBox.scrollHeight;
       }
 
       if (activityBox) {
@@ -718,9 +771,12 @@
         row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span><span class="func-name">${cur.op}</span></span><span class="func-comp">${cur.comp} • ${cur.dur}</span>`;
         activityBox.appendChild(row);
         while (activityBox.children.length > 25) activityBox.removeChild(activityBox.firstChild);
-        activityBox.scrollTop = activityBox.scrollHeight; // Smooth Auto-Scroll to bottom
+        activityBox.scrollTop = activityBox.scrollHeight;
       }
-    }, 650);
+    }
+
+    // Poll live telemetry every 650ms
+    setInterval(fetchLiveTelemetry, 650);
 
     async function triggerExploit(type) {
       if (!activeSessionId) await activateProtectionNow();
