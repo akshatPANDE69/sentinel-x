@@ -6,10 +6,14 @@ Write-Host "=======================================================" -Foreground
 Write-Host "   🛡️  SENTINEL-X ZERO-TRUST GAME SECURITY PLATFORM    " -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 
-# 1. Update / Clone Repo
+# 1. Update / Clone Repo with Force Reset to avoid stale local cache
 if (Test-Path "sentinel-x") {
     Set-Location sentinel-x
-    git pull *>$null
+    git fetch origin main *>$null
+    git reset --hard origin/main *>$null
+} elseif (Test-Path ".git") {
+    git fetch origin main *>$null
+    git reset --hard origin/main *>$null
 } elseif (-not (Test-Path "server\server.py")) {
     Write-Host "[+] Fetching Sentinel-X repository..." -ForegroundColor Yellow
     if (Get-Command git -ErrorAction SilentlyContinue) {
@@ -44,7 +48,7 @@ try {
 } catch {}
 
 Write-Host "[+] Starting Sentinel-X Security Agent & Web Console..." -ForegroundColor Green
-Write-Host "[+] All target game selection is managed cleanly in the web dashboard!" -ForegroundColor Cyan
+Write-Host "[+] Target games (Roblox, Pokemon, CS2, etc.) are chosen directly in the dashboard!" -ForegroundColor Cyan
 Start-Process "http://127.0.0.1:8080/"
 
 # Launch zero-dependency server directly with Python

@@ -7,6 +7,10 @@ cls
 echo =======================================================
 echo   🛡️  SENTINEL-X ZERO-TRUST GAME SECURITY PLATFORM     
 echo =======================================================
+echo [+] Pulling latest updates from GitHub...
+git fetch origin main >nul 2>&1
+git reset --hard origin/main >nul 2>&1
+
 echo [+] Starting Security Agent Daemon & Web Console...
 echo [+] Select any game/process (Roblox, Pokemon, CS2, etc.) in the dashboard!
 
