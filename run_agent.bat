@@ -1,41 +1,21 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 
 cd /d "%~dp0"
 cls
 
 echo =======================================================
-echo        STARTING SENTINEL-X SECURITY AGENT              
+echo   🛡️  SENTINEL-X ZERO-TRUST GAME SECURITY PLATFORM     
 echo =======================================================
+echo [+] Starting Security Agent Daemon & Web Console...
+echo [+] Select any game/process (Roblox, Pokemon, CS2, etc.) in the dashboard!
 
-echo.
-echo =======================================================
-echo   SELECT TARGET APPLICATION / GAME TO PROTECT:
-echo   [1] Sentinel-X Arena (Default Demo Target)
-echo   [2] CyberStrike 2026 (Unreal Engine 5)
-echo   [3] Tactical Breach 2026 (Unity Engine)
-echo   [4] Custom Executable (.exe), Roblox, or Pokemon
-echo =======================================================
-set /p GAME_CHOICE="Enter target game [1-4] (Default: 1): "
-if "%GAME_CHOICE%"=="" set GAME_CHOICE=1
-
-if "%GAME_CHOICE%"=="4" (
-    echo.
-    echo -------------------------------------------------------
-    set /p CUSTOM_NAME="Enter Game / App Name (e.g. Roblox / Pokemon): "
-    set /p CUSTOM_PATH="Paste full path to .exe or game folder: "
-    echo -------------------------------------------------------
-    echo [+] Registered !CUSTOM_NAME! with Sentinel-X Agent!
-)
-
-echo.
-echo [+] Target application confirmed!
-echo [+] Starting Local Authoritative Server and Security Console...
+start http://127.0.0.1:8080/
 
 python server\server.py
 
 if %ERRORLEVEL% neq 0 (
     echo.
-    echo [!] Server encountered an issue.
+    echo [!] Server exited.
     pause
 )

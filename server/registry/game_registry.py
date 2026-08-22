@@ -27,29 +27,45 @@ class GameRegistry:
 
     def load_registry(self):
         default_games = {
+            "roblox": RegisteredGame({
+                "game_id": "roblox",
+                "name": "Roblox (RobloxPlayerBeta.exe)",
+                "version": "2.610.0",
+                "platforms": ["windows", "macos"],
+                "executable_hash": "a3f889c1d41d8cd98f00b204e9800998ecf8427ea3f889c1d41d8cd98f00b204",
+                "developer_public_key": "pk_roblox_client"
+            }),
+            "pokemon-mgba": RegisteredGame({
+                "game_id": "pokemon-mgba",
+                "name": "Pokémon / GBA Emulator (mGBA.exe)",
+                "version": "0.10.3",
+                "platforms": ["windows", "macos", "linux"],
+                "executable_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "developer_public_key": "pk_mgba_emu"
+            }),
+            "cs2": RegisteredGame({
+                "game_id": "cs2",
+                "name": "Counter-Strike 2 (cs2.exe)",
+                "version": "1.40.1",
+                "platforms": ["windows"],
+                "executable_hash": "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+                "developer_public_key": "pk_valve_cs2"
+            }),
+            "valorant": RegisteredGame({
+                "game_id": "valorant",
+                "name": "Valorant (VALORANT.exe)",
+                "version": "8.04.0",
+                "platforms": ["windows"],
+                "executable_hash": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+                "developer_public_key": "pk_riot_games"
+            }),
             "sx-arena": RegisteredGame({
                 "game_id": "sx-arena",
-                "name": "Sentinel-X Arena",
+                "name": "Sentinel-X Arena (Built-in Demo)",
                 "version": "1.0.0",
                 "platforms": ["macos", "windows", "linux"],
                 "executable_hash": "d41d8cd98f00b204e9800998ecf8427e",
-                "developer_public_key": "pk_secp256k1_sentinel_arena_prod"
-            }),
-            "cyber-strike-fps": RegisteredGame({
-                "game_id": "cyber-strike-fps",
-                "name": "CyberStrike 2026",
-                "version": "2.4.1",
-                "platforms": ["macos", "windows"],
-                "executable_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-                "developer_public_key": "pk_cyberstrike_prod"
-            }),
-            "custom-tactical-2026": RegisteredGame({
-                "game_id": "custom-tactical-2026",
-                "name": "Tactical Breach",
-                "version": "1.0.0",
-                "platforms": ["macos", "windows"],
-                "executable_hash": "d41d8cd98f00b204e9800998ecf8427e",
-                "developer_public_key": "pk_tactical_dev"
+                "developer_public_key": "pk_sentinel_arena_dev"
             })
         }
 

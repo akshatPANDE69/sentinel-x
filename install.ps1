@@ -3,7 +3,7 @@ $ErrorActionPreference = "SilentlyContinue"
 
 Clear-Host
 Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "   SENTINEL-X ZERO-TRUST GAME SECURITY PLATFORM        " -ForegroundColor Cyan
+Write-Host "   🛡️  SENTINEL-X ZERO-TRUST GAME SECURITY PLATFORM    " -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 
 # 1. Update / Clone Repo
@@ -33,29 +33,7 @@ if (-not $PYTHON) {
     exit 1
 }
 
-# 3. Interactive Target Game Selection Prompt
-Write-Host ""
-Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "   SELECT APPLICATION / GAME TO PROTECT:               " -ForegroundColor Yellow
-Write-Host "   [1] 🎮 Sentinel-X Arena (Default Demo Target)       " -ForegroundColor White
-Write-Host "   [2] 🎯 CyberStrike 2026 (Unreal Engine 5)           " -ForegroundColor White
-Write-Host "   [3] 🛡️ Tactical Breach 2026 (Unity Engine)          " -ForegroundColor White
-Write-Host "   [4] 📁 Custom Executable (.exe), Roblox, or Pokemon " -ForegroundColor White
-Write-Host "=======================================================" -ForegroundColor Cyan
-$choice = Read-Host "Enter target game [1-4] (Default: 1)"
-if (-not $choice) { $choice = "1" }
-
-if ($choice -eq "4") {
-    Write-Host ""
-    Write-Host "-------------------------------------------------------" -ForegroundColor Yellow
-    $customAppName = Read-Host "Enter Game / App Name (e.g. Roblox / Pokemon)"
-    if (-not $customAppName) { $customAppName = "Custom Game" }
-    $customExePath = Read-Host "Paste full path to game .exe or folder (or press Enter to auto-scan)"
-    Write-Host "-------------------------------------------------------" -ForegroundColor Yellow
-    Write-Host "[+] Target '$customAppName' registered with Sentinel-X!" -ForegroundColor Green
-}
-
-# 4. Clean up stale port 8080 processes
+# 3. Clean up stale port 8080 processes
 try {
     $conns = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue
     if ($conns) {
@@ -65,8 +43,8 @@ try {
     }
 } catch {}
 
-Write-Host ""
 Write-Host "[+] Starting Sentinel-X Security Agent & Web Console..." -ForegroundColor Green
+Write-Host "[+] All target game selection is managed cleanly in the web dashboard!" -ForegroundColor Cyan
 Start-Process "http://127.0.0.1:8080/"
 
 # Launch zero-dependency server directly with Python
