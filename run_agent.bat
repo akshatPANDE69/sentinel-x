@@ -20,13 +20,22 @@ echo   SELECT TARGET APPLICATION / GAME TO PROTECT:
 echo   [1] Sentinel-X Arena (Default Demo Target)
 echo   [2] CyberStrike 2026 (Unreal Engine 5)
 echo   [3] Tactical Breach 2026 (Unity Engine)
-echo   [4] Custom Executable Path (.exe)
+echo   [4] Custom Executable (.exe) or Emulator (Pokemon)
 echo =======================================================
 set /p GAME_CHOICE="Enter target game [1-4] (Default: 1): "
 if "%GAME_CHOICE%"=="" set GAME_CHOICE=1
 
+if "%GAME_CHOICE%"=="4" (
+    echo.
+    echo -------------------------------------------------------
+    set /p CUSTOM_NAME="Enter Game / App Name (e.g. Pokemon Emerald): "
+    set /p CUSTOM_PATH="Paste or type full path to .exe file: "
+    echo -------------------------------------------------------
+    echo [+] Registered !CUSTOM_NAME! at !CUSTOM_PATH!
+)
+
 echo.
-echo [+] Target application confirmed (Option %GAME_CHOICE%)!
+echo [+] Target application confirmed!
 echo [+] Starting Local Authoritative Server and Security Console...
 echo [+] Opening http://127.0.0.1:8080/ in your default browser...
 

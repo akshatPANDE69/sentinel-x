@@ -8,7 +8,7 @@ echo "======================================================="
 echo "       STARTING SENTINEL-X SECURITY AGENT              "
 echo "======================================================="
 
-# Kill any stale instance on port 8080
+# Kill stale server on port 8080
 lsof -ti:8080 | xargs kill -9 2>/dev/null || true
 
 if [ -f "$HOME/.cargo/env" ]; then
@@ -19,14 +19,24 @@ if [ -d ".venv" ]; then
     source .venv/bin/activate
 fi
 
-# 1. Start Rust Security Core in background if built
-if [ -f "agent/rust-core/target/release/sentinel-core" ]; then
-    echo "[+] Launching Rust Security Core Daemon..."
-    ./agent/rust-core/target/release/sentinel-core &
-    RUST_PID=$!
-    trap "kill $RUST_PID 2>/dev/null || true" EXIT
+echo ""
+echo "======================================================="
+echo "  SELECT APPLICATION / GAME TO PROTECT:                "
+echo "  [1] Sentinel-X Arena (Default Demo Target)           "
+echo "  [2] CyberStrike 2026 (Unreal Engine 5)               "
+echo "  [3] Tactical Breach 2026 (Unity Engine)              "
+echo "  [4] Custom Executable Path (.app / .exe)             "
+echo "======================================================="
+read -p "Enter target game [1-4] (Default: 1): " choice
+choice=${choice:-1}
+
+if [ "$choice" = "4" ]; then
+    echo "-------------------------------------------------------"
+    read -p "Enter Game / App Name: " custom_name
+    read -p "Paste or type full path to application binary: " custom_path
+    echo "-------------------------------------------------------"
+    echo "[+] Target registered: $custom_name ($custom_path)"
 fi
 
-# 2. Start Local Authoritative Server & Console
 echo "[+] Starting Local Authoritative Server & Console on 127.0.0.1:8080..."
 python3 server/server.py

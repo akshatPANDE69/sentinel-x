@@ -44,12 +44,31 @@ Write-Host "   SELECT APPLICATION / GAME TO PROTECT:               " -Foreground
 Write-Host "   [1] 🎮 Sentinel-X Arena (Default Demo Target)       " -ForegroundColor White
 Write-Host "   [2] 🎯 CyberStrike 2026 (Unreal Engine 5)           " -ForegroundColor White
 Write-Host "   [3] 🛡️ Tactical Breach 2026 (Unity Engine)          " -ForegroundColor White
-Write-Host "   [4] 📁 Custom Executable Path (.exe)                " -ForegroundColor White
+Write-Host "   [4] 📁 Custom Executable (.exe) or Emulator (Pokemon)" -ForegroundColor White
 Write-Host "=======================================================" -ForegroundColor Cyan
 $choice = Read-Host "Enter target game [1-4] (Default: 1)"
 if (-not $choice) { $choice = "1" }
 
-Write-Host "[+] Target game confirmed (Option $choice)!" -ForegroundColor Green
+$customExePath = ""
+$customAppName = ""
+
+if ($choice -eq "4") {
+    Write-Host ""
+    Write-Host "-------------------------------------------------------" -ForegroundColor Yellow
+    $customAppName = Read-Host "Enter Game / App Name (e.g. Pokemon Emerald)"
+    if (-not $customAppName) { $customAppName = "Custom Game" }
+    
+    $customExePath = Read-Host "Paste or type full path to .exe file"
+    Write-Host "-------------------------------------------------------" -ForegroundColor Yellow
+    
+    if ($customExePath -and (Test-Path $customExePath)) {
+        Write-Host "[+] Found executable: $customExePath" -ForegroundColor Green
+        $fileHash = (Get-FileHash -Path $customExePath -Algorithm SHA256).Hash.ToLower()
+        Write-Host "[+] Measured SHA-256 binary hash: $fileHash" -ForegroundColor Green
+    } else {
+        Write-Host "[!] Path registered. Sentinel-X will hook process upon launch." -ForegroundColor Yellow
+    }
+}
 
 # Kill stale server on port 8080
 $stale = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue
