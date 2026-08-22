@@ -20,7 +20,7 @@ echo   SELECT TARGET APPLICATION / GAME TO PROTECT:
 echo   [1] Sentinel-X Arena (Default Demo Target)
 echo   [2] CyberStrike 2026 (Unreal Engine 5)
 echo   [3] Tactical Breach 2026 (Unity Engine)
-echo   [4] Custom Executable (.exe) or Emulator (Pokemon)
+echo   [4] Custom Executable (.exe), Roblox, or Pokemon
 echo =======================================================
 set /p GAME_CHOICE="Enter target game [1-4] (Default: 1): "
 if "%GAME_CHOICE%"=="" set GAME_CHOICE=1
@@ -28,10 +28,10 @@ if "%GAME_CHOICE%"=="" set GAME_CHOICE=1
 if "%GAME_CHOICE%"=="4" (
     echo.
     echo -------------------------------------------------------
-    set /p CUSTOM_NAME="Enter Game / App Name (e.g. Pokemon Emerald): "
-    set /p CUSTOM_PATH="Paste or type full path to .exe file: "
+    set /p CUSTOM_NAME="Enter Game / App Name (e.g. Roblox / Pokemon): "
+    set /p CUSTOM_PATH="Paste full path to .exe or game folder: "
     echo -------------------------------------------------------
-    echo [+] Registered !CUSTOM_NAME! at !CUSTOM_PATH!
+    echo [+] Registered !CUSTOM_NAME! with Sentinel-X Agent!
 )
 
 echo.
