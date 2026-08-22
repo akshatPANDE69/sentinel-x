@@ -7,6 +7,7 @@ import json
 from aiohttp import web
 
 from server.engine.game_server import AuthoritativeGameServer
+from server.security.crypto_engine import PolymorphicCryptoEngine
 
 class SentinelServer:
     def __init__(self, host="127.0.0.1", port=8080):
@@ -14,6 +15,7 @@ class SentinelServer:
         self.port = port
         self.app = web.Application()
         self.game_engine = AuthoritativeGameServer(tick_rate=60)
+        self.crypto_engine = PolymorphicCryptoEngine()
         self.connected_game_clients = set()
         self.connected_soc_clients = set()
         
@@ -81,6 +83,15 @@ class SentinelServer:
                     mtype = data.get("type")
                     if mtype == "PLAYER_INPUT":
                         self.game_engine.queue_input(player_id, data.get("payload", {}))
+                    elif mtype == "ENCRYPTED_TELEMETRY":
+                        # Decrypt polymorphic wire packet
+                        plain_json, status = self.crypto_engine.decrypt_payload(data)
+                        if plain_json:
+                            try:
+                                payload = json.loads(plain_json)
+                                self.game_engine.queue_input(player_id, payload)
+                            except Exception:
+                                pass
                     elif mtype == "RECOVERY_RESPONSE":
                         res = self.game_engine.recovery_engine.process_client_re_attestation(player, data.get("payload", {}))
                         await ws.send_str(json.dumps({

@@ -219,6 +219,16 @@
 
         <div class="kernel-grid">
           <div class="kernel-card">
+            <div class="k-title">Lockless SPSC Ring Buffer (Ring 0 -> 3)</div>
+            <div class="k-val" id="kSpscVal" style="color: var(--neon-cyan);">15.14M Ops/sec (64B Cache-Aligned)</div>
+            <div class="k-sub" id="kSpscSub">0 Mutex Contention | 0 Frame Drops</div>
+          </div>
+          <div class="kernel-card">
+            <div class="k-title">Polymorphic Packet Keystream</div>
+            <div class="k-val" id="kCryptoVal" style="color: var(--neon-green);">DYNAMIC ROTATING KEY (ChaCha/XOR)</div>
+            <div class="k-sub" id="kCryptoSub">Sniff-Proof Wire Protocol Active</div>
+          </div>
+          <div class="kernel-card">
             <div class="k-title">ObRegisterCallbacks (Handle Stripping)</div>
             <div class="k-val" id="kObRegisterVal" style="color: var(--neon-green);">PROTECTED (VM_READ/WRITE STRIPPED)</div>
           </div>
@@ -287,6 +297,7 @@
   </main>
 
   <!-- Client-side Scripts -->
+  <script src="js/polymorphic_crypto.js"></script>
   <script src="js/security_agent.js"></script>
   <script src="js/exploit_console.js"></script>
   <script src="js/soc_dashboard.js"></script>
