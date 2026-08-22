@@ -1,14 +1,32 @@
 # Python
+.venv/
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
-venv/
-.venv/
-ENV/
 
-# OS
+# Rust
+agent/rust-core/target/
+**/*.rs.bk
+Cargo.lock
+
+# Native C++ binaries
+agent/native/spsc_benchmark
+agent/native/vector_scanner
+
+# Local certificates and keys
+server/*.pem
+server/*.key
+*.pem
+*.key
+
+# System & IDE
 .DS_Store
-Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Temporary test files
+/tmp/sentinel_*
+scratch/
