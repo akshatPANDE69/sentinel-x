@@ -4,6 +4,13 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd "$DIR"
 
+echo "======================================================="
+echo "       STARTING SENTINEL-X SECURITY AGENT              "
+echo "======================================================="
+
+# Kill any stale instance on port 8080
+lsof -ti:8080 | xargs kill -9 2>/dev/null || true
+
 if [ -f "$HOME/.cargo/env" ]; then
     source "$HOME/.cargo/env"
 fi
@@ -11,10 +18,6 @@ fi
 if [ -d ".venv" ]; then
     source .venv/bin/activate
 fi
-
-echo "======================================================="
-echo "       STARTING SENTINEL-X SECURITY AGENT              "
-echo "======================================================="
 
 # 1. Start Rust Security Core in background if built
 if [ -f "agent/rust-core/target/release/sentinel-core" ]; then

@@ -15,11 +15,20 @@ from server.session.session_manager import SessionManager, SessionState
 from server.security.checks import UnifiedSecurityScheduler
 from agent.sentinel_agent import SentinelXAgent, AgentState
 
+
+@web.middleware
+async def no_cache_middleware(request, handler):
+    response = await handler(request)
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 class SentinelServer:
     def __init__(self, host="127.0.0.1", port=8080):
         self.host = host
         self.port = port
-        self.app = web.Application()
+        self.app = web.Application(middlewares=[no_cache_middleware])
         
         # Core Platform Modules
         self.game_registry = GameRegistry()
