@@ -6,7 +6,17 @@ Write-Host "=======================================================" -Foreground
 Write-Host "   🛡️  SENTINEL-X ZERO-TRUST GAME SECURITY PLATFORM    " -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 
-# 1. Update / Clone Repo with Force Reset to avoid stale local cache
+# Force kill any stale python processes on port 8080 or port 8081
+try {
+    $conns = Get-NetTCPConnection -LocalPort 8080,8081,8082,8085 -ErrorAction SilentlyContinue
+    if ($conns) {
+        foreach ($c in $conns) {
+            if ($c.OwningProcess) { Stop-Process -Id $c.OwningProcess -Force -ErrorAction SilentlyContinue }
+        }
+    }
+} catch {}
+
+# Sync / Clone Repo
 if (Test-Path "sentinel-x") {
     Set-Location sentinel-x
     git fetch origin main *>$null
@@ -29,7 +39,6 @@ if (Test-Path "sentinel-x") {
     }
 }
 
-# 2. Check Python
 $PYTHON = if (Get-Command python -ErrorAction SilentlyContinue) { "python" } elseif (Get-Command py -ErrorAction SilentlyContinue) { "py" } else { "" }
 
 if (-not $PYTHON) {
@@ -37,19 +46,8 @@ if (-not $PYTHON) {
     exit 1
 }
 
-# 3. Clean up stale port 8080 processes
-try {
-    $conns = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue
-    if ($conns) {
-        foreach ($c in $conns) {
-            if ($c.OwningProcess) { Stop-Process -Id $c.OwningProcess -Force -ErrorAction SilentlyContinue }
-        }
-    }
-} catch {}
-
 Write-Host "[+] Starting Sentinel-X Security Agent & Web Console..." -ForegroundColor Green
 Write-Host "[+] Target games (Roblox, Pokemon, CS2, etc.) are chosen directly in the dashboard!" -ForegroundColor Cyan
-Start-Process "http://127.0.0.1:8080/"
 
-# Launch zero-dependency server directly with Python
+# Launch server
 & $PYTHON server\server.py

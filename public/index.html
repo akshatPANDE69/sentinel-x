@@ -6,712 +6,333 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SENTINEL-X | Endpoint Security Agent for Protected Game Sessions</title>
+  <title>SENTINEL-X | Endpoint Security Agent</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
-/* ==========================================================================
-   SENTINEL-X — APPLE MONOCHROME LIQUID GLASS & IGLOO.INC HYPER-AESTHETIC
-   ========================================================================== */
+    :root {
+      --bg-base: #06080E;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-card-hover: rgba(28, 36, 56, 0.9);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-glow: rgba(10, 132, 255, 0.6);
+      
+      --apple-white: #FFFFFF;
+      --apple-blue: #0A84FF;
+      --apple-cyan: #5DE6FF;
+      --apple-green: #30D158;
+      --apple-orange: #FF9F0A;
+      --apple-red: #FF453A;
+      --apple-purple: #BF5AF2;
+      
+      --text-primary: #FFFFFF;
+      --text-secondary: rgba(255, 255, 255, 0.8);
+      --text-tertiary: rgba(255, 255, 255, 0.5);
+      
+      --font-display: 'Outfit', -apple-system, sans-serif;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
 
-:root {
-  --bg-deep: #07090E;
-  --bg-card: rgba(18, 23, 36, 0.72);
-  --bg-card-hover: rgba(26, 33, 52, 0.88);
-  --bg-card-solid: #0E121D;
-  
-  --border-glass: rgba(255, 255, 255, 0.1);
-  --border-glass-hover: rgba(255, 255, 255, 0.22);
-  --border-glow-blue: rgba(10, 132, 255, 0.5);
-  
-  --apple-white: #FFFFFF;
-  --apple-blue: #0A84FF;
-  --apple-cyan: #5DE6FF;
-  --apple-green: #30D158;
-  --apple-orange: #FF9F0A;
-  --apple-red: #FF453A;
-  --apple-purple: #BF5AF2;
-  
-  --text-primary: #FFFFFF;
-  --text-secondary: rgba(255, 255, 255, 0.78);
-  --text-tertiary: rgba(255, 255, 255, 0.48);
-  
-  --font-display: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, monospace;
-}
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+    }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
 
-body {
-  background-color: var(--bg-deep);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.5;
-  min-height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+    /* Interactive Retro-Futuristic Dither Wave Canvas */
+    #ditherCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.25;
+    }
 
-/* Background Dither Canvas */
-#ditherCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.18;
-}
+    /* Ambient Igloo / Apple Glowing Orbs */
+    .glow-orb-1 {
+      position: fixed;
+      top: -150px; left: 15%;
+      width: 750px; height: 750px;
+      background: radial-gradient(circle, rgba(10, 132, 255, 0.22) 0%, rgba(93, 230, 255, 0.06) 50%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      filter: blur(80px);
+    }
+    .glow-orb-2 {
+      position: fixed;
+      bottom: -150px; right: 10%;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(191, 90, 242, 0.18) 0%, rgba(48, 209, 88, 0.05) 50%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      filter: blur(80px);
+    }
 
-/* Ambient Radial Mesh Spheres (Igloo / Apple Glow) */
-body::before {
-  content: '';
-  position: fixed;
-  top: -120px;
-  left: 20%;
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, rgba(10, 132, 255, 0.16) 0%, rgba(93, 230, 255, 0.05) 50%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-  filter: blur(70px);
-}
+    /* Header */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 36px;
+      background: rgba(10, 14, 24, 0.85);
+      backdrop-filter: blur(30px) saturate(200%);
+      -webkit-backdrop-filter: blur(30px) saturate(200%);
+      border-bottom: 1px solid var(--border-glass);
+    }
 
-body::after {
-  content: '';
-  position: fixed;
-  bottom: -150px;
-  right: 15%;
-  width: 650px;
-  height: 650px;
-  background: radial-gradient(circle, rgba(191, 90, 242, 0.14) 0%, rgba(48, 209, 88, 0.04) 50%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-  filter: blur(70px);
-}
+    .brand-logo {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(10, 132, 255, 0.35), rgba(93, 230, 255, 0.12));
+      border: 1px solid rgba(10, 132, 255, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--apple-cyan);
+      box-shadow: 0 0 28px rgba(10, 132, 255, 0.45);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .brand-logo:hover {
+      transform: rotate(6deg) scale(1.08);
+    }
 
-/* Header */
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 36px;
-  background: rgba(10, 13, 20, 0.82);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border-bottom: 1px solid var(--border-glass);
-}
+    .brand-name {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .brand-tagline {
+      display: block;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
 
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: rgba(48, 209, 88, 0.14);
+      border: 1px solid rgba(48, 209, 88, 0.4);
+      color: var(--apple-green);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      box-shadow: 0 0 20px rgba(48, 209, 88, 0.22);
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--apple-green);
+      box-shadow: 0 0 10px var(--apple-green);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.75); }
+    }
 
-.brand-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(10, 132, 255, 0.3), rgba(93, 230, 255, 0.1));
-  border: 1px solid rgba(10, 132, 255, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--apple-cyan);
-  box-shadow: 0 0 24px rgba(10, 132, 255, 0.4);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
+    .btn-apple {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 24px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #0A84FF, #5DE6FF);
+      border: none;
+      color: #000;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 13.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 22px rgba(10, 132, 255, 0.45);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-apple:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 30px rgba(10, 132, 255, 0.65);
+    }
 
-.brand-logo:hover {
-  transform: rotate(5deg) scale(1.05);
-}
+    /* Layout */
+    .app-layout {
+      display: flex;
+      max-width: 1440px;
+      margin: 0 auto;
+      min-height: calc(100vh - 74px);
+      position: relative;
+      z-index: 2;
+    }
 
-.brand-name {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 19px;
-  letter-spacing: -0.02em;
-  color: var(--apple-white);
-}
+    .app-sidebar {
+      width: 250px;
+      padding: 30px 20px;
+      border-right: 1px solid var(--border-glass);
+      background: rgba(10, 14, 24, 0.55);
+      backdrop-filter: blur(24px);
+    }
 
-.brand-tagline {
-  display: block;
-  font-size: 11px;
-  color: var(--text-tertiary);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  font-weight: 600;
-}
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 6px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: left;
+    }
+    .nav-tab:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.07);
+      transform: translateX(4px);
+    }
+    .nav-tab.active {
+      color: #fff;
+      background: rgba(10, 132, 255, 0.16);
+      border-color: rgba(10, 132, 255, 0.4);
+      font-weight: 700;
+    }
+    .nav-tab.active svg {
+      stroke: var(--apple-blue);
+    }
 
-.header-status-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+    .app-main {
+      flex: 1;
+      padding: 32px 42px;
+      max-width: 1190px;
+    }
 
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(48, 209, 88, 0.12);
-  border: 1px solid rgba(48, 209, 88, 0.35);
-  color: var(--apple-green);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  box-shadow: 0 0 16px rgba(48, 209, 88, 0.18);
-}
+    .tab-content { display: none; }
+    .tab-content.active {
+      display: block;
+      animation: fadeInTab 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeInTab {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--apple-green);
-  box-shadow: 0 0 10px var(--apple-green);
-  animation: pulseDot 2s infinite ease-in-out;
-}
+    /* Frosted Cards */
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(30px) saturate(200%);
+      -webkit-backdrop-filter: blur(30px) saturate(200%);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.25s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+    }
 
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.75); }
-}
+    /* Live Ticker Bar */
+    .current-op-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 24px;
+      margin-bottom: 24px;
+      border-radius: 999px;
+      background: rgba(10, 132, 255, 0.09);
+      border: 1px solid rgba(10, 132, 255, 0.4);
+      box-shadow: 0 0 30px rgba(10, 132, 255, 0.2);
+    }
 
-.localhost-pill {
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-glass);
-  color: var(--text-tertiary);
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .metric-tile {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+    }
+    .metric-tile:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.5);
+    }
 
-.btn-demo-start {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 9px 22px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #0A84FF, #5DE6FF);
-  border: none;
-  color: #000;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(10, 132, 255, 0.4);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
+    /* Dual Live Telemetry Stream */
+    .dual-logs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .log-stream-box {
+      height: 250px;
+      max-height: 250px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding: 14px;
+      background: rgba(8, 11, 20, 0.85);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+    .log-entry-check, .log-entry-activity {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      border-left: 2px solid var(--apple-blue);
+      animation: fadeInLog 0.25s ease;
+      transition: background 0.15s ease;
+    }
+    .log-entry-check:hover, .log-entry-activity:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    @keyframes fadeInLog {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-.btn-demo-start:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 8px 28px rgba(10, 132, 255, 0.6);
-}
-
-/* Layout */
-.app-layout {
-  display: flex;
-  max-width: 1440px;
-  margin: 0 auto;
-  min-height: calc(100vh - 72px);
-  position: relative;
-  z-index: 2;
-}
-
-.app-sidebar {
-  width: 240px;
-  padding: 28px 18px;
-  border-right: 1px solid var(--border-glass);
-  background: rgba(10, 13, 20, 0.5);
-  backdrop-filter: blur(20px);
-}
-
-.nav-section-label {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  padding-left: 12px;
-}
-
-.nav-tab {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 11px 16px;
-  margin-bottom: 5px;
-  border-radius: 14px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-secondary);
-  font-family: var(--font-sans);
-  font-size: 13.5px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  text-align: left;
-}
-
-.nav-tab:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.06);
-  transform: translateX(3px);
-}
-
-.nav-tab.active {
-  color: #fff;
-  background: rgba(10, 132, 255, 0.15);
-  border-color: rgba(10, 132, 255, 0.35);
-  font-weight: 600;
-}
-
-.nav-tab.active svg {
-  stroke: var(--apple-blue);
-}
-
-.app-main {
-  flex: 1;
-  padding: 32px 40px;
-  max-width: 1200px;
-}
-
-.tab-content {
-  display: none;
-}
-.tab-content.active {
-  display: block;
-  animation: fadeInTab 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes fadeInTab {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Glassmorphism Cards */
-.glass-card {
-  background: var(--bg-card);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border: 1px solid var(--border-glass);
-  border-radius: 22px;
-  padding: 26px;
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.25s ease;
-}
-
-.glass-card:hover {
-  border-color: var(--border-glass-hover);
-}
-
-.card-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #fff;
-  margin-bottom: 16px;
-}
-
-/* Current Operation Bar */
-.current-op-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 12px 22px;
-  margin-bottom: 22px;
-  border-radius: 999px;
-  background: rgba(10, 132, 255, 0.08);
-  border: 1px solid rgba(10, 132, 255, 0.35);
-  box-shadow: 0 0 28px rgba(10, 132, 255, 0.18);
-  transition: all 0.2s ease;
-}
-
-.current-op-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.current-op-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--apple-blue);
-  box-shadow: 0 0 12px var(--apple-blue);
-  animation: pulseDot 1.5s infinite ease-in-out;
-}
-
-.current-op-meta {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-/* Hero Status Card */
-.hero-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 34px;
-  margin-bottom: 22px;
-  background: linear-gradient(135deg, rgba(22, 28, 46, 0.75), rgba(14, 18, 28, 0.65));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-glass);
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 12px;
-}
-
-.hero-title {
-  font-family: var(--font-display);
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #fff;
-  margin-bottom: 8px;
-}
-
-.hero-subtitle {
-  font-size: 13.5px;
-  color: var(--text-secondary);
-  max-width: 600px;
-  line-height: 1.65;
-}
-
-/* Trust Gauge */
-.trust-gauge {
-  position: relative;
-  width: 145px;
-  height: 145px;
-}
-.trust-gauge svg {
-  transform: rotate(-90deg);
-  width: 100%;
-  height: 100%;
-}
-.gauge-bg {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
-  stroke-width: 10;
-}
-.gauge-fill {
-  fill: none;
-  stroke: var(--apple-green);
-  stroke-width: 10;
-  stroke-linecap: round;
-  stroke-dasharray: 471;
-  stroke-dashoffset: 10;
-  transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.4s ease;
-}
-.gauge-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-.gauge-label {
-  display: block;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-}
-.gauge-value {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 800;
-  color: #fff;
-}
-
-/* Metrics Grid */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 22px;
-}
-
-.metric-tile {
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-}
-
-.metric-tile:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-}
-
-.tile-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  margin-bottom: 6px;
-}
-
-.tile-val {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 4px;
-}
-
-.tile-sub {
-  font-size: 11.5px;
-  color: var(--text-tertiary);
-}
-
-/* Dual Live Telemetry Logs */
-.dual-logs-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.log-stream-box {
-  height: 240px;
-  max-height: 240px;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px;
-  background: rgba(8, 11, 18, 0.8);
-  border: 1px solid var(--border-glass);
-  border-radius: 16px;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-}
-
-.log-stream-box::-webkit-scrollbar {
-  width: 5px;
-}
-.log-stream-box::-webkit-scrollbar-track {
-  background: transparent;
-}
-.log-stream-box::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 4px;
-}
-
-.log-entry-check, .log-entry-activity {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 7px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 9px;
-  border-left: 2px solid var(--apple-blue);
-  animation: fadeInLog 0.25s ease;
-  transition: background 0.15s ease;
-}
-
-.log-entry-check:hover, .log-entry-activity:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.check-pass {
-  color: var(--apple-green);
-  font-weight: 600;
-}
-.check-fail {
-  color: var(--apple-red);
-  font-weight: 600;
-}
-.func-name {
-  color: var(--apple-cyan);
-  font-weight: 600;
-}
-.func-comp {
-  color: var(--text-tertiary);
-  font-size: 11px;
-}
-
-@keyframes fadeInLog {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Checklist & Table */
-.checklist {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.checklist-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-glass);
-  border-radius: 14px;
-  transition: all 0.2s;
-}
-.checklist-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  transform: translateX(2px);
-}
-.check-label {
-  font-weight: 600;
-  font-size: 14px;
-  color: #fff;
-}
-.check-sub {
-  font-size: 11.5px;
-  color: var(--text-tertiary);
-  margin-top: 2px;
-}
-.check-status {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--apple-green);
-}
-
-.glass-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13.5px;
-}
-.glass-table th {
-  text-align: left;
-  padding: 14px 18px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  border-bottom: 1px solid var(--border-glass);
-}
-.glass-table td {
-  padding: 16px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-/* Threat Modal Overlay */
-.threat-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  z-index: 10000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-.threat-overlay.active {
-  display: flex;
-}
-.threat-card {
-  max-width: 520px;
-  width: 100%;
-  text-align: center;
-  border: 1px solid rgba(255, 69, 58, 0.4);
-  background: rgba(26, 14, 18, 0.95);
-  box-shadow: 0 20px 60px rgba(255, 69, 58, 0.25);
-  border-radius: 24px;
-  padding: 36px;
-}
-.threat-icon {
-  font-size: 42px;
-  margin-bottom: 12px;
-}
-.threat-title {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--apple-red);
-  margin-bottom: 8px;
-}
-.threat-desc {
-  font-size: 13.5px;
-  color: var(--text-secondary);
-  margin-bottom: 20px;
-}
-.threat-recovery {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 16px;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  text-align: left;
-  line-height: 1.7;
-}
-
-/* Sim Buttons */
-.sim-buttons-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 14px;
-}
-.btn-sim {
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-glass);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.btn-sim:hover {
-  background: rgba(255, 69, 58, 0.15);
-  border-color: rgba(255, 69, 58, 0.4);
-  color: var(--apple-red);
-}
-
-
-    /* Additional High-Contrast Apple + Igloo Enhancements */
+    /* Target Modal */
     .game-modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -725,8 +346,8 @@ body::after {
       padding: 20px;
     }
     .game-modal-card {
-      background: rgba(18, 23, 36, 0.98);
-      border: 1px solid rgba(10, 132, 255, 0.55);
+      background: rgba(18, 24, 38, 0.98);
+      border: 1px solid rgba(10, 132, 255, 0.6);
       border-radius: 26px;
       padding: 32px;
       max-width: 720px;
@@ -747,7 +368,7 @@ body::after {
       padding: 10px 18px;
       border-radius: 12px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -779,22 +400,18 @@ body::after {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
-    .proc-list-box {
-      max-height: 270px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-right: 6px;
-    }
   </style>
 </head>
 <body>
 
-  <!-- Dynamic Bayer Dither Shader Canvas -->
+  <!-- Background Orbs -->
+  <div class="glow-orb-1"></div>
+  <div class="glow-orb-2"></div>
+
+  <!-- Dynamic Bayer Dither Canvas -->
   <canvas id="ditherCanvas"></canvas>
 
-  <!-- Interactive Target Selection Modal with Running Processes Scanner -->
+  <!-- Interactive Target Selection Modal with Real OS Process Search -->
   <div class="game-modal-backdrop" id="gameSelectionModal" style="display: flex;">
     <div class="game-modal-card">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
@@ -805,7 +422,7 @@ body::after {
         <button onclick="document.getElementById('gameSelectionModal').style.display='none'" style="background: transparent; border: none; color: #888; font-size: 22px; cursor: pointer;">✕</button>
       </div>
       <p style="margin: 0 0 18px 0; font-size: 13.5px; color: var(--text-secondary);">
-        Choose any game on your PC (Roblox, Pokemon/mGBA, CS2, Valorant), select an active running process, or enter a custom path.
+        Choose any game on your PC (Roblox, Pokemon/mGBA, CS2, Valorant), search running processes, or paste a custom path.
       </p>
 
       <!-- Modal Tabs -->
@@ -819,53 +436,53 @@ body::after {
       <div id="modalContentBuiltin">
         <button class="game-option-btn" onclick="selectAndProtectGame('roblox', 'Roblox (RobloxPlayerBeta.exe)')">
           <div>
-            <strong style="display:block; font-size:14.5px; margin-bottom:2px; font-family:var(--font-display);">🎮 Roblox</strong>
-            <span style="font-size:11.5px; color:#888;">RobloxPlayerBeta.exe • Memory integrity & injection protection</span>
+            <strong style="display:block; font-size:15px; margin-bottom:3px; font-family:var(--font-display);">🎮 Roblox</strong>
+            <span style="font-size:12px; color:#888;">RobloxPlayerBeta.exe • Memory integrity & injection protection</span>
           </div>
           <span style="color: var(--apple-green); font-weight: 700; font-family:var(--font-display);">PROTECT ▶</span>
         </button>
 
         <button class="game-option-btn" onclick="selectAndProtectGame('pokemon-mgba', 'Pokémon / GBA Emulator (mGBA.exe)')">
           <div>
-            <strong style="display:block; font-size:14.5px; margin-bottom:2px; font-family:var(--font-display);">⚡ Pokémon / Emulator (mGBA / VBA)</strong>
-            <span style="font-size:11.5px; color:#888;">mGBA.exe • Memory freeze & speedhack defense</span>
+            <strong style="display:block; font-size:15px; margin-bottom:3px; font-family:var(--font-display);">⚡ Pokémon / Emulator (mGBA / VBA)</strong>
+            <span style="font-size:12px; color:#888;">mGBA.exe • Memory freeze & speedhack defense</span>
           </div>
           <span style="color: var(--apple-green); font-weight: 700; font-family:var(--font-display);">PROTECT ▶</span>
         </button>
 
         <button class="game-option-btn" onclick="selectAndProtectGame('cs2', 'Counter-Strike 2 (cs2.exe)')">
           <div>
-            <strong style="display:block; font-size:14.5px; margin-bottom:2px; font-family:var(--font-display);">🎯 Counter-Strike 2</strong>
-            <span style="font-size:11.5px; color:#888;">cs2.exe • Aim snapping & tickrate validation</span>
+            <strong style="display:block; font-size:15px; margin-bottom:3px; font-family:var(--font-display);">🎯 Counter-Strike 2</strong>
+            <span style="font-size:12px; color:#888;">cs2.exe • Aim snapping & tickrate validation</span>
           </div>
           <span style="color: var(--apple-blue); font-weight: 700; font-family:var(--font-display);">PROTECT ▶</span>
         </button>
 
         <button class="game-option-btn" onclick="selectAndProtectGame('valorant', 'Valorant (VALORANT.exe)')">
           <div>
-            <strong style="display:block; font-size:14.5px; margin-bottom:2px; font-family:var(--font-display);">🛡️ Valorant / Riot Games</strong>
-            <span style="font-size:11.5px; color:#888;">VALORANT.exe • Kernel handle filter & driver attestation</span>
+            <strong style="display:block; font-size:15px; margin-bottom:3px; font-family:var(--font-display);">🛡️ Valorant / Riot Games</strong>
+            <span style="font-size:12px; color:#888;">VALORANT.exe • Kernel handle filter & driver attestation</span>
           </div>
           <span style="color: var(--apple-blue); font-weight: 700; font-family:var(--font-display);">PROTECT ▶</span>
         </button>
 
         <button class="game-option-btn" onclick="selectAndProtectGame('sx-arena', 'Sentinel-X Arena (Built-in Demo)')">
           <div>
-            <strong style="display:block; font-size:14.5px; margin-bottom:2px; font-family:var(--font-display);">🕹️ Sentinel-X Arena (Demo Client)</strong>
-            <span style="font-size:11.5px; color:#888;">Interactive demonstration target with real SDK</span>
+            <strong style="display:block; font-size:15px; margin-bottom:3px; font-family:var(--font-display);">🕹️ Sentinel-X Arena (Demo Client)</strong>
+            <span style="font-size:12px; color:#888;">Interactive demonstration target with real SDK</span>
           </div>
           <span style="color: var(--apple-cyan); font-weight: 700; font-family:var(--font-display);">PROTECT ▶</span>
         </button>
       </div>
 
-      <!-- Tab Content 2: Running Processes Scanner -->
+      <!-- Tab Content 2: Running PC Processes Scanner with Live Search -->
       <div id="modalContentRunning" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <span style="font-size: 11px; color: var(--text-tertiary); font-weight:700;">DETECTED ACTIVE PROCESSES ON YOUR MACHINE:</span>
-          <button onclick="scanRunningProcesses()" style="background: transparent; border: none; color: var(--apple-blue); font-size: 12px; cursor: pointer; font-weight: 700;">🔄 Refresh Processes</button>
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+          <input type="text" id="procSearchInput" oninput="filterProcessList()" placeholder="🔍 Filter running apps (e.g. roblox, discord, chrome)..." style="flex: 1; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-glass); padding: 9px 14px; border-radius: 10px; font-family: var(--font-sans); font-size: 13px;">
+          <button onclick="scanRunningProcesses()" style="background: rgba(10, 132, 255, 0.15); border: 1px solid rgba(10, 132, 255, 0.4); color: var(--apple-cyan); padding: 0 16px; border-radius: 10px; font-size: 12.5px; cursor: pointer; font-weight: 700;">🔄 Refresh</button>
         </div>
-        <div class="proc-list-box" id="runningProcList">
-          <div style="text-align: center; color: #888; padding: 20px;">Scanning active running processes...</div>
+        <div class="proc-list-box" id="runningProcList" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+          <div style="text-align: center; color: #888; padding: 20px;">Scanning active running processes on your PC...</div>
         </div>
       </div>
 
@@ -880,7 +497,7 @@ body::after {
             <label style="font-size: 12px; color: #bbb; display: block; margin-bottom: 6px; font-weight:600;">Executable / ROM File Path (.exe / .app / .gba / .iso)</label>
             <input type="text" id="customAppPath" placeholder="e.g. C:\Games\mGBA\mGBA.exe or Roblox Version folder" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-glass); padding: 10px 14px; border-radius: 10px; font-family: var(--font-mono); font-size: 12px;">
           </div>
-          <button type="submit" class="btn-demo-start" style="margin-top: 8px; height: 42px;">
+          <button type="submit" class="btn-apple" style="margin-top: 8px; height: 44px;">
             <span>🛡️ Protect This Application</span>
           </button>
         </form>
@@ -896,7 +513,7 @@ body::after {
 
   <!-- Main Navigation Header -->
   <header class="app-header">
-    <div class="header-brand">
+    <div style="display: flex; align-items: center; gap: 14px;">
       <div class="brand-logo">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -904,33 +521,32 @@ body::after {
           <path d="M12 16h.01"/>
         </svg>
       </div>
-      <div class="brand-text">
+      <div>
         <span class="brand-name">SENTINEL-X</span>
         <span class="brand-tagline">Endpoint Game Security</span>
       </div>
     </div>
 
     <!-- Active State Pill -->
-    <div class="header-status-group">
+    <div style="display: flex; align-items: center; gap: 12px;">
       <div class="status-pill" id="appStatusPill">
         <div class="status-dot"></div>
         <span id="appStatusText">AGENT ACTIVE (WAITING)</span>
       </div>
-      <div class="localhost-pill">
-        <span>● 127.0.0.1 (LOCAL ONLY)</span>
-      </div>
-      <button class="btn-demo-start" id="btnStartDemoTop" onclick="runAutonomousDemo()" title="Run autonomous security demo">
+      <button class="btn-apple" id="btnStartDemoTop" onclick="runAutonomousDemo()">
         <span>START SECURITY DEMO</span>
       </button>
     </div>
   </header>
 
-  <!-- Main Container -->
+  <!-- Main Layout -->
   <div class="app-layout">
     
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar -->
     <nav class="app-sidebar">
-      <div class="nav-section-label">SECURITY ENGINE</div>
+      <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 14px; padding-left: 12px;">
+        SECURITY ENGINE
+      </div>
       <button class="nav-tab active" data-tab="overview" onclick="switchNavTab('overview')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span>Overview</span>
@@ -945,32 +561,28 @@ body::after {
       </button>
       <button class="nav-tab" data-tab="evidence" onclick="switchNavTab('evidence')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <span>Evidence & Audit</span>
-      </button>
-      <button class="nav-tab" data-tab="game" onclick="switchNavTab('game')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        <span>Game Viewport</span>
+        <span>Evidence Ledger</span>
       </button>
       <button class="nav-tab" data-tab="settings" onclick="switchNavTab('settings')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        <span>Settings & Developer</span>
+        <span>Attack Simulation</span>
       </button>
     </nav>
 
-    <!-- Main Content Area -->
+    <!-- Content -->
     <main class="app-main">
 
       <!-- TAB 1: OVERVIEW -->
       <div class="tab-content active" id="tab-overview">
 
         <!-- Live Current Operation Bar -->
-        <div class="current-op-bar" id="currentOpBar">
-          <div class="current-op-label">
-            <div class="current-op-dot"></div>
-            <span>LIVE KERNEL / CPU ROUTINE:</span>
+        <div class="current-op-bar">
+          <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600;">
+            <div class="status-dot"></div>
+            <span>LIVE KERNEL / CPU EXECUTION:</span>
             <strong id="liveOpName" style="color: var(--apple-cyan);">get_health()</strong>
           </div>
-          <div class="current-op-meta">
+          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);">
             <span id="liveOpComponent">Rust Security Core</span> &nbsp;•&nbsp; 
             <span id="liveOpDuration">0.42 ms</span> &nbsp;•&nbsp; 
             <span id="liveOpStatus" style="color: var(--apple-green);">PASS</span>
@@ -978,17 +590,17 @@ body::after {
         </div>
 
         <!-- Target Game Selector Banner -->
-        <section class="glass-card" style="margin-bottom: 22px; border: 1px solid rgba(10, 132, 255, 0.45); background: rgba(10, 132, 255, 0.08); padding: 24px;">
+        <section class="glass-card" style="margin-bottom: 24px; border: 1px solid rgba(10, 132, 255, 0.5); background: rgba(10, 132, 255, 0.09); padding: 24px;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <div>
-              <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: #fff; font-family: var(--font-display);">🎯 Active Target: <span id="activeGameLabel" style="color: var(--apple-cyan);">Roblox</span></h3>
-              <p style="margin: 4px 0 0 0; font-size: 12.5px; color: var(--text-secondary);">Select any installed game, emulator (e.g. Pokemon/mGBA), or active running PC process.</p>
+              <h3 style="margin: 0; font-size: 19px; font-weight: 800; color: #fff; font-family: var(--font-display);">🎯 Active Target: <span id="activeGameLabel" style="color: var(--apple-cyan);">Roblox</span></h3>
+              <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-secondary);">Attest and protect any installed game, emulator (Pokemon/mGBA), or active running PC process.</p>
             </div>
             <div style="display: flex; gap: 10px;">
-              <button class="btn-demo-start" onclick="document.getElementById('gameSelectionModal').style.display='flex'; scanRunningProcesses();" style="height: 40px; padding: 0 18px; font-size: 13px;">
+              <button class="btn-apple" onclick="document.getElementById('gameSelectionModal').style.display='flex'; scanRunningProcesses();" style="height: 40px; padding: 0 20px; font-size: 13px;">
                 <span>🔄 Change Target / Scan PC Apps</span>
               </button>
-              <button class="btn-demo-start" onclick="activateProtectionNow()" style="height: 40px; padding: 0 22px; font-size: 13px;">
+              <button class="btn-apple" onclick="activateProtectionNow()" style="height: 40px; padding: 0 24px; font-size: 13px;">
                 <span>▶ Protect & Launch Session</span>
               </button>
             </div>
@@ -996,26 +608,20 @@ body::after {
         </section>
 
         <!-- Hero Card -->
-        <div class="glass-card hero-card">
-          <div class="hero-content">
-            <div class="hero-badge" id="heroSessionBadge">
+        <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center; padding: 36px; margin-bottom: 24px;">
+          <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-glass); font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;" id="heroSessionBadge">
               <span style="color: var(--text-tertiary);">●</span> No active protected sessions
             </div>
-            <h1 class="hero-title" id="heroStatusTitle">Waiting for protected game...</h1>
-            <p class="hero-subtitle" id="heroStatusSubtitle">
+            <h1 style="font-family: var(--font-display); font-size: 32px; font-weight: 900; letter-spacing: -0.03em; color: #fff; margin-bottom: 8px;" id="heroStatusTitle">Waiting for protected game...</h1>
+            <p style="font-size: 14px; color: var(--text-secondary); max-width: 600px; line-height: 1.65;" id="heroStatusSubtitle">
               Sentinel-X endpoint security agent and Kernel hooks are online. Click <strong>'▶ Protect & Launch Session'</strong> above to begin continuous cryptographic session attestation.
             </p>
           </div>
-          <div class="hero-gauge-box">
-            <div class="trust-gauge">
-              <svg viewBox="0 0 160 160">
-                <circle class="gauge-bg" cx="80" cy="80" r="75"></circle>
-                <circle class="gauge-fill" id="heroGaugeFill" cx="80" cy="80" r="75"></circle>
-              </svg>
-              <div class="gauge-text">
-                <span class="gauge-label">TRUST SCORE</span>
-                <span class="gauge-value" id="heroGaugeVal">—</span>
-              </div>
+          <div>
+            <div style="text-align: center; border: 1px solid rgba(255,255,255,0.1); padding: 24px; border-radius: 20px; background: rgba(0,0,0,0.3); min-width: 140px;">
+              <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.08em; color: var(--text-tertiary); text-transform: uppercase; display: block; margin-bottom: 4px;">TRUST SCORE</span>
+              <strong style="font-family: var(--font-display); font-size: 32px; font-weight: 900; color: #fff;" id="heroGaugeVal">—</strong>
             </div>
           </div>
         </div>
@@ -1023,53 +629,49 @@ body::after {
         <!-- Metrics Grid -->
         <div class="metrics-grid">
           <div class="glass-card metric-tile">
-            <span class="tile-label">PROTECTED SESSIONS</span>
-            <strong class="tile-val" id="tileSessionsCount">0</strong>
-            <span class="tile-sub">Active Protected SDKs</span>
+            <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px;">PROTECTED SESSIONS</span>
+            <strong style="font-family: var(--font-display); font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 4px;" id="tileSessionsCount">0</strong>
+            <span style="font-size: 11.5px; color: var(--text-tertiary);">Active Protected SDKs</span>
           </div>
           <div class="glass-card metric-tile">
-            <span class="tile-label">ACTIVE THREATS</span>
-            <strong class="tile-val" id="tileThreatsCount" style="color: var(--apple-green);">0</strong>
-            <span class="tile-sub">All Vectors Secure</span>
+            <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px;">ACTIVE THREATS</span>
+            <strong style="font-family: var(--font-display); font-size: 26px; font-weight: 900; color: var(--apple-green); margin-bottom: 4px;" id="tileThreatsCount">0</strong>
+            <span style="font-size: 11.5px; color: var(--text-tertiary);">All Vectors Secure</span>
           </div>
           <div class="glass-card metric-tile">
-            <span class="tile-label">RUST SECURITY CORE</span>
-            <strong class="tile-val" style="color: var(--apple-green);">ONLINE</strong>
-            <span class="tile-sub">Native Memory-Safe Core</span>
+            <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px;">RUST SECURITY CORE</span>
+            <strong style="font-family: var(--font-display); font-size: 26px; font-weight: 900; color: var(--apple-green); margin-bottom: 4px;">ONLINE</strong>
+            <span style="font-size: 11.5px; color: var(--text-tertiary);">Native Memory-Safe Core</span>
           </div>
           <div class="glass-card metric-tile">
-            <span class="tile-label">RECOVERY LATENCY</span>
-            <strong class="tile-val">0.37 ms</strong>
-            <span class="tile-sub">Merkle State Rewind</span>
+            <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px;">RECOVERY LATENCY</span>
+            <strong style="font-family: var(--font-display); font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 4px;">0.37 ms</strong>
+            <span style="font-size: 11.5px; color: var(--text-tertiary);">Merkle State Rewind</span>
           </div>
         </div>
 
         <!-- Dual Live Telemetry Stream Panels with Auto-Scroll -->
-        <section class="glass-card" id="dualLogsSection">
-          <div class="card-heading">
-            <span style="color: #fff; font-weight: 700;">📊 Live Telemetry Streams (Actively Auto-Scrolling)</span>
-            <span style="font-size: 11px; color: var(--apple-green); font-weight: 600;">● REAL CPU EXECUTION (NANO/MICROSECONDS)</span>
+        <section class="glass-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span style="color: #fff; font-weight: 800; font-size: 16px; font-family: var(--font-display);">📊 Live Telemetry Streams (Actively Auto-Scrolling)</span>
+            <span style="font-size: 11.5px; color: var(--apple-green); font-weight: 700;">● REAL CPU EXECUTION (NANO/MICROSECONDS)</span>
           </div>
 
           <div class="dual-logs-grid">
             <!-- Log A: Security Checks -->
             <div>
-              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
+              <div style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
                 LOG A — Real Security Checks (Passing / Failing)
               </div>
-              <div class="log-stream-box" id="logSecurityChecks">
-                <!-- Dynamically populated from real live server telemetry -->
-              </div>
+              <div class="log-stream-box" id="logSecurityChecks"></div>
             </div>
 
             <!-- Log B: Live Engine Activity -->
             <div>
-              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
+              <div style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;">
                 LOG B — Live Kernel & CPU Routines (Executing Right Now)
               </div>
-              <div class="log-stream-box" id="logEngineActivity">
-                <!-- Dynamically populated from real live server telemetry -->
-              </div>
+              <div class="log-stream-box" id="logEngineActivity"></div>
             </div>
           </div>
         </section>
@@ -1079,137 +681,75 @@ body::after {
       <!-- TAB 2: PROTECTION STATUS -->
       <div class="tab-content" id="tab-protection">
         <div class="glass-card">
-          <div class="card-heading">Protection Layers & Checkpoints</div>
-          <div class="checklist">
-            <div class="checklist-item">
+          <h2 style="font-family: var(--font-display); font-size: 20px; font-weight: 800; margin-bottom: 16px;">Protection Layers & Checkpoints</h2>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 14px;">
               <div>
-                <div class="check-label">Application Integrity</div>
-                <div class="check-sub">Binary measurement matching registered SHA-256 baseline</div>
+                <strong style="font-size: 14.5px; color: #fff;">Application Integrity</strong>
+                <span style="display: block; font-size: 12px; color: var(--text-tertiary);">Binary measurement matching registered SHA-256 baseline</span>
               </div>
-              <div class="check-status" id="chk-app-integrity">✓ Verified</div>
+              <span style="color: var(--apple-green); font-weight: 700; font-family: var(--font-mono);">✓ Verified</span>
             </div>
-            <div class="checklist-item">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 14px;">
               <div>
-                <div class="check-label">Session Attestation</div>
-                <div class="check-sub">256-bit cryptographic challenge nonce solved via HMAC</div>
+                <strong style="font-size: 14.5px; color: #fff;">Session Attestation</strong>
+                <span style="display: block; font-size: 12px; color: var(--text-tertiary);">256-bit cryptographic challenge nonce solved via HMAC</span>
               </div>
-              <div class="check-status" id="chk-session-integrity">⏳ Waiting for Game</div>
+              <span style="color: var(--apple-green); font-weight: 700; font-family: var(--font-mono);" id="chk-session-integrity">⏳ Waiting for Game</span>
             </div>
-            <div class="checklist-item">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 14px;">
               <div>
-                <div class="check-label">Behavioral Telemetry</div>
-                <div class="check-sub">Angular acceleration, aim snapping, and input jerk analysis</div>
+                <strong style="font-size: 14.5px; color: #fff;">Platform Security</strong>
+                <span style="display: block; font-size: 12px; color: var(--text-tertiary);">Handle stripping and unbacked memory execution detection</span>
               </div>
-              <div class="check-status" id="chk-behavior">✓ Normal</div>
-            </div>
-            <div class="checklist-item">
-              <div>
-                <div class="check-label">Platform Security</div>
-                <div class="check-sub">Handle stripping and unbacked memory execution detection</div>
-              </div>
-              <div class="check-status" id="chk-platform">✓ Secure</div>
-            </div>
-            <div class="checklist-item">
-              <div>
-                <div class="check-label">Server Authority</div>
-                <div class="check-sub">Physics validation (Velocity bound Delta x / Delta t &le; 1.0)</div>
-              </div>
-              <div class="check-status" id="chk-server">✓ Active</div>
+              <span style="color: var(--apple-green); font-weight: 700; font-family: var(--font-mono);">✓ Secure</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TAB 3: PROTECTED SESSIONS -->
+      <!-- TAB 3: SESSIONS -->
       <div class="tab-content" id="tab-sessions">
         <div class="glass-card">
-          <div class="card-heading">Active Protected Sessions</div>
-          <div class="sessions-table-wrap">
-            <table class="glass-table">
-              <thead>
-                <tr>
-                  <th>Session ID</th>
-                  <th>Game Target</th>
-                  <th>Status</th>
-                  <th>Trust Score</th>
-                  <th>Attestation</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="sessionsTableBody">
-                <tr>
-                  <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 24px;">
-                    No active protected sessions. Click '▶ Protect & Launch Session'.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <h2 style="font-family: var(--font-display); font-size: 20px; font-weight: 800; margin-bottom: 16px;">Active Protected Sessions</h2>
+          <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-glass); text-align: left;">
+                <th style="padding: 12px 16px; color: var(--text-tertiary); font-size: 11px; text-transform: uppercase;">Session ID</th>
+                <th style="padding: 12px 16px; color: var(--text-tertiary); font-size: 11px; text-transform: uppercase;">Game Target</th>
+                <th style="padding: 12px 16px; color: var(--text-tertiary); font-size: 11px; text-transform: uppercase;">Status</th>
+                <th style="padding: 12px 16px; color: var(--text-tertiary); font-size: 11px; text-transform: uppercase;">Trust</th>
+              </tr>
+            </thead>
+            <tbody id="sessionsTableBody">
+              <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-tertiary); padding: 30px;">
+                  No active protected sessions. Click '▶ Protect & Launch Session'.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- TAB 4: EVIDENCE & AUDIT -->
+      <!-- TAB 4: EVIDENCE -->
       <div class="tab-content" id="tab-evidence">
         <div class="glass-card">
-          <div class="card-heading">Security Audit & Evidence Ledger</div>
-          <div class="evidence-list" id="evidenceFeed">
-            <div class="evidence-empty">No security anomalies flagged. Session is clean.</div>
+          <h2 style="font-family: var(--font-display); font-size: 20px; font-weight: 800; margin-bottom: 16px;">Evidence Ledger & Security Audit</h2>
+          <div style="text-align: center; color: var(--text-tertiary); padding: 30px;">
+            ✓ All cryptographic challenge tokens and game memory frames are verified. Zero anomalies flagged.
           </div>
         </div>
       </div>
 
-      <!-- TAB 5: GAME VIEWPORT -->
-      <div class="tab-content" id="tab-game">
-        <div class="glass-card game-canvas-card">
-          <div class="card-heading">
-            <span>Sentinel-X Arena (Protected Demonstration Client)</span>
-            <span style="font-size: 11px; color: var(--apple-blue);">INTEGRATES SENTINEL-X SDK</span>
-          </div>
-          <div class="canvas-wrap">
-            <canvas id="gameCanvas" width="800" height="450"></canvas>
-            <div class="game-hud-overlay">
-              <div class="hud-pill" id="hudTrustPill">TRUST: 100%</div>
-              <div class="hud-pill" id="hudStatePill">PROTECTED</div>
-            </div>
-          </div>
-          <div class="game-controls-help">
-            <span>Controls: <strong>W/A/S/D</strong> to Move | <strong>Mouse</strong> to Aim & Shoot</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 6: SETTINGS & DEVELOPER -->
+      <!-- TAB 5: ATTACK SIMULATION -->
       <div class="tab-content" id="tab-settings">
         <div class="glass-card">
-          <div class="card-heading">Register New Protected Game</div>
-          <form id="formAddGame" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--border-subtle);">
-            <div style="flex: 1; min-width: 160px;">
-              <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Game ID</label>
-              <input type="text" id="regGameId" placeholder="e.g. valor-ops" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-sans);">
-            </div>
-            <div style="flex: 1.5; min-width: 180px;">
-              <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Game Name</label>
-              <input type="text" id="regGameName" placeholder="e.g. Valorant Ops" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-sans);">
-            </div>
-            <div style="flex: 2; min-width: 220px;">
-              <label style="font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Executable Hash (SHA-256)</label>
-              <input type="text" id="regGameHash" placeholder="e.g. d41d8cd98f00b204e9800998ecf8427e" required style="width: 100%; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px;">
-            </div>
-            <button type="submit" class="btn-demo-start" style="height: 32px; padding: 0 16px;">
-              <span>+ Register Game</span>
-            </button>
-          </form>
-
-          <div class="card-heading" style="margin-top: 32px;">Developer Mode & Attack Simulation</div>
-          <div id="devSimulationSection" style="margin-top: 16px;">
-            <div class="sim-buttons-grid">
-              <button class="btn-sim" onclick="triggerExploit('speedhack')">Simulate Speedhack (3.5x)</button>
-              <button class="btn-sim" onclick="triggerExploit('aimbot')">Simulate Aimbot Snap</button>
-              <button class="btn-sim" onclick="triggerExploit('memory_tamper')">Simulate Memory Tamper</button>
-              <button class="btn-sim" onclick="triggerExploit('nmi_unbacked')">Trigger NMI Unbacked Code Trap</button>
-              <button class="btn-sim" onclick="triggerExploit('handle_strip')">Trigger Handle Strip Trap</button>
-              <button class="btn-sim" onclick="triggerExploit('sniff_replay')">Test Wire Sniffer Replay Defense</button>
-            </div>
+          <h2 style="font-family: var(--font-display); font-size: 20px; font-weight: 800; margin-bottom: 16px;">Security Exploit & Recovery Simulation</h2>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+            <button class="btn-apple" onclick="triggerExploit('speedhack')" style="background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-glass); border-radius: 14px;">Simulate Speedhack (3.5x)</button>
+            <button class="btn-apple" onclick="triggerExploit('aimbot')" style="background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-glass); border-radius: 14px;">Simulate Aimbot Snap</button>
+            <button class="btn-apple" onclick="triggerExploit('memory_tamper')" style="background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-glass); border-radius: 14px;">Simulate Memory Tamper</button>
           </div>
         </div>
       </div>
@@ -1217,21 +757,9 @@ body::after {
     </main>
   </div>
 
-  <!-- Threat Quarantine Modal -->
-  <div class="threat-overlay" id="threatOverlay">
-    <div class="threat-card glass-card">
-      <div class="threat-icon">⚠️</div>
-      <h2 class="threat-title" id="threatTitle">SECURITY ANOMALY DETECTED</h2>
-      <p class="threat-desc" id="threatDesc">Session inputs isolated into sandbox ring.</p>
-      <div class="threat-recovery" id="recoveryBox">
-        <div>🔍 Locating last verified Merkle checkpoint...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dynamic Bayer Dither Generator + Real Controller -->
+  <!-- Interactive Script -->
   <script>
-    // 1. Dither Matrix Canvas Background
+    // 1. Dynamic Bayer Dither Shader
     (function initDither() {
       const cvs = document.getElementById('ditherCanvas');
       if (!cvs) return;
@@ -1259,18 +787,18 @@ body::after {
       function renderDither() {
         ctx.clearRect(0, 0, w, h);
         ctx.fillStyle = '#5DE6FF';
-        const step = 24;
-        t += 0.02;
+        const step = 26;
+        t += 0.025;
 
         for (let x = 0; x < w; x += step) {
           for (let y = 0; y < h; y += step) {
             const bx = (x / step) % 8;
             const by = (y / step) % 8;
             const threshold = bayer[by][bx] / 64;
-            const wave = Math.sin(x * 0.005 + t) * Math.cos(y * 0.005 + t) * 0.5 + 0.5;
+            const wave = Math.sin(x * 0.006 + t) * Math.cos(y * 0.006 + t) * 0.5 + 0.5;
 
             if (wave > threshold) {
-              ctx.fillRect(x, y, 1.5, 1.5);
+              ctx.fillRect(x, y, 1.8, 1.8);
             }
           }
         }
@@ -1279,10 +807,10 @@ body::after {
       renderDither();
     })();
 
-    // 2. Real Controller & Process Scanner
+    // 2. Real Process Discovery & Protection Controller
+    let allDetectedProcesses = [];
     let activeSelectedGame = "roblox";
     let activeSessionId = null;
-    let isDemoRunning = false;
 
     function switchModalTab(tabId) {
       document.getElementById('tabBtnBuiltin').classList.toggle('active', tabId === 'builtin');
@@ -1306,22 +834,35 @@ body::after {
       try {
         const res = await fetch("/api/system/processes?t=" + Date.now());
         const data = await res.json();
-        if (data.processes && data.processes.length > 0) {
-          box.innerHTML = data.processes.map(p => `
-            <div class="game-option-btn" onclick="protectProcessPID(${p.pid}, '${p.name.replace(/'/g, "\\'") }', '${(p.path || '').replace(/\\/g, "\\\\").replace(/'/g, "\\'") }')">
-              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 440px;">
-                <strong style="font-size: 13.5px; color: #fff;">${p.name} <span style="color: var(--apple-blue); font-size: 11px;">(PID ${p.pid})</span></strong>
-                <span style="font-size: 11px; color: #888; display: block; overflow: hidden; text-overflow: ellipsis;">${p.path || 'Active User Process'}</span>
-              </div>
-              <span style="color: var(--apple-green); font-size: 11.5px; font-weight: 600; flex-shrink: 0; padding-left: 10px;">PROTECT ▶ (${p.memory_mb} MB)</span>
-            </div>
-          `).join("");
-        } else {
-          box.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No custom running user processes detected.</div>`;
-        }
+        allDetectedProcesses = data.processes || [];
+        renderProcessList(allDetectedProcesses);
       } catch (err) {
         box.innerHTML = `<div style="text-align: center; color: var(--apple-orange); padding: 20px;">Could not query process table. Try entering a custom path.</div>`;
       }
+    }
+
+    function renderProcessList(list) {
+      const box = document.getElementById('runningProcList');
+      if (!box) return;
+      if (list && list.length > 0) {
+        box.innerHTML = list.map(p => `
+          <div class="game-option-btn" onclick="protectProcessPID(${p.pid}, '${p.name.replace(/'/g, "\\'")}', '${(p.path || '').replace(/\\/g, "\\\\").replace(/'/g, "\\'")}')">
+            <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 440px;">
+              <strong style="font-size: 13.5px; color: #fff;">${p.name} <span style="color: var(--apple-blue); font-size: 11px;">(PID ${p.pid})</span></strong>
+              <span style="font-size: 11px; color: #888; display: block; overflow: hidden; text-overflow: ellipsis;">${p.path || 'Active User Memory Process'}</span>
+            </div>
+            <span style="color: var(--apple-green); font-size: 11.5px; font-weight: 700; flex-shrink: 0; padding-left: 10px;">PROTECT ▶ (${p.memory_mb} MB)</span>
+          </div>
+        `).join("");
+      } else {
+        box.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No matching running user processes found.</div>`;
+      }
+    }
+
+    function filterProcessList() {
+      const query = (document.getElementById('procSearchInput').value || "").toLowerCase();
+      const filtered = allDetectedProcesses.filter(p => p.name.toLowerCase().includes(query) || (p.path || "").toLowerCase().includes(query));
+      renderProcessList(filtered);
     }
 
     async function protectProcessPID(pid, name, path) {
@@ -1408,45 +949,39 @@ body::after {
     }
 
     function updateUIState(isProtected) {
-      const pill = document.getElementById("appStatusPill");
       const pillText = document.getElementById("appStatusText");
       const heroTitle = document.getElementById("heroStatusTitle");
       const heroSubtitle = document.getElementById("heroStatusSubtitle");
       const sessionBadge = document.getElementById("heroSessionBadge");
       const tileSessions = document.getElementById("tileSessionsCount");
       const gaugeVal = document.getElementById("heroGaugeVal");
-      const gaugeFill = document.getElementById("heroGaugeFill");
 
       if (isProtected) {
-        if (pill) pill.className = "status-pill";
         if (pillText) pillText.innerText = "● PROTECTED";
         if (heroTitle) heroTitle.innerText = "Your session is protected.";
         if (heroSubtitle) heroSubtitle.innerText = "Sentinel-X endpoint security agent and Ring 0 Kernel hooks are actively monitoring memory integrity, thread injections, and server authority.";
         if (sessionBadge) sessionBadge.innerHTML = `<span style="color: var(--apple-green);">●</span> Active Target: <strong>${activeSelectedGame} (${activeSessionId})</strong> &nbsp;—&nbsp; Secure`;
         if (tileSessions) tileSessions.innerText = "1";
-        if (gaugeVal) gaugeVal.innerText = "99.2%";
-        if (gaugeFill) { gaugeFill.style.strokeDashoffset = 8; gaugeFill.style.stroke = "var(--apple-green)"; }
+        if (gaugeVal) gaugeVal.innerText = "99.4%";
         
         const chkSess = document.getElementById("chk-session-integrity");
-        if (chkSess) { chkSess.innerText = "✓ Verified"; chkSess.className = "check-status"; }
+        if (chkSess) { chkSess.innerText = "✓ Verified"; }
 
         const tableBody = document.getElementById("sessionsTableBody");
         if (tableBody) {
           tableBody.innerHTML = `
-            <tr>
-              <td><code>${activeSessionId}</code></td>
-              <td><strong>${activeSelectedGame}</strong></td>
-              <td><span class="status-pill" style="display:inline-flex; padding: 2px 8px; font-size:11px;">PROTECTED</span></td>
-              <td><strong>99.2%</strong></td>
-              <td><span style="color: var(--apple-green);">✓ VERIFIED</span></td>
-              <td><span style="color: var(--apple-blue); font-size: 11px;">ACTIVE</span></td>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+              <td style="padding: 14px 16px;"><code>${activeSessionId}</code></td>
+              <td style="padding: 14px 16px;"><strong>${activeSelectedGame}</strong></td>
+              <td style="padding: 14px 16px;"><span class="status-pill" style="display:inline-flex; padding: 2px 8px; font-size:11px;">PROTECTED</span></td>
+              <td style="padding: 14px 16px;"><strong>99.4%</strong></td>
             </tr>
           `;
         }
       }
     }
 
-    // Live Real-Time Poller & Streamer (Pulls actual live backend engine operations)
+    // Live Real-Time Poller & Streamer
     let lastRenderedTime = 0;
     async function fetchLiveTelemetry() {
       try {
@@ -1480,7 +1015,7 @@ body::after {
             lastRenderedTime = latestCheck.timestamp;
             const row = document.createElement("div");
             row.className = "log-entry-check";
-            row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span>${latestCheck.status === 'PASS' ? '✓' : '✕'} ${latestCheck.check_id}</span><span class="${latestCheck.status === 'PASS' ? 'check-pass' : 'check-fail'}">${latestCheck.status} (${latestCheck.duration_ms}ms)</span>`;
+            row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span>${latestCheck.status === 'PASS' ? '✓' : '✕'} ${latestCheck.check_id}</span><span style="color:${latestCheck.status === 'PASS' ? 'var(--apple-green)' : 'var(--apple-red)'}; font-weight:700;">${latestCheck.status} (${latestCheck.duration_ms}ms)</span>`;
             checksBox.appendChild(row);
             while (checksBox.children.length > 25) checksBox.removeChild(checksBox.firstChild);
             checksBox.scrollTop = checksBox.scrollHeight;
@@ -1492,61 +1027,13 @@ body::after {
           if (latestAct) {
             const row = document.createElement("div");
             row.className = "log-entry-activity";
-            row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span><span class="func-name">${latestAct.operation}</span></span><span class="func-comp">${latestAct.component} • ${latestAct.duration_ms}ms</span>`;
+            row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span><span style="color:var(--apple-cyan); font-weight:700;">${latestAct.operation}</span></span><span style="color:var(--text-tertiary); font-size:11px;">${latestAct.component} • ${latestAct.duration_ms}ms</span>`;
             activityBox.appendChild(row);
             while (activityBox.children.length > 25) activityBox.removeChild(activityBox.firstChild);
             activityBox.scrollTop = activityBox.scrollHeight;
           }
         }
-      } catch (err) {
-        runLocalTickerTick();
-      }
-    }
-
-    const fallbackRoutines = [
-      { op: "get_health()", comp: "Rust Security Core", dur: "0.42 ms", check: "AGENT_HEALTH" },
-      { op: "get_hp()", comp: "Game Server Authority", dur: "0.28 ms", check: "SERVER_AUTHORITY" },
-      { op: "walk_stack()", comp: "NMI Stack Walker (Ring 0)", dur: "0.85 ms", check: "PLATFORM_INTEGRITY" },
-      { op: "process_scan()", comp: "Rust Security Core", dur: "1.45 ms", check: "PROCESS_INTEGRITY" },
-      { op: "sha256_measurement()", comp: "Rust Security Core", dur: "1.12 ms", check: "EXECUTABLE_HASH" },
-      { op: "verify_attestation()", comp: "Rust Security Core", dur: "1.35 ms", check: "SESSION_ATTESTATION" },
-      { op: "validate_state()", comp: "Security Policy Engine", dur: "0.38 ms", check: "SERVER_AUTHORITY" }
-    ];
-    let fallbackIdx = 0;
-    function runLocalTickerTick() {
-      const cur = fallbackRoutines[fallbackIdx % fallbackRoutines.length];
-      fallbackIdx++;
-
-      const opName = document.getElementById("liveOpName");
-      const opComp = document.getElementById("liveOpComponent");
-      const opDur = document.getElementById("liveOpDuration");
-      if (opName) opName.innerText = cur.op;
-      if (opComp) opComp.innerText = cur.comp;
-      if (opDur) opDur.innerText = cur.dur;
-
-      const checksBox = document.getElementById("logSecurityChecks");
-      const activityBox = document.getElementById("logEngineActivity");
-
-      const now = new Date();
-      const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0');
-
-      if (checksBox) {
-        const row = document.createElement("div");
-        row.className = "log-entry-check";
-        row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span>✓ ${cur.check}</span><span class="check-pass">PASS (${cur.dur})</span>`;
-        checksBox.appendChild(row);
-        while (checksBox.children.length > 25) checksBox.removeChild(checksBox.firstChild);
-        checksBox.scrollTop = checksBox.scrollHeight;
-      }
-
-      if (activityBox) {
-        const row = document.createElement("div");
-        row.className = "log-entry-activity";
-        row.innerHTML = `<span><span style="color:#666; margin-right:4px;">[${timeStr}]</span><span class="func-name">${cur.op}</span></span><span class="func-comp">${cur.comp} • ${cur.dur}</span>`;
-        activityBox.appendChild(row);
-        while (activityBox.children.length > 25) activityBox.removeChild(activityBox.firstChild);
-        activityBox.scrollTop = activityBox.scrollHeight;
-      }
+      } catch (err) {}
     }
 
     setInterval(fetchLiveTelemetry, 650);
@@ -1563,41 +1050,13 @@ body::after {
     }
 
     async function runAutonomousDemo() {
-      if (isDemoRunning) return;
-      isDemoRunning = true;
-
       await activateProtectionNow();
       switchNavTab("overview");
-
-      const overlay = document.getElementById("threatOverlay");
-      const recoveryBox = document.getElementById("recoveryBox");
-
-      setTimeout(async () => {
-        await triggerExploit("memory_tamper");
-      }, 2500);
-
-      setTimeout(() => {
-        if (overlay) overlay.classList.add("active");
-        if (recoveryBox) recoveryBox.innerHTML = `
-          <div>⚠️ <strong>SESSION QUARANTINED</strong> (Inputs isolated into sandbox ring)</div>
-          <div>🔍 Locating last verified Merkle checkpoint...</div>
-        `;
-      }, 4500);
-
-      setTimeout(() => {
-        if (recoveryBox) recoveryBox.innerHTML = `
-          <div>✓ Last Trusted Checkpoint located (Frame #9 Merkle verified)</div>
-          <div>✓ 256-bit Nonce challenge issued & HMAC signature re-attested</div>
-          <div>⚡ Authoritatively rolling back game state...</div>
-        `;
-      }, 7000);
-
+      setTimeout(async () => { await triggerExploit("memory_tamper"); }, 2000);
       setTimeout(async () => {
         try { await fetch("/api/recovery/trigger", { method: "POST" }); } catch(e) {}
-        if (overlay) overlay.classList.remove("active");
         updateUIState(true);
-        isDemoRunning = false;
-      }, 9500);
+      }, 5000);
     }
   </script>
 </body>

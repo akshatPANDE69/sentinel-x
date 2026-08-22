@@ -7,6 +7,7 @@ import uuid
 import threading
 import hashlib
 import webbrowser
+import subprocess
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse
 
@@ -14,7 +15,6 @@ from urllib.parse import urlparse
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 PUBLIC_DIR = os.path.join(BASE_DIR, "public")
 
-# Insert path for module resolution
 sys.path.insert(0, BASE_DIR)
 from server.registry.game_registry import GameRegistry
 from server.security.checks import UnifiedSecurityScheduler
@@ -29,13 +29,12 @@ class StandaloneHTTPHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=PUBLIC_DIR, **kwargs)
 
     def log_message(self, format, *args):
-        # Clean terminal output (avoid noisy asset logs)
         if "GET /api/" in format % args or "POST /api/" in format % args:
-            sys.stdout.write(f"[HTTP API] {format % args}\n")
+            sys.stdout.write(f"[API] {format % args}\n")
             sys.stdout.flush()
 
     def end_headers(self):
-        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0')
         self.send_header('Pragma', 'no-cache')
         self.send_header('Expires', '0')
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -63,54 +62,56 @@ class StandaloneHTTPHandler(SimpleHTTPRequestHandler):
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             procs = []
-            
-            # Method 1: Try psutil if available
-            try:
-                import psutil
-                for p in psutil.process_iter(['pid', 'name', 'exe', 'memory_info']):
-                    try:
-                        name = p.info['name'] or ""
-                        exe = p.info.get('exe') or ""
-                        if name and not name.lower().startswith(("system", "registry", "smss", "csrss", "svchost", "lsass", "services")):
-                            mem_mb = round((p.info['memory_info'].rss or 0) / (1024 * 1024), 1) if p.info.get('memory_info') else 0
-                            procs.append({"pid": p.info['pid'], "name": name, "path": exe, "memory_mb": mem_mb})
-                    except Exception:
-                        continue
-            except Exception:
-                pass
 
-            # Method 2: Windows native tasklist fallback
-            if not procs and os.name == 'nt':
+            # 1. Windows PowerShell process discovery (Gets real apps with windows & memory)
+            if sys.platform == 'win32' or os.name == 'nt':
                 try:
-                    import subprocess
-                    out = subprocess.check_output('tasklist /FO CSV /NH', shell=True, text=True, errors='ignore')
-                    for line in out.strip().split('
-'):
-                        parts = [p.strip('"') for p in line.split('","')]
-                        if len(parts) >= 5:
-                            pname, ppid, _, _, pmem = parts[0], parts[1], parts[2], parts[3], parts[4]
-                            if not pname.lower().startswith(("system", "registry", "smss", "csrss", "svchost")):
-                                try:
-                                    mem_val = float(pmem.replace(' K', '').replace(',', '').strip()) / 1024.0
-                                except Exception:
-                                    mem_val = 50.0
-                                procs.append({"pid": int(ppid), "name": pname, "path": f"C:\Program Files\{pname}", "memory_mb": round(mem_val, 1)})
+                    cmd = 'powershell -NoProfile -NonInteractive -Command "Get-Process | Where-Object { $_.ProcessName -notmatch \'^(System|Idle|svchost|csrss|smss|services|lsass|winlogon|fontdrvhost)\' } | Select-Object -First 60 Id, ProcessName, Path, @{Name=\'MemoryMB\';Expression={[math]::Round($_.WorkingSet64 / 1MB, 1)}} | ConvertTo-Json"'
+                    out = subprocess.check_output(cmd, shell=True, text=True, errors='ignore', timeout=3)
+                    loaded = json.loads(out)
+                    if isinstance(loaded, dict): loaded = [loaded]
+                    for item in loaded:
+                        pname = item.get("ProcessName", "") + ".exe"
+                        pid = item.get("Id", 0)
+                        ppath = item.get("Path") or f"C:\\Program Files\\{pname}"
+                        pmem = item.get("MemoryMB", 50.0)
+                        procs.append({"pid": pid, "name": pname, "path": ppath, "memory_mb": pmem})
                 except Exception:
                     pass
 
-            # Fallback real game detections
-            if not procs:
-                procs = [
-                    {"pid": 4420, "name": "RobloxPlayerBeta.exe", "path": "C:\Users\AppData\Local\Roblox\RobloxPlayerBeta.exe", "memory_mb": 450.2},
-                    {"pid": 5890, "name": "mGBA.exe (Pokemon Emerald)", "path": "C:\Games\mGBA\mGBA.exe", "memory_mb": 185.0},
-                    {"pid": 7120, "name": "cs2.exe (Counter-Strike 2)", "path": "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\bin\win64\cs2.exe", "memory_mb": 1250.4},
-                    {"pid": 8340, "name": "VALORANT.exe", "path": "C:\Riot Games\VALORANT\live\VALORANT.exe", "memory_mb": 890.0},
-                    {"pid": 9120, "name": "javaw.exe (Minecraft)", "path": "C:\Program Files\Java\bin\javaw.exe", "memory_mb": 620.8},
-                    {"pid": 3210, "name": "gzdoom.exe (DOOM)", "path": "C:\Games\DOOM\gzdoom.exe", "memory_mb": 210.5}
-                ]
+                # Fallback to tasklist on Windows if PowerShell was blocked
+                if not procs:
+                    try:
+                        out = subprocess.check_output('tasklist /FO CSV /NH', shell=True, text=True, errors='ignore', timeout=2)
+                        for line in out.strip().split('\n'):
+                            parts = [p.strip('"') for p in line.split('","')]
+                            if len(parts) >= 5:
+                                pname, ppid, _, _, pmem = parts[0], parts[1], parts[2], parts[3], parts[4]
+                                if not pname.lower().startswith(("system", "idle", "svchost", "csrss", "smss")):
+                                    try:
+                                        mem_val = float(pmem.replace(' K', '').replace(',', '').strip()) / 1024.0
+                                    except Exception:
+                                        mem_val = 45.0
+                                    procs.append({"pid": int(ppid), "name": pname, "path": f"C:\\Program Files\\{pname}", "memory_mb": round(mem_val, 1)})
+                    except Exception:
+                        pass
 
-            procs.sort(key=lambda x: x["memory_mb"], reverse=True)
-            self.wfile.write(json.dumps({"processes": procs[:40]}).encode('utf-8'))
+            # 2. macOS / Linux process discovery
+            if not procs:
+                try:
+                    out = subprocess.check_output('ps -eo pid,rss,comm', shell=True, text=True, errors='ignore', timeout=2)
+                    for line in out.strip().split('\n')[1:]:
+                        parts = line.strip().split(None, 2)
+                        if len(parts) >= 3:
+                            ppid, prss, pcomm = parts[0], parts[1], parts[2]
+                            pname = os.path.basename(pcomm)
+                            if not pname.startswith(("launchd", "syslogd", "kernel_task", "kextd")):
+                                procs.append({"pid": int(ppid), "name": pname, "path": pcomm, "memory_mb": round(int(prss)/1024.0, 1)})
+                except Exception:
+                    pass
+
+            procs.sort(key=lambda x: x.get("memory_mb", 0), reverse=True)
+            self.wfile.write(json.dumps({"processes": procs[:50]}).encode('utf-8'))
             return
 
         elif path == "/api/telemetry/live":
@@ -148,7 +149,7 @@ class StandaloneHTTPHandler(SimpleHTTPRequestHandler):
                 "attestation_verified": True,
                 "trust_score": 0.99
             }
-            self.security_scheduler.record_operation("create_session()", "Security Engine", 0.5, "PASS")
+            self.security_scheduler.record_operation("create_session()", "Security Engine", 0.35, "PASS")
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
@@ -194,7 +195,6 @@ class StandaloneHTTPHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
 
-
 def start_background_check_engine(scheduler, active_sessions):
     """Background daemon thread executing continuous real security checks"""
     while True:
@@ -203,7 +203,8 @@ def start_background_check_engine(scheduler, active_sessions):
             scheduler.run_scheduled_checks(is_session_active=has_active, is_compromised=False)
         except Exception:
             pass
-        time.sleep(0.7)
+        time.sleep(0.65)
+
 
 class ReusableHTTPServer(HTTPServer):
     allow_reuse_address = True
@@ -215,7 +216,6 @@ def run_standalone_server(preferred_port=8080):
     httpd = None
     actual_port = preferred_port
     
-    # Try preferred port and fallbacks
     for p in [preferred_port, 8081, 8082, 8085, 3000, 5000]:
         try:
             httpd = ReusableHTTPServer(('127.0.0.1', p), StandaloneHTTPHandler)
@@ -228,7 +228,9 @@ def run_standalone_server(preferred_port=8080):
         httpd = ReusableHTTPServer(('127.0.0.1', 0), StandaloneHTTPHandler)
         actual_port = httpd.server_port
 
-    url = f"http://127.0.0.1:{actual_port}/"
+    threading.Thread(target=start_background_check_engine, args=(StandaloneHTTPHandler.security_scheduler, StandaloneHTTPHandler.active_sessions), daemon=True).start()
+
+    url = f"http://127.0.0.1:{actual_port}/?t={int(time.time())}"
     print("=======================================================")
     print("  🛡️  SENTINEL-X ZERO-TRUST GAME SECURITY PLATFORM     ")
     print("=======================================================")
@@ -237,7 +239,6 @@ def run_standalone_server(preferred_port=8080):
     print("  Press Ctrl+C to stop.")
     print("=======================================================")
 
-    # Open browser automatically
     def open_browser():
         time.sleep(0.6)
         try:
