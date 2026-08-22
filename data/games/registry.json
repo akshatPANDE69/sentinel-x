@@ -1,43 +1,35 @@
-{
-  "games": [
-    {
-      "game_id": "sx-arena",
-      "name": "Sentinel-X Arena",
-      "version": "1.0.0",
-      "platforms": [
-        "macos",
-        "windows",
-        "linux"
-      ],
-      "executable_hash": "d41d8cd98f00b204e9800998ecf8427e",
-      "sdk_version": "1.0",
-      "developer_public_key": "pk_secp256k1_sentinel_arena_prod",
-      "registered_at": 1787420000000
-    },
-    {
-      "game_id": "cyber-strike-fps",
-      "name": "CyberStrike 2026",
-      "version": "2.4.1",
-      "platforms": [
-        "macos",
-        "windows"
-      ],
-      "executable_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "sdk_version": "1.0",
-      "developer_public_key": "pk_cyberstrike_prod",
-      "registered_at": 1787421000000
-    },
-    {
-      "game_id": "custom-tactical-2026",
-      "name": "Tactical Breach",
-      "version": "1.0.0",
-      "platforms": [
-        "macos"
-      ],
-      "executable_hash": "d41d8cd98f00b204e9800998ecf8427e",
-      "sdk_version": "1.0",
-      "developer_public_key": "",
-      "registered_at": 1787436365560
-    }
-  ]
-}
+[
+  {
+    "game_id": "sx-arena",
+    "name": "Sentinel-X Arena",
+    "version": "1.0.0",
+    "platforms": [
+      "macos",
+      "windows",
+      "linux"
+    ],
+    "executable_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "developer_public_key": "pk_secp256k1_sentinel_arena_prod"
+  },
+  {
+    "game_id": "cyber-strike-fps",
+    "name": "CyberStrike 2026",
+    "version": "2.4.1",
+    "platforms": [
+      "macos",
+      "windows"
+    ],
+    "executable_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "developer_public_key": "pk_cyberstrike_prod"
+  },
+  {
+    "game_id": "custom-tactical-2026",
+    "name": "Tactical Breach",
+    "version": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "executable_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "developer_public_key": "pk_custom-tactical-2026"
+  }
+]
