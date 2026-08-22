@@ -1,6 +1,24 @@
 @echo off
-call .venv\Scripts\activate 2>nul
+setlocal
+
+cd /d "%~dp0"
+
 echo =======================================================
-echo       STARTING SENTINEL-X ENDPOINT SECURITY AGENT      
+echo        STARTING SENTINEL-X SECURITY AGENT              
 echo =======================================================
-python server\server.py
+
+if exist agent\rust-core\target\release\sentinel-core.exe (
+    echo [+] Launching Rust Security Core Daemon...
+    start /B agent\rust-core\target\release\sentinel-core.exe
+)
+
+echo [+] Starting Local Authoritative Server & Console...
+echo [+] Opening http://127.0.0.1:8080/ in your browser...
+
+if exist .venv\Scripts\python.exe (
+    start http://127.0.0.1:8080/
+    .venv\Scripts\python.exe server\server.py
+) else (
+    start http://127.0.0.1:8080/
+    python server\server.py
+)
