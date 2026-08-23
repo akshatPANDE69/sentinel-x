@@ -1,0 +1,2251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentinel-X — Cinematic Deck</title>
+
+  <style>
+    :root {
+      --void: #000000;
+      --fiery-red: #ff1f16;
+      --deep-orange: #ff4a16;
+      --orange: #ff7a18;
+      --yellow: #ffd166;
+      --text: #f4f6ff;
+      --muted: #8e96ad;
+      --line: rgba(255, 255, 255, 0.12);
+      --panel: rgba(7, 8, 16, 0.72);
+      --ease-filmic: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+      --deck-transition: 900ms var(--ease-filmic);
+      --reveal-duration: 900ms;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    body {
+      min-width: 320px;
+      color: var(--text);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    body::before,
+    body::after,
+    .bg-grid,
+    .aurora-blob,
+    .noise,
+    .noise-overlay {
+      display: none !important;
+      content: none !important;
+      background: none !important;
+      opacity: 0 !important;
+    }
+
+    #liquid-aurora {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      background: #000;
+    }
+
+    .site-shell {
+      position: relative;
+      z-index: 1;
+      width: 100vw;
+      height: 100vh;
+      isolation: isolate;
+    }
+
+    nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 20;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.64);
+      backdrop-filter: blur(18px);
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      position: relative;
+      width: 25px;
+      height: 25px;
+      border: 1px solid rgba(255, 95, 45, 0.95);
+      border-radius: 50%;
+      box-shadow:
+        0 0 18px rgba(255, 31, 22, 0.55),
+        inset 0 0 12px rgba(255, 122, 24, 0.58);
+    }
+
+    .brand-mark::after {
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(255, 209, 102, 0.95);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 260ms var(--ease-soft);
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible,
+    .nav-links a.active {
+      color: #fff;
+    }
+
+    .nav-links a.active {
+      text-shadow: 0 0 16px rgba(255, 100, 32, 0.8);
+    }
+
+    main {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .slides {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .slides {
+      perspective: 2200px;
+      perspective-origin: 50% 50%;
+      transform-style: preserve-3d;
+    }
+
+    main,
+    .slides {
+      transform-style: preserve-3d;
+    }
+
+    section.slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      padding: 120px 0 92px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      will-change: transform, opacity, filter;
+      transition:
+        opacity var(--deck-transition),
+        transform var(--deck-transition),
+        filter var(--deck-transition),
+        visibility 0s linear 950ms;
+    }
+
+    section.slide.is-active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: none;
+      filter: none;
+      transition:
+        opacity var(--deck-transition),
+        transform var(--deck-transition),
+        filter var(--deck-transition),
+        visibility 0s linear 0s;
+    }
+
+    /* ===== REVEAL — a gentle cinematic dissolve: soft zoom + drift, no hard flips ===== */
+    section.slide[data-transition="reveal"].is-prev {
+      transform: translate3d(0, -2.4vh, -6vw) scale(1.045);
+      filter: brightness(0.55) blur(10px);
+    }
+    section.slide[data-transition="reveal"]:not(.is-active):not(.is-prev) {
+      transform: translate3d(0, 3.2vh, -6vw) scale(0.96);
+      filter: brightness(0.55) blur(10px);
+    }
+
+    /* ===== DRIFT — a slow vertical parallax push, like a crane shot settling ===== */
+    section.slide[data-transition="drift"].is-prev {
+      transform: translate3d(0, -6vh, -3vw) scale(0.985);
+      filter: brightness(0.5) blur(11px);
+    }
+    section.slide[data-transition="drift"]:not(.is-active):not(.is-prev) {
+      transform: translate3d(0, 6vh, -3vw) scale(0.985);
+      filter: brightness(0.5) blur(11px);
+    }
+
+    /* ===== GLIDE — a subtle lateral dolly, content eases in from the side ===== */
+    section.slide[data-transition="glide"].is-prev {
+      transform: translate3d(-3.5vw, 0, -4vw) scale(0.975);
+      filter: brightness(0.5) blur(10px);
+    }
+    section.slide[data-transition="glide"]:not(.is-active):not(.is-prev) {
+      transform: translate3d(3.5vw, 0, -4vw) scale(0.975);
+      filter: brightness(0.5) blur(10px);
+    }
+
+    .slide-inner {
+      width: 100%;
+    }
+
+    /* ===== Content choreography — inner elements ease in after the slide arrives ===== */
+    @keyframes contentReveal {
+      from {
+        opacity: 0;
+        transform: translateY(22px) scale(0.985);
+        filter: blur(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    .slide.is-active .eyebrow,
+    .slide.is-active h1,
+    .slide.is-active h2,
+    .slide.is-active .hero-copy,
+    .slide.is-active .section-lead,
+    .slide.is-active .hero-actions,
+    .slide.is-active .hero-card,
+    .slide.is-active .evidence-tag,
+    .slide.is-active .feature-list .feature,
+    .slide.is-active .timeline-card,
+    .slide.is-active .compare-col,
+    .slide.is-active .console-panel,
+    .slide.is-active .quote p,
+    .slide.is-active .quote cite {
+      animation: contentReveal var(--reveal-duration) var(--ease-filmic) both;
+    }
+
+    .slide.is-active .eyebrow,
+    .slide.is-active .evidence-tag {
+      animation-delay: 60ms;
+    }
+
+    .slide.is-active h1,
+    .slide.is-active h2 {
+      animation-delay: 130ms;
+    }
+
+    .slide.is-active .hero-copy,
+    .slide.is-active .section-lead,
+    .slide.is-active .quote p {
+      animation-delay: 210ms;
+    }
+
+    .slide.is-active .hero-actions,
+    .slide.is-active .quote cite {
+      animation-delay: 300ms;
+    }
+
+    .slide.is-active .hero-card,
+    .slide.is-active .console-panel {
+      animation-delay: 360ms;
+    }
+
+    .slide.is-active .feature-list .feature:nth-child(1),
+    .slide.is-active .timeline-card:nth-child(1),
+    .slide.is-active .compare-col:nth-child(1) {
+      animation-delay: 260ms;
+    }
+
+    .slide.is-active .feature-list .feature:nth-child(2),
+    .slide.is-active .timeline-card:nth-child(2),
+    .slide.is-active .compare-col:nth-child(2) {
+      animation-delay: 340ms;
+    }
+
+    .slide.is-active .feature-list .feature:nth-child(3),
+    .slide.is-active .timeline-card:nth-child(3) {
+      animation-delay: 420ms;
+    }
+
+    .slide.is-active .feature-list .feature:nth-child(4) {
+      animation-delay: 500ms;
+    }
+
+    .slide.is-active .console-rows .status-row:nth-child(1) {
+      animation-delay: 440ms;
+    }
+
+    .slide.is-active .console-rows .status-row:nth-child(2) {
+      animation-delay: 500ms;
+    }
+
+    .slide.is-active .console-rows .status-row:nth-child(3) {
+      animation-delay: 560ms;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .slide.is-active .eyebrow,
+      .slide.is-active h1,
+      .slide.is-active h2,
+      .slide.is-active .hero-copy,
+      .slide.is-active .section-lead,
+      .slide.is-active .hero-actions,
+      .slide.is-active .hero-card,
+      .slide.is-active .evidence-tag,
+      .slide.is-active .feature-list .feature,
+      .slide.is-active .timeline-card,
+      .slide.is-active .compare-col,
+      .slide.is-active .console-panel,
+      .slide.is-active .quote p,
+      .slide.is-active .quote cite {
+        animation: none;
+      }
+    }
+
+    .hero {
+      min-height: 100%;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #ffc0a2;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 28px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--fiery-red), var(--yellow));
+      content: "";
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 920px;
+      margin-bottom: 28px;
+      font-size: clamp(3.8rem, 10vw, 9.7rem);
+      font-weight: 800;
+      letter-spacing: -0.085em;
+      line-height: 0.86;
+    }
+
+    h1 span {
+      color: transparent;
+      background: linear-gradient(
+        110deg,
+        #fff 8%,
+        #ffb08c 34%,
+        #ff4a16 64%,
+        #ffd166 94%
+      );
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .hero-copy {
+      max-width: 630px;
+      color: #b5bbcf;
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 20px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition:
+        transform 420ms var(--ease-soft),
+        border-color 260ms ease,
+        background 260ms ease,
+        box-shadow 420ms var(--ease-soft);
+      will-change: transform;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      border-color: rgba(255, 74, 22, 0.9);
+      background: rgba(255, 74, 22, 0.16);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 34px rgba(255, 61, 20, 0.22);
+    }
+
+    .button:active {
+      transform: translateY(-1px) scale(0.98);
+      transition-duration: 120ms;
+    }
+
+    .button.primary {
+      border-color: rgba(255, 74, 22, 0.82);
+      background: linear-gradient(
+        120deg,
+        rgba(255, 31, 22, 0.42),
+        rgba(255, 122, 24, 0.25)
+      );
+      box-shadow: 0 0 32px rgba(255, 48, 20, 0.2);
+    }
+
+    .glass-card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.44),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(18px);
+      transform: perspective(900px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)) translateZ(0);
+      transition:
+        transform 420ms var(--ease-soft),
+        border-color 320ms ease,
+        box-shadow 420ms var(--ease-soft);
+    }
+
+    .feature.glass-card:hover,
+    .timeline-card.glass-card:hover,
+    .compare-col.glass-card:hover {
+      border-color: rgba(255, 122, 24, 0.4);
+      box-shadow:
+        0 28px 90px rgba(255, 61, 20, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .glass-card {
+        transition: none;
+        transform: none !important;
+      }
+    }
+
+    .hero-card {
+      position: absolute;
+      right: 0;
+      bottom: 11%;
+      width: min(300px, 32vw);
+      padding: 22px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #ffd6c2;
+    }
+
+    .status::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ff6a36;
+      box-shadow: 0 0 14px #ff6a36;
+      content: "";
+    }
+
+    .metric {
+      color: #fff;
+      font-size: 3rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.07em;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.5;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      align-items: center;
+      gap: clamp(38px, 8vw, 120px);
+      width: 100%;
+    }
+
+    h2 {
+      max-width: 620px;
+      margin-bottom: 20px;
+      font-size: clamp(2.6rem, 6vw, 6rem);
+      letter-spacing: -0.075em;
+      line-height: 0.94;
+    }
+
+    .section-lead {
+      max-width: 520px;
+      color: #aab1c6;
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .feature {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 18px;
+      padding: 22px;
+    }
+
+    .feature-number {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(255, 74, 22, 0.62);
+      border-radius: 50%;
+      color: #ffc2a7;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .feature h3 {
+      margin-bottom: 7px;
+      font-size: 1.05rem;
+    }
+
+    .feature p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .quote {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .quote p {
+      margin-bottom: 26px;
+      color: #fff0e8;
+      font-size: clamp(1.8rem, 4vw, 4.4rem);
+      font-weight: 700;
+      letter-spacing: -0.065em;
+      line-height: 1.04;
+    }
+
+    .quote cite {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-style: normal;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      width: 100%;
+      margin-top: 40px;
+    }
+
+    .timeline-card {
+      min-height: 220px;
+      padding: 24px;
+    }
+
+    .timeline-card small {
+      color: #ffb18f;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .timeline-card h3 {
+      margin: 52px 0 12px;
+      font-size: 1.2rem;
+    }
+
+    .timeline-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    /* ===== Evidence labeling (per content accuracy rules) ===== */
+    .evidence-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+      padding: 5px 13px;
+      border: 1px solid rgba(255, 122, 24, 0.42);
+      border-radius: 999px;
+      color: #ffcaa8;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: rgba(255, 74, 22, 0.08);
+    }
+
+    .evidence-tag.is-source {
+      border-color: rgba(255, 209, 102, 0.42);
+      color: #ffe3ab;
+      background: rgba(255, 209, 102, 0.07);
+    }
+
+    .evidence-tag.is-roadmap {
+      border-color: rgba(255, 255, 255, 0.18);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* ===== Traditional-vs-Sentinel-X comparison ===== */
+    .compare-col {
+      padding: 26px;
+    }
+
+    .compare-col h3 {
+      margin-bottom: 16px;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .compare-col.is-sentinel h3 {
+      color: #ffc2a7;
+    }
+
+    .compare-col ul {
+      display: grid;
+      gap: 11px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .compare-col li {
+      position: relative;
+      padding-left: 18px;
+      color: #cfd4e6;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .compare-col li::before {
+      position: absolute;
+      top: 0.55em;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+      content: "";
+    }
+
+    .compare-col.is-sentinel li::before {
+      background: linear-gradient(180deg, var(--yellow), var(--fiery-red));
+      box-shadow: 0 0 8px rgba(255, 74, 22, 0.6);
+    }
+
+    /* ===== Security console panel ===== */
+    .console-panel {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 30px;
+    }
+
+    .console-rows {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .console-rows .status-row {
+      margin-bottom: 0;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .console-rows .status-row:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .deck-controls {
+      position: fixed;
+      right: 28px;
+      bottom: 28px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .deck-arrow {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.56);
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.34),
+        inset 0 0 16px rgba(255, 74, 22, 0.08);
+      cursor: pointer;
+      font-size: 1.4rem;
+      line-height: 1;
+      transition:
+        border-color 260ms ease,
+        background 260ms ease,
+        transform 380ms var(--ease-soft),
+        box-shadow 380ms var(--ease-soft);
+      backdrop-filter: blur(14px);
+    }
+
+    .deck-arrow:hover,
+    .deck-arrow:focus-visible {
+      border-color: rgba(255, 106, 54, 0.9);
+      background: rgba(255, 74, 22, 0.18);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 32px rgba(255, 74, 22, 0.2);
+    }
+
+    .deck-arrow:active:not(:disabled) {
+      transform: translateY(-1px) scale(0.94);
+      transition-duration: 120ms;
+    }
+
+    .deck-arrow:disabled {
+      cursor: not-allowed;
+      opacity: 0.32;
+      transform: none;
+    }
+
+    .deck-progress {
+      position: fixed;
+      right: 28px;
+      bottom: 88px;
+      z-index: 30;
+      color: rgba(255, 220, 203, 0.8);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .slide-dots {
+      position: fixed;
+      top: 50%;
+      right: 28px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transform: translateY(-50%);
+    }
+
+    .slide-dot {
+      width: 6px;
+      height: 6px;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.28);
+      cursor: pointer;
+      transition:
+        height 460ms var(--ease-soft),
+        width 460ms var(--ease-soft),
+        background 320ms ease,
+        box-shadow 320ms ease,
+        transform 260ms var(--ease-soft);
+    }
+
+    .slide-dot:hover {
+      transform: scale(1.35);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .slide-dot.active {
+      height: 28px;
+      background: linear-gradient(180deg, var(--yellow), var(--fiery-red));
+      box-shadow: 0 0 16px rgba(255, 74, 22, 0.75);
+      transform: none;
+    }
+
+    footer {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 2;
+      padding: 16px 0 22px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      pointer-events: none;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    @media (max-width: 820px) {
+      .hero-card {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        width: min(100%, 340px);
+        margin-top: 54px;
+      }
+
+      section.slide {
+        align-items: flex-start;
+        overflow-y: auto;
+        padding-top: 112px;
+        padding-bottom: 116px;
+      }
+
+      .section-grid {
+        grid-template-columns: 1fr;
+        gap: 42px;
+      }
+
+      .timeline {
+        grid-template-columns: 1fr;
+      }
+
+      .slide-dots {
+        top: auto;
+        right: 50%;
+        bottom: 94px;
+        flex-direction: row;
+        transform: translateX(50%);
+      }
+
+      .slide-dot.active {
+        width: 28px;
+        height: 6px;
+      }
+
+      /* Lighter, GPU-friendly motion on smaller screens: fade + drift only. */
+      section.slide[data-transition] .is-prev,
+      section.slide[data-transition].is-prev,
+      section.slide[data-transition]:not(.is-active):not(.is-prev) {
+        filter: brightness(0.6) blur(6px);
+      }
+
+      section.slide[data-transition="reveal"].is-prev,
+      section.slide[data-transition="drift"].is-prev,
+      section.slide[data-transition="glide"].is-prev {
+        transform: translate3d(0, -3vh, 0) scale(0.98);
+      }
+
+      section.slide[data-transition="reveal"]:not(.is-active):not(.is-prev),
+      section.slide[data-transition="drift"]:not(.is-active):not(.is-prev),
+      section.slide[data-transition="glide"]:not(.is-active):not(.is-prev) {
+        transform: translate3d(0, 3vh, 0) scale(0.98);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .container {
+        width: min(100% - 32px, 1180px);
+      }
+
+      .nav-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 16px 0;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+        gap: 12px;
+      }
+
+      h1 {
+        font-size: clamp(3.5rem, 19vw, 6rem);
+      }
+
+      .deck-controls {
+        right: 16px;
+        bottom: 18px;
+      }
+
+      .deck-progress {
+        right: 16px;
+        bottom: 74px;
+      }
+
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      section.slide {
+        --deck-transition: 1ms;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="liquid-aurora" aria-hidden="true"></canvas>
+
+  <div class="site-shell">
+    <nav>
+      <div class="container nav-inner">
+        <a class="brand" href="#top" aria-label="Sentinel-X home">
+          <span class="brand-mark"></span>
+          Sentinel-X
+        </a>
+
+        <div class="nav-links" aria-label="Slide navigation">
+          <a href="#top" data-slide-link="0">Home</a>
+          <a href="#problem" data-slide-link="1">Problem</a>
+          <a href="#architecture" data-slide-link="3">Architecture</a>
+          <a href="#demo" data-slide-link="10">Live Demo</a>
+          <a href="#roadmap" data-slide-link="16">Roadmap</a>
+        </div>
+      </div>
+    </nav>
+
+    <main id="deck" aria-label="Sentinel-X presentation deck">
+      <div class="slides">
+        <section class="slide hero is-active" data-slide="0" id="top" aria-hidden="false">
+          <div class="container slide-inner">
+            <div class="eyebrow">Trust infrastructure for modern games</div>
+            <h1>Make trust <span>visible.</span></h1>
+            <p class="hero-copy">
+              Sentinel-X turns invisible client-side manipulation into a
+              verifiable, continuously evolving evidence chain.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button primary" href="#architecture" data-go-to="3">
+                Explore the system
+              </a>
+              <a class="button" href="#demo" data-go-to="10">
+                See the proof
+              </a>
+            </div>
+
+            <div class="hero-card glass-card">
+              <div class="status-row">
+                <span>Live engine status</span>
+                <span class="status">Verified</span>
+              </div>
+              <div class="metric" data-count-to="98.7">0.0</div>
+              <div class="metric-label">
+                Dynamic trust score<br />
+                Evidence chain synchronized
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="1" id="problem" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">The problem</div>
+                <h2>Modern cheats leave modern traces.</h2>
+                <p class="section-lead">
+                  Binary and memory patches rewrite client state before it ever
+                  reaches the server. Forged client-server handshakes hide buffer
+                  overflows behind “valid” checkpoints. Blunt anti-cheat
+                  over-corrects—honest players get trapped in account-linking
+                  deadlocks.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">01</div>
+                  <div>
+                    <h3>Client state is not truth</h3>
+                    <p>
+                      Position, health, inventory and state live on the server.
+                      The client proposes; the server disposes.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">02</div>
+                  <div>
+                    <h3>One signal is never enough</h3>
+                    <p>
+                      Kernel, memory and behavioral anomalies become correlated
+                      evidence instead of isolated accusations.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">03</div>
+                  <div>
+                    <h3>Trust should move with reality</h3>
+                    <p>
+                      A dynamic score rises and falls with real signal:
+                      deterministic logic first, ML assistance second.
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="2" id="solution" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Source-level architecture</div>
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">The solution</div>
+                <h2>A trust engine, not a ban hammer.</h2>
+                <p class="section-lead">
+                  Sentinel-X is a continuously-running trust layer for game
+                  clients. It verifies kernel, memory and behavioral signal; it
+                  decides using deterministic engine logic; and when trust
+                  drops, the evidence chain—not a black box—shows exactly why.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">→</div>
+                  <div>
+                    <h3>What it is</h3>
+                    <p>An always-on trust layer sitting alongside the client.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">→</div>
+                  <div>
+                    <h3>What it verifies</h3>
+                    <p>Kernel, memory, client and behavioral signal—correlated.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">→</div>
+                  <div>
+                    <h3>How it decides</h3>
+                    <p>Deterministic engine logic first; ML assists, never votes.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">→</div>
+                  <div>
+                    <h3>When trust fails</h3>
+                    <p>The dynamic score moves and the evidence chain shows why.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="3" id="architecture" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Source-level architecture</div>
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">The architecture</div>
+                <h2>Evidence that cannot quietly disappear.</h2>
+                <p class="section-lead">
+                  Every anomaly becomes a signed, hash-linked Evidence record.
+                  Altering history is mathematically visible, not merely logged.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">A</div>
+                  <div>
+                    <h3>Capture</h3>
+                    <p>
+                      Collect high-signal observations across the kernel,
+                      memory, client and player behavior.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">B</div>
+                  <div>
+                    <h3>Link</h3>
+                    <p>
+                      Sign and hash-link every record so the timeline remains
+                      tamper-evident from source to decision.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">C</div>
+                  <div>
+                    <h3>Decide</h3>
+                    <p>
+                      Trust scores come from real engine logic. ML assists the
+                      investigation, but never gets the final vote.
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="4" id="workflow" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Source-level architecture</div>
+            <div class="quote">
+              <div class="eyebrow">Continuous security</div>
+              <p>Capture → Link → Decide, running continuously.</p>
+              <cite>Every cycle re-checks trust—nothing is a one-time verdict.</cite>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="5" id="crypto" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Source-level — primitives not yet published</div>
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">Cryptographic security</div>
+                <h2>Hash-linked, signed, tamper-evident.</h2>
+                <p class="section-lead">
+                  Every Evidence record is signed and hash-linked to the one
+                  before it, so the timeline itself proves whether it has been
+                  altered—rather than relying on a log that could be edited.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">01</div>
+                  <div>
+                    <h3>Signing</h3>
+                    <p>Each Evidence record is signed at capture time.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">02</div>
+                  <div>
+                    <h3>Hash-linking</h3>
+                    <p>Each record references the hash of the record before it.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">03</div>
+                  <div>
+                    <h3>Tamper evidence</h3>
+                    <p>Editing history breaks the chain instead of hiding the edit.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="6" id="authority" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Source-level architecture</div>
+            <div class="quote">
+              <div class="eyebrow">Server authority</div>
+              <p>Client input → server validation → decision.</p>
+              <cite>The client proposes; the server disposes.</cite>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="7" id="trust-engine" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Source-level architecture</div>
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">Trust engine</div>
+                <h2>A score, not a switch.</h2>
+                <p class="section-lead">
+                  Trust rises and falls with real signal instead of flipping
+                  between “clean” and “banned.” Deterministic engine logic
+                  makes the call; ML contributes evidence, not verdicts.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">01</div>
+                  <div>
+                    <h3>Dynamic, not binary</h3>
+                    <p>The score moves continuously with incoming signal.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">02</div>
+                  <div>
+                    <h3>Deterministic first</h3>
+                    <p>Rule-based engine logic makes the enforcement decision.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">03</div>
+                  <div>
+                    <h3>ML assists, never votes</h3>
+                    <p>Machine learning contributes confidence, not the final call.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="8" id="quarantine" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-roadmap">→ Roadmap — not yet demonstrated</div>
+            <div class="quote">
+              <div class="eyebrow">Quarantine &amp; recovery</div>
+              <p>Isolation and recovery flow: architecture defined.</p>
+              <cite>
+                A concrete quarantine and recovery implementation has not yet
+                been demonstrated on this reference build.
+              </cite>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="9" id="console" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Live UI concept</div>
+            <div class="eyebrow" style="justify-content:center;display:flex;">Security console</div>
+            <h2 style="text-align:center;margin-left:auto;margin-right:auto;">The state the console actually shows.</h2>
+
+            <div class="console-panel glass-card">
+              <div class="console-rows">
+                <div class="status-row">
+                  <span>Evidence chain</span>
+                  <span class="status">Synchronized</span>
+                </div>
+                <div class="status-row">
+                  <span>Trust engine</span>
+                  <span class="status">Verified</span>
+                </div>
+                <div class="status-row">
+                  <span>Dynamic trust score</span>
+                  <span class="status">98.7</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="10" id="demo" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Demonstrated in reference build</div>
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">Live demonstration</div>
+                <h2>Break the chain. Watch it flip.</h2>
+                <p class="section-lead">
+                  The simulator tampers with a signed Evidence record live on
+                  stage. The moment one hash stops matching, the chain
+                  downstream is provably invalid—VERIFIED flips to INVALID in
+                  real time.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">01</div>
+                  <div>
+                    <h3>Normal / trusted</h3>
+                    <p>Session runs with a synchronized, verified evidence chain.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">02</div>
+                  <div>
+                    <h3>Tamper injected</h3>
+                    <p>The simulator alters a signed Evidence record live.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">03</div>
+                  <div>
+                    <h3>Detection</h3>
+                    <p>The hash-link downstream of the edit stops matching.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">04</div>
+                  <div>
+                    <h3>Final state</h3>
+                    <p>Status flips from VERIFIED to INVALID in real time.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="11" id="testing" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-roadmap">→ Roadmap — results not yet published</div>
+            <div class="quote">
+              <div class="eyebrow">Verification &amp; testing</div>
+              <p>A formal, published test suite is not yet available.</p>
+              <cite>
+                No pass/fail counts, coverage figures or test-category
+                breakdowns are published for this build.
+              </cite>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="12" id="platforms" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-roadmap">→ Roadmap — not yet documented</div>
+            <div class="quote">
+              <div class="eyebrow">Platform support</div>
+              <p>Platform coverage has not yet been documented.</p>
+              <cite>
+                No specific operating systems are confirmed as runtime-verified
+                for this reference build.
+              </cite>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="13" id="performance" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-roadmap">→ Roadmap — no benchmark published</div>
+            <div class="quote">
+              <div class="eyebrow">Performance</div>
+              <p>No measured performance benchmark is published yet.</p>
+              <cite>
+                Overhead, latency and throughput figures will be added once a
+                benchmark methodology is published.
+              </cite>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="14" id="threats" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Source-level architecture</div>
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">Threat coverage</div>
+                <h2>What the architecture actually addresses.</h2>
+                <p class="section-lead">
+                  Current capabilities target the problems the architecture was
+                  built around. Coverage claims stop where the reference build
+                  stops.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">01</div>
+                  <div>
+                    <h3>Client state manipulation</h3>
+                    <p>Server treats client state as a proposal, never as truth.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">02</div>
+                  <div>
+                    <h3>Forged “valid” checkpoints</h3>
+                    <p>Correlated kernel/memory/behavioral evidence, not one signal.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">03</div>
+                  <div>
+                    <h3>Blunt false positives</h3>
+                    <p>A moving trust score replaces binary ban decisions.</p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">→</div>
+                  <div>
+                    <h3>Limitations</h3>
+                    <p>
+                      Reference build only. Pilot integration with a live game
+                      client and broader behavior-based evidence sources are
+                      roadmap items, not shipped capabilities.
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="15" id="differentiation" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Based on stated architecture</div>
+            <div class="eyebrow" style="justify-content:center;display:flex;">Differentiation</div>
+            <h2 style="text-align:center;margin-left:auto;margin-right:auto;">Not another ban hammer.</h2>
+
+            <div class="section-grid">
+              <div class="compare-col glass-card">
+                <h3>Traditional approach</h3>
+                <ul>
+                  <li>Trusts client-reported state</li>
+                  <li>Single-signal detection</li>
+                  <li>Binary ban / no-ban decisions</li>
+                  <li>Opaque, unauditable verdicts</li>
+                </ul>
+              </div>
+
+              <div class="compare-col is-sentinel glass-card">
+                <h3>Sentinel-X</h3>
+                <ul>
+                  <li>Server-authoritative state</li>
+                  <li>Correlated multi-signal evidence</li>
+                  <li>Dynamic, continuously-moving trust score</li>
+                  <li>Hash-linked, tamper-evident evidence chain</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="16" id="roadmap" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="eyebrow">The next move</div>
+            <h2>From reference build to drop-in SDK.</h2>
+            <p class="section-lead">
+              The architecture runs end-to-end today. The next steps take it
+              from a reference build into something studios can integrate
+              directly.
+            </p>
+
+            <div class="timeline">
+              <article class="timeline-card glass-card">
+                <small>Now</small>
+                <h3>Reference build</h3>
+                <p>
+                  Kernel driver, evidence chain and trust engine working
+                  end-to-end.
+                </p>
+              </article>
+
+              <article class="timeline-card glass-card">
+                <small>Next</small>
+                <h3>Pilot integration</h3>
+                <p>
+                  Integrate with a real game client and expand behavior-based
+                  evidence sources.
+                </p>
+              </article>
+
+              <article class="timeline-card glass-card">
+                <small>Scale</small>
+                <h3>Drop-in SDK</h3>
+                <p>
+                  Studios plug in kernel, evidence and trust infrastructure to
+                  ship faster.
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="17" id="impact" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="quote">
+              <div class="eyebrow">Where this stands</div>
+              <p>One end-to-end path. No black-box verdicts.</p>
+              <cite>Sentinel-X — trust, rendered in real time.</cite>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div class="slide-dots" aria-label="Choose slide">
+      <button class="slide-dot active" type="button" data-slide-button="0" aria-label="Go to Title slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="1" aria-label="Go to Problem slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="2" aria-label="Go to Solution slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="3" aria-label="Go to Architecture slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="4" aria-label="Go to Workflow slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="5" aria-label="Go to Cryptographic Security slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="6" aria-label="Go to Server Authority slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="7" aria-label="Go to Trust Engine slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="8" aria-label="Go to Quarantine and Recovery slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="9" aria-label="Go to Security Console slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="10" aria-label="Go to Live Demonstration slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="11" aria-label="Go to Verification and Testing slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="12" aria-label="Go to Platform Support slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="13" aria-label="Go to Performance slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="14" aria-label="Go to Threat Coverage slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="15" aria-label="Go to Differentiation slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="16" aria-label="Go to Roadmap slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="17" aria-label="Go to Final Impact slide"></button>
+    </div>
+
+    <div class="deck-progress" aria-live="polite">
+      <span id="current-slide">01</span> / <span id="slide-count">18</span>
+    </div>
+
+    <div class="deck-controls" aria-label="Slide controls">
+      <button class="deck-arrow" id="previous-slide" type="button" aria-label="Previous slide">
+        <span aria-hidden="true">←</span>
+      </button>
+      <button class="deck-arrow" id="next-slide" type="button" aria-label="Next slide">
+        <span aria-hidden="true">→</span>
+      </button>
+    </div>
+
+    <footer>
+      <div class="container footer-inner">
+        <span>Sentinel-X</span>
+        <span>Trust, rendered in real time.</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const slides = [...document.querySelectorAll(".slide")];
+      const dots = [...document.querySelectorAll(".slide-dot")];
+      const navLinks = [...document.querySelectorAll("[data-slide-link]")];
+      const previousButton = document.getElementById("previous-slide");
+      const nextButton = document.getElementById("next-slide");
+      const currentSlideLabel = document.getElementById("current-slide");
+      const slideCountLabel = document.getElementById("slide-count");
+
+      // Cycle through three distinct, softly cinematic camera-style transitions.
+      const TRANSITION_VARIANTS = ["reveal", "drift", "glide"];
+      slides.forEach((slide, index) => {
+        slide.setAttribute(
+          "data-transition",
+          TRANSITION_VARIANTS[index % TRANSITION_VARIANTS.length]
+        );
+      });
+
+      let activeIndex = 0;
+      let isTransitioning = false;
+
+      slideCountLabel.textContent = String(slides.length).padStart(2, "0");
+
+      function updateDeck(nextIndex, direction = 1) {
+        const targetIndex = Math.min(
+          Math.max(Number(nextIndex) || 0, 0),
+          slides.length - 1
+        );
+
+        if (targetIndex === activeIndex || isTransitioning) {
+          return;
+        }
+
+        isTransitioning = true;
+
+        slides.forEach((slide, index) => {
+          slide.classList.toggle("is-active", index === targetIndex);
+          slide.classList.toggle("is-prev", index < targetIndex);
+          slide.setAttribute("aria-hidden", index === targetIndex ? "false" : "true");
+        });
+
+        dots.forEach((dot, index) => {
+          dot.classList.toggle("active", index === targetIndex);
+          dot.setAttribute("aria-current", index === targetIndex ? "true" : "false");
+        });
+
+        navLinks.forEach((link, index) => {
+          link.classList.toggle("active", index === targetIndex);
+          if (index === targetIndex) {
+            link.setAttribute("aria-current", "page");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        });
+
+        currentSlideLabel.textContent = String(targetIndex + 1).padStart(2, "0");
+        previousButton.disabled = targetIndex === 0;
+        nextButton.disabled = targetIndex === slides.length - 1;
+
+        activeIndex = targetIndex;
+        window.history.replaceState(null, "", `#${slides[targetIndex].id}`);
+
+        const activeCounts = slides[targetIndex].querySelectorAll("[data-count-to]");
+        activeCounts.forEach((el) => animateCount(el));
+
+        window.setTimeout(() => {
+          isTransitioning = false;
+        }, 900);
+      }
+
+      function move(delta) {
+        updateDeck(activeIndex + delta, delta);
+      }
+
+      // ===== Metric count-up — plays whenever the hero card becomes active =====
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      function animateCount(el) {
+        const target = Number.parseFloat(el.dataset.countTo);
+
+        if (!Number.isFinite(target)) {
+          return;
+        }
+
+        if (reduceMotion) {
+          el.textContent = target.toFixed(1);
+          return;
+        }
+
+        const duration = 1300;
+        const start = performance.now();
+
+        function tick(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = (target * eased).toFixed(1);
+
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            el.textContent = target.toFixed(1);
+          }
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      const countTargets = [...document.querySelectorAll("[data-count-to]")];
+
+      // ===== Subtle pointer tilt on glass cards — light, GPU-cheap 3D response =====
+      const tiltCards = [...document.querySelectorAll(".feature.glass-card, .timeline-card.glass-card, .compare-col.glass-card")];
+
+      if (!reduceMotion && window.matchMedia("(hover: hover)").matches) {
+        tiltCards.forEach((card) => {
+          card.addEventListener("pointermove", (event) => {
+            const rect = card.getBoundingClientRect();
+            const px = (event.clientX - rect.left) / rect.width - 0.5;
+            const py = (event.clientY - rect.top) / rect.height - 0.5;
+            card.style.setProperty("--tilt-x", `${(px * 6).toFixed(2)}deg`);
+            card.style.setProperty("--tilt-y", `${(py * -6).toFixed(2)}deg`);
+          });
+
+          card.addEventListener("pointerleave", () => {
+            card.style.setProperty("--tilt-x", "0deg");
+            card.style.setProperty("--tilt-y", "0deg");
+          });
+        });
+      }
+
+      previousButton.addEventListener("click", () => move(-1));
+      nextButton.addEventListener("click", () => move(1));
+
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          updateDeck(Number(dot.dataset.slideButton));
+        });
+      });
+
+      navLinks.forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          updateDeck(Number(link.dataset.slideLink));
+        });
+      });
+
+      document.querySelectorAll("[data-go-to]").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          updateDeck(Number(link.dataset.goTo));
+        });
+      });
+
+      window.addEventListener("keydown", (event) => {
+        if (
+          event.target instanceof HTMLInputElement ||
+          event.target instanceof HTMLTextAreaElement ||
+          event.target.isContentEditable
+        ) {
+          return;
+        }
+
+        if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(event.key)) {
+          event.preventDefault();
+          move(1);
+        }
+
+        if (["ArrowLeft", "ArrowUp", "PageUp"].includes(event.key)) {
+          event.preventDefault();
+          move(-1);
+        }
+
+        if (event.key === "Home") {
+          event.preventDefault();
+          updateDeck(0);
+        }
+
+        if (event.key === "End") {
+          event.preventDefault();
+          updateDeck(slides.length - 1);
+        }
+      });
+
+      let wheelLocked = false;
+
+      window.addEventListener(
+        "wheel",
+        (event) => {
+          if (wheelLocked || Math.abs(event.deltaY) < 8) {
+            return;
+          }
+
+          event.preventDefault();
+          wheelLocked = true;
+          move(event.deltaY > 0 ? 1 : -1);
+
+          window.setTimeout(() => {
+            wheelLocked = false;
+          }, 850);
+        },
+        { passive: false }
+      );
+
+      window.addEventListener("hashchange", () => {
+        const hash = window.location.hash.slice(1);
+        const hashIndex = slides.findIndex((slide) => slide.id === hash);
+
+        if (hashIndex >= 0 && hashIndex !== activeIndex) {
+          updateDeck(hashIndex);
+        }
+      });
+
+      const initialHash = window.location.hash.slice(1);
+      const initialIndex = slides.findIndex((slide) => slide.id === initialHash);
+
+      if (initialIndex >= 0) {
+        activeIndex = initialIndex;
+        slides.forEach((slide, index) => {
+          slide.classList.toggle("is-active", index === activeIndex);
+          slide.classList.toggle("is-prev", index < activeIndex);
+          slide.setAttribute("aria-hidden", index === activeIndex ? "false" : "true");
+        });
+        dots.forEach((dot, index) => {
+          dot.classList.toggle("active", index === activeIndex);
+        });
+        navLinks.forEach((link, index) => {
+          link.classList.toggle("active", index === activeIndex);
+        });
+        currentSlideLabel.textContent = String(activeIndex + 1).padStart(2, "0");
+      }
+
+      previousButton.disabled = activeIndex === 0;
+      nextButton.disabled = activeIndex === slides.length - 1;
+
+      slides[activeIndex]
+        .querySelectorAll("[data-count-to]")
+        .forEach((el) => animateCount(el));
+
+      const canvas = document.getElementById("liquid-aurora");
+      const gl =
+        canvas.getContext("webgl", {
+          alpha: false,
+          antialias: false,
+          depth: false,
+          stencil: false,
+          powerPreference: "high-performance"
+        }) ||
+        canvas.getContext("experimental-webgl", {
+          alpha: false,
+          antialias: false,
+          depth: false,
+          stencil: false,
+          powerPreference: "high-performance"
+        });
+
+      if (!gl) {
+        canvas.style.background = "#000";
+        return;
+      }
+
+      const vertexSource = `
+        attribute vec2 a_position;
+
+        void main() {
+          gl_Position = vec4(a_position, 0.0, 1.0);
+        }
+      `;
+
+      const fragmentSource = `
+        precision mediump float;
+
+        uniform vec2 u_resolution;
+        uniform vec2 u_mouse;
+        uniform vec2 u_mouseVelocity;
+        uniform float u_time;
+        uniform float u_pixelRatio;
+
+        #define PI 3.14159265359
+
+        mat2 rotate(float angle) {
+          float s = sin(angle);
+          float c = cos(angle);
+          return mat2(c, -s, s, c);
+        }
+
+        float hash21(vec2 p) {
+          p = fract(p * vec2(123.34, 456.21));
+          p += dot(p, p + 45.32);
+          return fract(p.x * p.y);
+        }
+
+        float noise(vec2 p) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          f = f * f * (3.0 - 2.0 * f);
+
+          float a = hash21(i);
+          float b = hash21(i + vec2(1.0, 0.0));
+          float c = hash21(i + vec2(0.0, 1.0));
+          float d = hash21(i + vec2(1.0, 1.0));
+
+          return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+        }
+
+        float fbm(vec2 p) {
+          float value = 0.0;
+          float amplitude = 0.5;
+
+          for (int i = 0; i < 5; i++) {
+            value += amplitude * noise(p);
+            p = p * 2.03 + vec2(17.1, 9.2);
+            amplitude *= 0.5;
+          }
+
+          return value;
+        }
+
+        float ribbon(vec2 p, float phase, float frequency, float width) {
+          float wave =
+            sin(p.x * frequency + phase) * 0.34 +
+            sin(p.x * frequency * 1.73 - phase * 1.31) * 0.16;
+
+          float distanceToRibbon = abs(p.y - wave);
+          return 1.0 - smoothstep(0.0, width, distanceToRibbon);
+        }
+
+        void main() {
+          vec2 safeResolution = max(u_resolution, vec2(1.0));
+          vec2 uv = gl_FragCoord.xy / safeResolution;
+          vec2 p = uv - 0.5;
+
+          p.x *= safeResolution.x / safeResolution.y;
+
+          float time = u_time * 0.12;
+          vec2 mouse = u_mouse - 0.5;
+          mouse.x *= safeResolution.x / safeResolution.y;
+
+          vec2 velocity = u_mouseVelocity;
+          velocity.x *= safeResolution.x / safeResolution.y;
+
+          float mouseDistance = length(p - mouse);
+          float mouseInfluence =
+            exp(-mouseDistance * 3.4) *
+            (0.45 + min(length(velocity) * 7.0, 0.75));
+
+          vec2 warp = vec2(
+            fbm(p * 1.25 + vec2(time * 0.32, -time * 0.21)),
+            fbm(p * 1.25 + vec2(-time * 0.19, time * 0.27))
+          ) - 0.5;
+
+          warp += normalize(velocity + vec2(0.00001)) *
+                   mouseInfluence * 0.11;
+
+          p += warp * 0.36;
+          p += vec2(
+            sin(time * 2.0 + p.y * 4.0),
+            cos(time * 1.7 + p.x * 3.0)
+          ) * 0.012;
+
+          vec3 deepFire = vec3(0.34, 0.008, 0.002);
+          vec3 vividRed = vec3(1.0, 0.025, 0.008);
+          vec3 deepOrange = vec3(1.0, 0.19, 0.015);
+          vec3 warmOrange = vec3(1.0, 0.47, 0.045);
+          vec3 hotYellow = vec3(1.0, 0.86, 0.30);
+
+          float leftRibbon = ribbon(
+            p + vec2(0.22, -0.01),
+            time * 1.9,
+            2.15,
+            0.075
+          );
+
+          float centerRibbon = ribbon(
+            (p - vec2(0.02, 0.02)) * rotate(-0.21),
+            -time * 1.45 + 1.7,
+            2.75,
+            0.052
+          );
+
+          float rightRibbon = ribbon(
+            (p - vec2(-0.22, 0.08)) * rotate(0.18),
+            time * 1.18 + 3.4,
+            2.35,
+            0.066
+          );
+
+          float fineFlow = ribbon(
+            p * rotate(0.46) + vec2(0.0, 0.08),
+            time * 2.6,
+            4.8,
+            0.026
+          );
+
+          float ribbonLight =
+            leftRibbon * 0.92 +
+            centerRibbon * 0.78 +
+            rightRibbon * 0.88 +
+            fineFlow * 0.33;
+
+          float localGlow =
+            exp(-mouseDistance * 5.5) *
+            (0.35 + min(length(velocity) * 6.0, 0.85));
+
+          float colorNoise = fbm(p * 2.5 + time);
+          float paletteMix = smoothstep(-0.65, 0.8, p.x + colorNoise * 0.30);
+
+          vec3 fire = mix(deepFire, vividRed, smoothstep(0.05, 0.42, paletteMix));
+          fire = mix(fire, deepOrange, smoothstep(0.25, 0.68, paletteMix));
+          fire = mix(fire, warmOrange, smoothstep(0.48, 0.86, paletteMix));
+
+          float highlight = smoothstep(
+            0.54,
+            0.98,
+            ribbonLight + colorNoise * 0.08
+          );
+
+          fire = mix(fire, hotYellow, highlight * 0.82);
+
+          vec3 color = fire * ribbonLight;
+
+          color += vividRed * localGlow * 0.28;
+          color += warmOrange * localGlow * 0.18;
+          color += hotYellow * localGlow * 0.06;
+
+          float edgeFade = smoothstep(
+            0.94,
+            0.22,
+            length(p * vec2(0.83, 0.94))
+          );
+
+          float vignette = pow(max(edgeFade, 0.0), 1.55);
+
+          color *= vignette;
+          color *= 1.18;
+
+          // Smooth HDR-style glow compression without grain or dither.
+          color = color / (1.0 + color * 0.58);
+          color = pow(max(color, 0.0), vec3(0.84));
+
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `;
+
+      function compileShader(type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          console.error(gl.getShaderInfoLog(shader));
+          gl.deleteShader(shader);
+          return null;
+        }
+
+        return shader;
+      }
+
+      const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
+      const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSource);
+
+      if (!vertexShader || !fragmentShader) {
+        canvas.style.background = "#000";
+        return;
+      }
+
+      const program = gl.createProgram();
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error(gl.getProgramInfoLog(program));
+        canvas.style.background = "#000";
+        return;
+      }
+
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([
+          -1, -1,
+           1, -1,
+          -1,  1,
+          -1,  1,
+           1, -1,
+           1,  1
+        ]),
+        gl.STATIC_DRAW
+      );
+
+      const positionLocation = gl.getAttribLocation(program, "a_position");
+      const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+      const mouseLocation = gl.getUniformLocation(program, "u_mouse");
+      const velocityLocation = gl.getUniformLocation(program, "u_mouseVelocity");
+      const timeLocation = gl.getUniformLocation(program, "u_time");
+      const pixelRatioLocation = gl.getUniformLocation(program, "u_pixelRatio");
+
+      gl.useProgram(program);
+      gl.enableVertexAttribArray(positionLocation);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+      gl.disable(gl.DEPTH_TEST);
+      gl.disable(gl.BLEND);
+
+      const state = {
+        width: 1,
+        height: 1,
+        dpr: 1,
+        start: performance.now(),
+        mouse: { x: 0.5, y: 0.5 },
+        targetMouse: { x: 0.5, y: 0.5 },
+        velocity: { x: 0, y: 0 },
+        lastTarget: { x: 0.5, y: 0.5 },
+        lastMoveTime: performance.now()
+      };
+
+      function resize() {
+        const maxDpr = window.matchMedia("(max-width: 700px)").matches
+          ? 1.25
+          : 1.75;
+
+        state.dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+        state.width = Math.max(
+          1,
+          Math.floor(window.innerWidth * state.dpr)
+        );
+        state.height = Math.max(
+          1,
+          Math.floor(window.innerHeight * state.dpr)
+        );
+
+        if (canvas.width !== state.width || canvas.height !== state.height) {
+          canvas.width = state.width;
+          canvas.height = state.height;
+          canvas.style.width = `${window.innerWidth}px`;
+          canvas.style.height = `${window.innerHeight}px`;
+          gl.viewport(0, 0, state.width, state.height);
+        }
+      }
+
+      function setPointer(clientX, clientY) {
+        const now = performance.now();
+        const dt = Math.max(
+          (now - state.lastMoveTime) / 1000,
+          0.008
+        );
+
+        const nextX = clientX / Math.max(window.innerWidth, 1);
+        const nextY = 1 - clientY / Math.max(window.innerHeight, 1);
+
+        state.targetMouse.x = Math.min(1, Math.max(0, nextX));
+        state.targetMouse.y = Math.min(1, Math.max(0, nextY));
+
+        const measuredX = (state.targetMouse.x - state.lastTarget.x) / dt;
+        const measuredY = (state.targetMouse.y - state.lastTarget.y) / dt;
+
+        state.velocity.x += (measuredX - state.velocity.x) * 0.18;
+        state.velocity.y += (measuredY - state.velocity.y) * 0.18;
+
+        state.lastTarget.x = state.targetMouse.x;
+        state.lastTarget.y = state.targetMouse.y;
+        state.lastMoveTime = now;
+      }
+
+      window.addEventListener("resize", resize, { passive: true });
+
+      window.addEventListener(
+        "pointermove",
+        (event) => setPointer(event.clientX, event.clientY),
+        { passive: true }
+      );
+
+      window.addEventListener(
+        "pointerleave",
+        () => {
+          state.targetMouse.x = 0.5;
+          state.targetMouse.y = 0.5;
+        },
+        { passive: true }
+      );
+
+      function render(now) {
+        resize();
+
+        const elapsed = (now - state.start) / 1000;
+
+        state.mouse.x +=
+          (state.targetMouse.x - state.mouse.x) * 0.055;
+        state.mouse.y +=
+          (state.targetMouse.y - state.mouse.y) * 0.055;
+
+        state.velocity.x *= 0.91;
+        state.velocity.y *= 0.91;
+
+        gl.useProgram(program);
+        gl.uniform2f(
+          resolutionLocation,
+          state.width,
+          state.height
+        );
+        gl.uniform2f(
+          mouseLocation,
+          state.mouse.x,
+          state.mouse.y
+        );
+        gl.uniform2f(
+          velocityLocation,
+          state.velocity.x,
+          state.velocity.y
+        );
+        gl.uniform1f(timeLocation, elapsed);
+        gl.uniform1f(pixelRatioLocation, state.dpr);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(render);
+      }
+
+      resize();
+      requestAnimationFrame(render);
+    })();
+  </script>
+</body>
+</html>
