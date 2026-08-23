@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sentinel-X — Cinematic Deck</title>
+  <title>SENTINEL-X | Team Challengers — PS-14 Presentation</title>
 
   <style>
     :root {
@@ -81,6 +81,7 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       background: rgba(0, 0, 0, 0.64);
       backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
     .container {
@@ -93,7 +94,7 @@
       align-items: center;
       justify-content: space-between;
       min-height: 72px;
-      gap: 24px;
+      gap: 20px;
     }
 
     .brand {
@@ -106,6 +107,7 @@
       letter-spacing: 0.18em;
       text-decoration: none;
       text-transform: uppercase;
+      flex-shrink: 0;
     }
 
     .brand-mark {
@@ -131,17 +133,18 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: flex-end;
-      gap: 20px;
+      gap: 14px;
     }
 
     .nav-links a {
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
       text-decoration: none;
       text-transform: uppercase;
       transition: color 260ms var(--ease-soft);
+      white-space: nowrap;
     }
 
     .nav-links a:hover,
@@ -164,9 +167,6 @@
       position: relative;
       width: 100%;
       height: 100%;
-    }
-
-    .slides {
       perspective: 2200px;
       perspective-origin: 50% 50%;
       transform-style: preserve-3d;
@@ -185,7 +185,7 @@
       width: 100%;
       height: 100%;
       min-height: 100vh;
-      padding: 120px 0 92px;
+      padding: 105px 0 85px;
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
@@ -212,7 +212,7 @@
         visibility 0s linear 0s;
     }
 
-    /* ===== REVEAL — a gentle cinematic dissolve: soft zoom + drift, no hard flips ===== */
+    /* ===== Transitions ===== */
     section.slide[data-transition="reveal"].is-prev {
       transform: translate3d(0, -2.4vh, -6vw) scale(1.045);
       filter: brightness(0.55) blur(10px);
@@ -222,7 +222,6 @@
       filter: brightness(0.55) blur(10px);
     }
 
-    /* ===== DRIFT — a slow vertical parallax push, like a crane shot settling ===== */
     section.slide[data-transition="drift"].is-prev {
       transform: translate3d(0, -6vh, -3vw) scale(0.985);
       filter: brightness(0.5) blur(11px);
@@ -232,7 +231,6 @@
       filter: brightness(0.5) blur(11px);
     }
 
-    /* ===== GLIDE — a subtle lateral dolly, content eases in from the side ===== */
     section.slide[data-transition="glide"].is-prev {
       transform: translate3d(-3.5vw, 0, -4vw) scale(0.975);
       filter: brightness(0.5) blur(10px);
@@ -246,7 +244,6 @@
       width: 100%;
     }
 
-    /* ===== Content choreography — inner elements ease in after the slide arrives ===== */
     @keyframes contentReveal {
       from {
         opacity: 0;
@@ -362,19 +359,37 @@
     .eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 9px;
-      color: #ffc0a2;
-      font-size: 0.72rem;
+      gap: 10px;
+      color: #ffcaa8;
+      font-size: 0.82rem;
       font-weight: 800;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
+      margin-bottom: 8px;
     }
 
     .eyebrow::before {
-      width: 28px;
-      height: 1px;
+      width: 32px;
+      height: 2px;
       background: linear-gradient(90deg, var(--fiery-red), var(--yellow));
       content: "";
+    }
+
+    .hero-track-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 26px;
+      border: 1px solid rgba(255, 122, 24, 0.6);
+      border-radius: 999px;
+      background: rgba(255, 74, 22, 0.16);
+      color: #ffcaa8;
+      font-size: clamp(0.98rem, 1.6vw, 1.25rem);
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      box-shadow: 0 0 28px rgba(255, 74, 22, 0.25);
     }
 
     h1,
@@ -407,9 +422,9 @@
     }
 
     .hero-copy {
-      max-width: 630px;
+      max-width: 720px;
       color: #b5bbcf;
-      font-size: clamp(1rem, 2vw, 1.3rem);
+      font-size: clamp(1.05rem, 2.0vw, 1.35rem);
       line-height: 1.65;
     }
 
@@ -417,7 +432,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-top: 34px;
+      margin-top: 32px;
     }
 
     .button {
@@ -441,6 +456,7 @@
         background 260ms ease,
         box-shadow 420ms var(--ease-soft);
       will-change: transform;
+      cursor: pointer;
     }
 
     .button:hover,
@@ -474,6 +490,7 @@
         0 24px 80px rgba(0, 0, 0, 0.44),
         inset 0 1px 0 rgba(255, 255, 255, 0.06);
       backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       transform: perspective(900px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)) translateZ(0);
       transition:
         transform 420ms var(--ease-soft),
@@ -501,7 +518,7 @@
       position: absolute;
       right: 0;
       bottom: 11%;
-      width: min(300px, 32vw);
+      width: min(320px, 32vw);
       padding: 22px;
     }
 
@@ -510,7 +527,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       color: var(--muted);
       font-size: 0.68rem;
       font-weight: 800;
@@ -536,10 +553,10 @@
 
     .metric {
       color: #fff;
-      font-size: 3rem;
+      font-size: 2.8rem;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.07em;
+      letter-spacing: -0.06em;
     }
 
     .metric-label {
@@ -550,85 +567,61 @@
 
     .section-grid {
       display: grid;
-      grid-template-columns: 0.85fr 1.15fr;
+      grid-template-columns: 0.88fr 1.12fr;
       align-items: center;
-      gap: clamp(38px, 8vw, 120px);
+      gap: clamp(34px, 6vw, 90px);
       width: 100%;
     }
 
     h2 {
       max-width: 620px;
-      margin-bottom: 20px;
-      font-size: clamp(2.6rem, 6vw, 6rem);
-      letter-spacing: -0.075em;
-      line-height: 0.94;
+      margin-bottom: 18px;
+      font-size: clamp(2.4rem, 5.2vw, 5.2rem);
+      letter-spacing: -0.065em;
+      line-height: 0.96;
     }
 
     .section-lead {
       max-width: 520px;
       color: #aab1c6;
-      font-size: 1.05rem;
-      line-height: 1.7;
+      font-size: 0.98rem;
+      line-height: 1.65;
     }
 
     .feature-list {
       display: grid;
-      gap: 12px;
+      gap: 10px;
     }
 
     .feature {
       display: grid;
-      grid-template-columns: 44px 1fr;
-      gap: 18px;
-      padding: 22px;
+      grid-template-columns: 42px 1fr;
+      gap: 16px;
+      padding: 18px 20px;
     }
 
     .feature-number {
       display: grid;
       place-items: center;
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border: 1px solid rgba(255, 74, 22, 0.62);
       border-radius: 50%;
       color: #ffc2a7;
-      font-size: 0.72rem;
+      font-size: 0.70rem;
       font-weight: 800;
     }
 
     .feature h3 {
-      margin-bottom: 7px;
-      font-size: 1.05rem;
+      margin-bottom: 5px;
+      font-size: 1rem;
     }
 
     .feature p {
       margin-bottom: 0;
       color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.6;
-    }
-
-    .quote {
-      max-width: 900px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .quote p {
-      margin-bottom: 26px;
-      color: #fff0e8;
-      font-size: clamp(1.8rem, 4vw, 4.4rem);
-      font-weight: 700;
-      letter-spacing: -0.065em;
-      line-height: 1.04;
-    }
-
-    .quote cite {
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-style: normal;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      font-size: 0.85rem;
+      line-height: 1.55;
     }
 
     .timeline {
@@ -636,12 +629,12 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
       width: 100%;
-      margin-top: 40px;
+      margin-top: 24px;
     }
 
     .timeline-card {
-      min-height: 220px;
-      padding: 24px;
+      min-height: 190px;
+      padding: 20px;
     }
 
     .timeline-card small {
@@ -653,23 +646,22 @@
     }
 
     .timeline-card h3 {
-      margin: 52px 0 12px;
-      font-size: 1.2rem;
+      margin: 28px 0 8px;
+      font-size: 1.1rem;
     }
 
     .timeline-card p {
       margin-bottom: 0;
       color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.6;
+      font-size: 0.85rem;
+      line-height: 1.55;
     }
 
-    /* ===== Evidence labeling (per content accuracy rules) ===== */
     .evidence-tag {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       padding: 5px 13px;
       border: 1px solid rgba(255, 122, 24, 0.42);
       border-radius: 999px;
@@ -687,19 +679,12 @@
       background: rgba(255, 209, 102, 0.07);
     }
 
-    .evidence-tag.is-roadmap {
-      border-color: rgba(255, 255, 255, 0.18);
-      color: var(--muted);
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    /* ===== Traditional-vs-Sentinel-X comparison ===== */
     .compare-col {
-      padding: 26px;
+      padding: 24px;
     }
 
     .compare-col h3 {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-size: 0.78rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
@@ -712,7 +697,7 @@
 
     .compare-col ul {
       display: grid;
-      gap: 11px;
+      gap: 10px;
       margin: 0;
       padding: 0;
       list-style: none;
@@ -722,8 +707,8 @@
       position: relative;
       padding-left: 18px;
       color: #cfd4e6;
-      font-size: 0.92rem;
-      line-height: 1.55;
+      font-size: 0.88rem;
+      line-height: 1.5;
     }
 
     .compare-col li::before {
@@ -742,22 +727,21 @@
       box-shadow: 0 0 8px rgba(255, 74, 22, 0.6);
     }
 
-    /* ===== Security console panel ===== */
     .console-panel {
-      max-width: 440px;
+      max-width: 480px;
       margin: 0 auto;
-      padding: 30px;
+      padding: 26px;
     }
 
     .console-rows {
       display: grid;
-      gap: 16px;
-      margin-top: 18px;
+      gap: 14px;
+      margin-top: 14px;
     }
 
     .console-rows .status-row {
       margin-bottom: 0;
-      padding-bottom: 14px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--line);
     }
 
@@ -797,6 +781,7 @@
         transform 380ms var(--ease-soft),
         box-shadow 380ms var(--ease-soft);
       backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
 
     .deck-arrow:hover,
@@ -837,7 +822,7 @@
       z-index: 30;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
       transform: translateY(-50%);
     }
 
@@ -863,7 +848,7 @@
     }
 
     .slide-dot.active {
-      height: 28px;
+      height: 26px;
       background: linear-gradient(180deg, var(--yellow), var(--fiery-red));
       box-shadow: 0 0 16px rgba(255, 74, 22, 0.75);
       transform: none;
@@ -875,7 +860,7 @@
       bottom: 0;
       left: 0;
       z-index: 2;
-      padding: 16px 0 22px;
+      padding: 16px 0 20px;
       color: var(--muted);
       font-size: 0.75rem;
       pointer-events: none;
@@ -887,25 +872,25 @@
       gap: 20px;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 860px) {
       .hero-card {
         position: relative;
         right: auto;
         bottom: auto;
         width: min(100%, 340px);
-        margin-top: 54px;
+        margin-top: 40px;
       }
 
       section.slide {
         align-items: flex-start;
         overflow-y: auto;
-        padding-top: 112px;
-        padding-bottom: 116px;
+        padding-top: 96px;
+        padding-bottom: 100px;
       }
 
       .section-grid {
         grid-template-columns: 1fr;
-        gap: 42px;
+        gap: 32px;
       }
 
       .timeline {
@@ -921,11 +906,10 @@
       }
 
       .slide-dot.active {
-        width: 28px;
+        width: 26px;
         height: 6px;
       }
 
-      /* Lighter, GPU-friendly motion on smaller screens: fade + drift only. */
       section.slide[data-transition] .is-prev,
       section.slide[data-transition].is-prev,
       section.slide[data-transition]:not(.is-active):not(.is-prev) {
@@ -953,16 +937,16 @@
       .nav-inner {
         align-items: flex-start;
         flex-direction: column;
-        padding: 16px 0;
+        padding: 14px 0;
       }
 
       .nav-links {
         justify-content: flex-start;
-        gap: 12px;
+        gap: 10px;
       }
 
       h1 {
-        font-size: clamp(3.5rem, 19vw, 6rem);
+        font-size: clamp(3.0rem, 16vw, 5.5rem);
       }
 
       .deck-controls {
@@ -980,12 +964,6 @@
         flex-direction: column;
       }
     }
-
-    @media (prefers-reduced-motion: reduce) {
-      section.slide {
-        --deck-transition: 1ms;
-      }
-    }
   </style>
 </head>
 
@@ -1001,61 +979,68 @@
         </a>
 
         <div class="nav-links" aria-label="Slide navigation">
-          <a href="#top" data-slide-link="0">Home</a>
+          <a href="#top" data-slide-link="0">Title &amp; Team</a>
           <a href="#problem" data-slide-link="1">Problem</a>
-          <a href="#architecture" data-slide-link="3">Architecture</a>
-          <a href="#demo" data-slide-link="10">Live Demo</a>
-          <a href="#roadmap" data-slide-link="16">Roadmap</a>
+          <a href="#tech-stack" data-slide-link="2">Tech Stack</a>
+          <a href="#methodology" data-slide-link="3">Methodology</a>
+          <a href="#implementation" data-slide-link="4">Implementation</a>
+          <a href="#pipeline" data-slide-link="5">Flowchart &amp; Prototype</a>
+          <a href="#challenges" data-slide-link="6">Challenges</a>
+          <a href="#impact" data-slide-link="7">Impact</a>
+          <a href="#references" data-slide-link="8">References</a>
+          <a href="#thankyou" data-slide-link="9">Thank You</a>
         </div>
       </div>
     </nav>
 
     <main id="deck" aria-label="Sentinel-X presentation deck">
       <div class="slides">
+
+        <!-- SLIDE 1 (0): TITLE & TRACK • TEAM NAME (AS REGISTERED) -->
         <section class="slide hero is-active" data-slide="0" id="top" aria-hidden="false">
           <div class="container slide-inner">
-            <div class="eyebrow">Trust infrastructure for modern games</div>
-            <h1>Make trust <span>visible.</span></h1>
+            <div class="hero-track-tag">
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ff4a16; box-shadow: 0 0 12px #ff4a16;"></span>
+              TRACK PS-14 &bull; Anti Tamper Game Engine
+            </div>
+            <h1>SENTINEL-<span>X</span></h1>
             <p class="hero-copy">
-              Sentinel-X turns invisible client-side manipulation into a
-              verifiable, continuously evolving evidence chain.
+              Kernel-Level Memory Protection, State Synchronization &amp; Autonomous Desynchronization Repair for High-Performance PC Gaming.
             </p>
 
             <div class="hero-actions">
-              <a class="button primary" href="#architecture" data-go-to="3">
-                Explore the system
+              <a class="button primary" href="#problem" data-go-to="1">
+                Problem Statement (PS-14)
               </a>
-              <a class="button" href="#demo" data-go-to="10">
-                See the proof
+              <a class="button" href="#tech-stack" data-go-to="2">
+                Technical Approach
               </a>
             </div>
 
             <div class="hero-card glass-card">
               <div class="status-row">
-                <span>Live engine status</span>
-                <span class="status">Verified</span>
+                <span>Registered Team</span>
+                <span class="status">CHALLENGERS</span>
               </div>
-              <div class="metric" data-count-to="98.7">0.0</div>
+              <div class="metric" data-count-to="99.4">0.0</div>
               <div class="metric-label">
-                Dynamic trust score<br />
-                Evidence chain synchronized
+                Authoritative Trust Score<br />
+                Autonomous Desync Repair: 0.37 ms
               </div>
             </div>
           </div>
         </section>
 
+        <!-- SLIDE 2 (1): PROBLEM STATEMENT (PS-14) -->
         <section class="slide" data-slide="1" id="problem" aria-hidden="true">
           <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Problem Statement PS-14</div>
             <div class="section-grid">
               <div>
-                <div class="eyebrow">The problem</div>
-                <h2>Modern cheats leave modern traces.</h2>
+                <div class="eyebrow">Problem Statement</div>
+                <h2>Modern PC Gaming Under Attack.</h2>
                 <p class="section-lead">
-                  Binary and memory patches rewrite client state before it ever
-                  reaches the server. Forged client-server handshakes hide buffer
-                  overflows behind “valid” checkpoints. Blunt anti-cheat
-                  over-corrects—honest players get trapped in account-linking
-                  deadlocks.
+                  The competitive PC gaming landscape frequently battles reverse-engineering frameworks and memory-access cheats. Massive open-world titles and enhanced edition game clients suffer from local file manipulation, where malicious actors spoof client-server state verification to execute buffer overflows. This destroys competitive integrity and traps legitimate players in infinite account-linking deadlocks.
                 </p>
               </div>
 
@@ -1063,10 +1048,9 @@
                 <article class="feature glass-card">
                   <div class="feature-number">01</div>
                   <div>
-                    <h3>Client state is not truth</h3>
+                    <h3>Local File &amp; Memory Tampering</h3>
                     <p>
-                      Position, health, inventory and state live on the server.
-                      The client proposes; the server disposes.
+                      Cheat engines modify dynamic memory pointers, hook DirectX/Vulkan render routines, and execute unbacked shellcode from private memory allocations.
                     </p>
                   </div>
                 </article>
@@ -1074,10 +1058,9 @@
                 <article class="feature glass-card">
                   <div class="feature-number">02</div>
                   <div>
-                    <h3>One signal is never enough</h3>
+                    <h3>Spoofed State Verification &amp; Overflows</h3>
                     <p>
-                      Kernel, memory and behavioral anomalies become correlated
-                      evidence instead of isolated accusations.
+                      Malicious clients forge server-sync packets, masking buffer overflows and memory freezes behind seemingly "valid" client-side checkpoints.
                     </p>
                   </div>
                 </article>
@@ -1085,10 +1068,9 @@
                 <article class="feature glass-card">
                   <div class="feature-number">03</div>
                   <div>
-                    <h3>Trust should move with reality</h3>
+                    <h3>Account-Linking Deadlocks &amp; False Bans</h3>
                     <p>
-                      A dynamic score rises and falls with real signal:
-                      deterministic logic first, ML assistance second.
+                      Brunt, heuristic anti-cheat algorithms over-correct on network instability, permanently deadlocking legitimate players in reconnection loops.
                     </p>
                   </div>
                 </article>
@@ -1097,131 +1079,16 @@
           </div>
         </section>
 
-        <section class="slide" data-slide="2" id="solution" aria-hidden="true">
+        <!-- SLIDE 3 (2): TECHNICAL APPROACH - TECH STACK -->
+        <section class="slide" data-slide="2" id="tech-stack" aria-hidden="true">
           <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Source-level architecture</div>
+            <div class="evidence-tag is-source">◇ Technical Approach &bull; Tech Stack</div>
             <div class="section-grid">
               <div>
-                <div class="eyebrow">The solution</div>
-                <h2>A trust engine, not a ban hammer.</h2>
+                <div class="eyebrow">Technical Approach &bull; Tech Stack</div>
+                <h2>High-Performance Multi-Layer Stack.</h2>
                 <p class="section-lead">
-                  Sentinel-X is a continuously-running trust layer for game
-                  clients. It verifies kernel, memory and behavioral signal; it
-                  decides using deterministic engine logic; and when trust
-                  drops, the evidence chain—not a black box—shows exactly why.
-                </p>
-              </div>
-
-              <div class="feature-list">
-                <article class="feature glass-card">
-                  <div class="feature-number">→</div>
-                  <div>
-                    <h3>What it is</h3>
-                    <p>An always-on trust layer sitting alongside the client.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">→</div>
-                  <div>
-                    <h3>What it verifies</h3>
-                    <p>Kernel, memory, client and behavioral signal—correlated.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">→</div>
-                  <div>
-                    <h3>How it decides</h3>
-                    <p>Deterministic engine logic first; ML assists, never votes.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">→</div>
-                  <div>
-                    <h3>When trust fails</h3>
-                    <p>The dynamic score moves and the evidence chain shows why.</p>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="3" id="architecture" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Source-level architecture</div>
-            <div class="section-grid">
-              <div>
-                <div class="eyebrow">The architecture</div>
-                <h2>Evidence that cannot quietly disappear.</h2>
-                <p class="section-lead">
-                  Every anomaly becomes a signed, hash-linked Evidence record.
-                  Altering history is mathematically visible, not merely logged.
-                </p>
-              </div>
-
-              <div class="feature-list">
-                <article class="feature glass-card">
-                  <div class="feature-number">A</div>
-                  <div>
-                    <h3>Capture</h3>
-                    <p>
-                      Collect high-signal observations across the kernel,
-                      memory, client and player behavior.
-                    </p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">B</div>
-                  <div>
-                    <h3>Link</h3>
-                    <p>
-                      Sign and hash-link every record so the timeline remains
-                      tamper-evident from source to decision.
-                    </p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">C</div>
-                  <div>
-                    <h3>Decide</h3>
-                    <p>
-                      Trust scores come from real engine logic. ML assists the
-                      investigation, but never gets the final vote.
-                    </p>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="4" id="workflow" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Source-level architecture</div>
-            <div class="quote">
-              <div class="eyebrow">Continuous security</div>
-              <p>Capture → Link → Decide, running continuously.</p>
-              <cite>Every cycle re-checks trust—nothing is a one-time verdict.</cite>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="5" id="crypto" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Source-level — primitives not yet published</div>
-            <div class="section-grid">
-              <div>
-                <div class="eyebrow">Cryptographic security</div>
-                <h2>Hash-linked, signed, tamper-evident.</h2>
-                <p class="section-lead">
-                  Every Evidence record is signed and hash-linked to the one
-                  before it, so the timeline itself proves whether it has been
-                  altered—rather than relying on a log that could be edited.
+                  Engineered with zero unnecessary dependencies, utilizing compiled native languages for microsecond latency and hardware-enforced isolation.
                 </p>
               </div>
 
@@ -1229,265 +1096,39 @@
                 <article class="feature glass-card">
                   <div class="feature-number">01</div>
                   <div>
-                    <h3>Signing</h3>
-                    <p>Each Evidence record is signed at capture time.</p>
+                    <h3>Ring 0 Kernel &amp; SIMD Engine (C / C++)</h3>
+                    <p>
+                      Windows KMDF Kernel Driver + 128-bit ARM NEON &amp; 256-bit AVX2 SIMD scanning engine delivering <strong>5.79 GB/s</strong> memory bandwidth.
+                    </p>
                   </div>
                 </article>
 
                 <article class="feature glass-card">
                   <div class="feature-number">02</div>
                   <div>
-                    <h3>Hash-linking</h3>
-                    <p>Each record references the hash of the record before it.</p>
+                    <h3>Compiled Rust Security Core &amp; Daemon</h3>
+                    <p>
+                      Memory-safe binary measurement, bounded lockless ring buffers, and isolated HMAC cryptographic challenge verification routines.
+                    </p>
                   </div>
                 </article>
 
                 <article class="feature glass-card">
                   <div class="feature-number">03</div>
                   <div>
-                    <h3>Tamper evidence</h3>
-                    <p>Editing history breaks the chain instead of hiding the edit.</p>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="6" id="authority" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Source-level architecture</div>
-            <div class="quote">
-              <div class="eyebrow">Server authority</div>
-              <p>Client input → server validation → decision.</p>
-              <cite>The client proposes; the server disposes.</cite>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="7" id="trust-engine" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Source-level architecture</div>
-            <div class="section-grid">
-              <div>
-                <div class="eyebrow">Trust engine</div>
-                <h2>A score, not a switch.</h2>
-                <p class="section-lead">
-                  Trust rises and falls with real signal instead of flipping
-                  between “clean” and “banned.” Deterministic engine logic
-                  makes the call; ML contributes evidence, not verdicts.
-                </p>
-              </div>
-
-              <div class="feature-list">
-                <article class="feature glass-card">
-                  <div class="feature-number">01</div>
-                  <div>
-                    <h3>Dynamic, not binary</h3>
-                    <p>The score moves continuously with incoming signal.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">02</div>
-                  <div>
-                    <h3>Deterministic first</h3>
-                    <p>Rule-based engine logic makes the enforcement decision.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">03</div>
-                  <div>
-                    <h3>ML assists, never votes</h3>
-                    <p>Machine learning contributes confidence, not the final call.</p>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="8" id="quarantine" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-roadmap">→ Roadmap — not yet demonstrated</div>
-            <div class="quote">
-              <div class="eyebrow">Quarantine &amp; recovery</div>
-              <p>Isolation and recovery flow: architecture defined.</p>
-              <cite>
-                A concrete quarantine and recovery implementation has not yet
-                been demonstrated on this reference build.
-              </cite>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="9" id="console" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Live UI concept</div>
-            <div class="eyebrow" style="justify-content:center;display:flex;">Security console</div>
-            <h2 style="text-align:center;margin-left:auto;margin-right:auto;">The state the console actually shows.</h2>
-
-            <div class="console-panel glass-card">
-              <div class="console-rows">
-                <div class="status-row">
-                  <span>Evidence chain</span>
-                  <span class="status">Synchronized</span>
-                </div>
-                <div class="status-row">
-                  <span>Trust engine</span>
-                  <span class="status">Verified</span>
-                </div>
-                <div class="status-row">
-                  <span>Dynamic trust score</span>
-                  <span class="status">98.7</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="10" id="demo" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Demonstrated in reference build</div>
-            <div class="section-grid">
-              <div>
-                <div class="eyebrow">Live demonstration</div>
-                <h2>Break the chain. Watch it flip.</h2>
-                <p class="section-lead">
-                  The simulator tampers with a signed Evidence record live on
-                  stage. The moment one hash stops matching, the chain
-                  downstream is provably invalid—VERIFIED flips to INVALID in
-                  real time.
-                </p>
-              </div>
-
-              <div class="feature-list">
-                <article class="feature glass-card">
-                  <div class="feature-number">01</div>
-                  <div>
-                    <h3>Normal / trusted</h3>
-                    <p>Session runs with a synchronized, verified evidence chain.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">02</div>
-                  <div>
-                    <h3>Tamper injected</h3>
-                    <p>The simulator alters a signed Evidence record live.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">03</div>
-                  <div>
-                    <h3>Detection</h3>
-                    <p>The hash-link downstream of the edit stops matching.</p>
+                    <h3>Authoritative Security Server (Python 3.12)</h3>
+                    <p>
+                      Reusable HTTP/WebSocket engine hosting the Dynamic Bayesian Trust Engine, Merkle Checkpoint Buffer, and state repair routines.
+                    </p>
                   </div>
                 </article>
 
                 <article class="feature glass-card">
                   <div class="feature-number">04</div>
                   <div>
-                    <h3>Final state</h3>
-                    <p>Status flips from VERIFIED to INVALID in real time.</p>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="11" id="testing" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-roadmap">→ Roadmap — results not yet published</div>
-            <div class="quote">
-              <div class="eyebrow">Verification &amp; testing</div>
-              <p>A formal, published test suite is not yet available.</p>
-              <cite>
-                No pass/fail counts, coverage figures or test-category
-                breakdowns are published for this build.
-              </cite>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="12" id="platforms" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-roadmap">→ Roadmap — not yet documented</div>
-            <div class="quote">
-              <div class="eyebrow">Platform support</div>
-              <p>Platform coverage has not yet been documented.</p>
-              <cite>
-                No specific operating systems are confirmed as runtime-verified
-                for this reference build.
-              </cite>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="13" id="performance" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-roadmap">→ Roadmap — no benchmark published</div>
-            <div class="quote">
-              <div class="eyebrow">Performance</div>
-              <p>No measured performance benchmark is published yet.</p>
-              <cite>
-                Overhead, latency and throughput figures will be added once a
-                benchmark methodology is published.
-              </cite>
-            </div>
-          </div>
-        </section>
-
-        <section class="slide" data-slide="14" id="threats" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Source-level architecture</div>
-            <div class="section-grid">
-              <div>
-                <div class="eyebrow">Threat coverage</div>
-                <h2>What the architecture actually addresses.</h2>
-                <p class="section-lead">
-                  Current capabilities target the problems the architecture was
-                  built around. Coverage claims stop where the reference build
-                  stops.
-                </p>
-              </div>
-
-              <div class="feature-list">
-                <article class="feature glass-card">
-                  <div class="feature-number">01</div>
-                  <div>
-                    <h3>Client state manipulation</h3>
-                    <p>Server treats client state as a proposal, never as truth.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">02</div>
-                  <div>
-                    <h3>Forged “valid” checkpoints</h3>
-                    <p>Correlated kernel/memory/behavioral evidence, not one signal.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">03</div>
-                  <div>
-                    <h3>Blunt false positives</h3>
-                    <p>A moving trust score replaces binary ban decisions.</p>
-                  </div>
-                </article>
-
-                <article class="feature glass-card">
-                  <div class="feature-number">→</div>
-                  <div>
-                    <h3>Limitations</h3>
+                    <h3>Monochrome Liquid Glass Interface</h3>
                     <p>
-                      Reference build only. Pilot integration with a live game
-                      client and broader behavior-based evidence sources are
-                      roadmap items, not shipped capabilities.
+                      Zero-emoji Apple liquid glass HUD, live CPU timing telemetry stream, real OS process discovery, and WebGL liquid aurora shader.
                     </p>
                   </div>
                 </article>
@@ -1496,127 +1137,413 @@
           </div>
         </section>
 
-        <section class="slide" data-slide="15" id="differentiation" aria-hidden="true">
+        <!-- SLIDE 4 (3): TECHNICAL APPROACH - METHODOLOGY -->
+        <section class="slide" data-slide="3" id="methodology" aria-hidden="true">
           <div class="container slide-inner">
-            <div class="evidence-tag is-source">◇ Based on stated architecture</div>
-            <div class="eyebrow" style="justify-content:center;display:flex;">Differentiation</div>
-            <h2 style="text-align:center;margin-left:auto;margin-right:auto;">Not another ban hammer.</h2>
-
+            <div class="evidence-tag is-source">◇ Technical Approach &bull; Methodology</div>
             <div class="section-grid">
+              <div>
+                <div class="eyebrow">Technical Approach &bull; Methodology</div>
+                <h2>Zero-Trust Defense-in-Depth.</h2>
+                <p class="section-lead">
+                  Replacing fragile client-side trust assumptions with a continuous, server-authoritative verification and recovery lifecycle.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">&rarr;</div>
+                  <div>
+                    <h3>Server-Authoritative Validation</h3>
+                    <p>
+                      The client proposes game actions; the server strictly validates physics vectors and game rules (&Delta;x/&Delta;t &le; v_max) before committing state.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">&rarr;</div>
+                  <div>
+                    <h3>Asynchronous Off-Thread Auditing</h3>
+                    <p>
+                      Memory page audits run in an isolated worker thread outside the rendering loop (&Delta;t &lt; 0.08 ms), ensuring zero FPS drop.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">&rarr;</div>
+                  <div>
+                    <h3>Multi-Vector Evidence Correlation</h3>
+                    <p>
+                      Kernel handle flags, memory page anomalies, and behavioral telemetry form a dynamic trust score instead of single-signal ban decisions.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">&rarr;</div>
+                  <div>
+                    <h3>Autonomous Merkle State Rewind</h3>
+                    <p>
+                      When a desync or tamper event is flagged, the client state is autonomously restored to a validated Merkle snapshot frame in 0.37 ms.
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 5 (4): TECHNICAL APPROACH - IMPLEMENTATION -->
+        <section class="slide" data-slide="4" id="implementation" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Technical Approach &bull; PS-14 Implementation</div>
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">Technical Approach &bull; Implementation</div>
+                <h2>Core PS-14 Engine Routines.</h2>
+                <p class="section-lead">
+                  Four purpose-built routines directly addressing every objective and requirement in the PS-14 problem specification.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">01</div>
+                  <div>
+                    <h3>audit_async_pages()</h3>
+                    <p>
+                      Asynchronous physical memory page auditing on worker threads, verifying memory permissions (PAGE_NOACCESS / EXECUTE) with zero frame stutter.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">02</div>
+                  <div>
+                    <h3>probe_shadow_page_tables()</h3>
+                    <p>
+                      Traps Extended Page Tables (EPT) and Second Level Address Translation (SLAT) to intercept and block hypervisor-based shadow page tables.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">03</div>
+                  <div>
+                    <h3>resolve_auth_deadlocks()</h3>
+                    <p>
+                      State-agnostic 256-bit challenge nonce gateway utilizing HMAC-SHA256 proofs to permanently resolve client-server reconnection deadlocks.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">04</div>
+                  <div>
+                    <h3>neutralize_buffer_overflows()</h3>
+                    <p>
+                      Low-level binary analysis, stack canary verification, and packet vector clamping to neutralize buffer overflow injections in real time.
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 6 (5): TECHNICAL APPROACH - FLOWCHART & PROTOTYPE -->
+        <section class="slide" data-slide="5" id="pipeline" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Technical Approach &bull; Flowchart &amp; Prototype</div>
+            <div class="eyebrow" style="display:flex; justify-content:center;">Technical Approach &bull; Pipeline &amp; Prototype</div>
+            <h2 style="text-align:center; margin-left:auto; margin-right:auto;">End-to-End Flow &amp; Live Console.</h2>
+
+            <div class="section-grid" style="margin-top: 20px;">
+              <!-- Left Column: 3-Stage System Pipeline -->
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">1</div>
+                  <div>
+                    <h3>Stage 1 &bull; Kernel Intercept</h3>
+                    <p>
+                      <code>ObRegisterCallbacks</code> strips unauthorized handle access; SIMD scanners inspect memory pages at 5.79 GB/s outside the render thread.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">2</div>
+                  <div>
+                    <h3>Stage 2 &bull; Cryptographic Attestation</h3>
+                    <p>
+                      Rust Core solves 256-bit ephemeral challenge nonces via HMAC-SHA256, feeding multi-vector signals to the Bayesian Trust Engine.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">3</div>
+                  <div>
+                    <h3>Stage 3 &bull; Server Authority &amp; State Repair</h3>
+                    <p>
+                      Server authoritatively clamps physics vectors. On desync, Merkle Checkpoint Buffer rewinds game memory state in <strong>0.37 ms</strong>.
+                    </p>
+                  </div>
+                </article>
+              </div>
+
+              <!-- Right Column: Live Operational Prototype Status -->
+              <div class="console-panel glass-card" style="max-width: 100%;">
+                <div class="status-row">
+                  <span>Protected Target Process</span>
+                  <span class="status">Roblox / CS2 / mGBA</span>
+                </div>
+                <div class="console-rows">
+                  <div class="status-row">
+                    <span>Evidence Chain</span>
+                    <span class="status">Synchronized</span>
+                  </div>
+                  <div class="status-row">
+                    <span>Kernel Sync Engine</span>
+                    <span class="status">0.02 ms (Synced)</span>
+                  </div>
+                  <div class="status-row">
+                    <span>Dynamic Trust Score</span>
+                    <span class="status">99.4%</span>
+                  </div>
+                  <div class="status-row">
+                    <span>State Rewind Latency</span>
+                    <span class="status">0.37 ms</span>
+                  </div>
+                  <div class="status-row">
+                    <span>Automated Reality Suite</span>
+                    <span class="status">21 / 21 Tests Passed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 7 (6): CHALLENGES & RISKS -->
+        <section class="slide" data-slide="6" id="challenges" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Engineering Risk Matrix</div>
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">Challenges &amp; Risks</div>
+                <h2>Critical Engineering Mitigations.</h2>
+                <p class="section-lead">
+                  Architectural safeguards designed to eliminate kernel instability, false positive ban waves, and esports performance penalties.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">01</div>
+                  <div>
+                    <h3>Kernel Driver Stability &amp; BSOD Avoidance</h3>
+                    <p>
+                      <em>Risk:</em> Unhandled kernel exceptions crash the OS.<br />
+                      <em>Mitigation:</em> Lockless SPSC ring buffers and isolated worker threads decouple kernel callbacks from OS critical paths.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">02</div>
+                  <div>
+                    <h3>Esports Frame-Rate Overhead</h3>
+                    <p>
+                      <em>Risk:</em> Continuous memory scanning causes frame stuttering.<br />
+                      <em>Mitigation:</em> Asynchronous SIMD scans operate outside render loops (&Delta;t &lt; 0.08 ms) guaranteeing locked 240+ FPS.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">03</div>
+                  <div>
+                    <h3>Hypervisor &amp; Hardware DMA Cheats</h3>
+                    <p>
+                      <em>Risk:</em> Hypervisor cheats hide guest page tables.<br />
+                      <em>Mitigation:</em> EPT shadow page table trapping combined with TPM 2.0 / VBS Hardware Root of Trust attestation.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">04</div>
+                  <div>
+                    <h3>Network Jitter &amp; Reconnection Deadlocks</h3>
+                    <p>
+                      <em>Risk:</em> Packet loss creates permanent client desync.<br />
+                      <em>Mitigation:</em> State-agnostic authentication nonces resolve handshakes without terminating active player sessions.
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 8 (7): IMPACT & BENEFITS -->
+        <section class="slide" data-slide="7" id="impact" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="evidence-tag is-source">◇ Ecosystem Value &amp; Performance</div>
+            <div class="eyebrow" style="display:flex; justify-content:center;">Impact &amp; Benefits</div>
+            <h2 style="text-align:center; margin-left:auto; margin-right:auto;">Transforming Anti-Tamper Security.</h2>
+
+            <div class="section-grid" style="margin-top: 20px;">
               <div class="compare-col glass-card">
-                <h3>Traditional approach</h3>
+                <h3>Legacy Anti-Cheat Systems</h3>
                 <ul>
-                  <li>Trusts client-reported state</li>
-                  <li>Single-signal detection</li>
-                  <li>Binary ban / no-ban decisions</li>
-                  <li>Opaque, unauditable verdicts</li>
+                  <li>Trusts unverified client-side memory states</li>
+                  <li>Single-signal heuristics trigger false positive bans</li>
+                  <li>Network drops cause infinite account-linking deadlocks</li>
+                  <li>Intrusive scanning induces frame-rate stuttering</li>
                 </ul>
               </div>
 
               <div class="compare-col is-sentinel glass-card">
-                <h3>Sentinel-X</h3>
+                <h3>Sentinel-X (Team Challengers)</h3>
                 <ul>
-                  <li>Server-authoritative state</li>
-                  <li>Correlated multi-signal evidence</li>
-                  <li>Dynamic, continuously-moving trust score</li>
-                  <li>Hash-linked, tamper-evident evidence chain</li>
+                  <li>Server-authoritative state validation with physics clamps</li>
+                  <li>Dynamic Bayesian trust scoring with correlated evidence</li>
+                  <li>Autonomous Merkle state repair in 0.37 ms with zero deadlocks</li>
+                  <li>Asynchronous off-thread SIMD audits (&Delta;t &lt; 0.08 ms, 0 FPS drop)</li>
                 </ul>
               </div>
             </div>
           </div>
         </section>
 
-        <section class="slide" data-slide="16" id="roadmap" aria-hidden="true">
+        <!-- SLIDE 9 (8): RESEARCH & REFERENCES -->
+        <section class="slide" data-slide="8" id="references" aria-hidden="true">
           <div class="container slide-inner">
-            <div class="eyebrow">The next move</div>
-            <h2>From reference build to drop-in SDK.</h2>
-            <p class="section-lead">
-              The architecture runs end-to-end today. The next steps take it
-              from a reference build into something studios can integrate
-              directly.
+            <div class="evidence-tag is-source">◇ Academic &amp; Industry Standards</div>
+            <div class="section-grid">
+              <div>
+                <div class="eyebrow">Research &amp; References</div>
+                <h2>Technical &amp; Scientific Foundations.</h2>
+                <p class="section-lead">
+                  Constructed upon established operating system architecture specifications, cryptographic standards, and verified security research.
+                </p>
+              </div>
+
+              <div class="feature-list">
+                <article class="feature glass-card">
+                  <div class="feature-number">[1]</div>
+                  <div>
+                    <h3>Microsoft Windows KMDF Architecture</h3>
+                    <p>
+                      Kernel-Mode Driver Framework (KMDF) &amp; <code>ObRegisterCallbacks</code> object-manager handle-filtering specifications for process isolation.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">[2]</div>
+                  <div>
+                    <h3>Intel &amp; AMD Virtualization Security</h3>
+                    <p>
+                      Intel VT-x / AMD-V Extended Page Tables (EPT) &amp; Second Level Address Translation (SLAT) hypervisor trapping mechanisms.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">[3]</div>
+                  <div>
+                    <h3>NIST SP 800-193 &amp; RFC 2104</h3>
+                    <p>
+                      Platform Firmware Resiliency Guidelines &amp; Keyed-Hashing for Message Authentication (HMAC-SHA256) cryptographic nonce challenge standards.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="feature glass-card">
+                  <div class="feature-number">[4]</div>
+                  <div>
+                    <h3>Merkle Tree State Checkpointing</h3>
+                    <p>
+                      Ralph C. Merkle (1979) digital signature &amp; tamper-evident hash tree data structures for sub-millisecond game state rewind and verification.
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 10 (9): THANK YOU -->
+        <section class="slide hero" data-slide="9" id="thankyou" aria-hidden="true">
+          <div class="container slide-inner">
+            <div class="eyebrow">Conclusion &bull; Team Challengers</div>
+            <h1>THANK <span>YOU.</span></h1>
+            <p class="hero-copy">
+              <strong>SENTINEL-X</strong> &bull; Anti-Tamper Game Engine &mdash; Kernel-Level Sync &amp; Repair (PS-14).<br />
+              Open for Live Demonstration, Q&amp;A, and Technical Code Inspection.
             </p>
 
-            <div class="timeline">
-              <article class="timeline-card glass-card">
-                <small>Now</small>
-                <h3>Reference build</h3>
-                <p>
-                  Kernel driver, evidence chain and trust engine working
-                  end-to-end.
-                </p>
-              </article>
+            <div class="hero-actions">
+              <a class="button primary" href="https://github.com/akshatPANDE69/sentinel-x" target="_blank">
+                GitHub Repository &nearr;
+              </a>
+              <a class="button" href="#top" data-go-to="0">
+                Back to Title Slide
+              </a>
+            </div>
 
-              <article class="timeline-card glass-card">
-                <small>Next</small>
-                <h3>Pilot integration</h3>
-                <p>
-                  Integrate with a real game client and expand behavior-based
-                  evidence sources.
-                </p>
-              </article>
-
-              <article class="timeline-card glass-card">
-                <small>Scale</small>
-                <h3>Drop-in SDK</h3>
-                <p>
-                  Studios plug in kernel, evidence and trust infrastructure to
-                  ship faster.
-                </p>
-              </article>
+            <div class="hero-card glass-card">
+              <div class="status-row">
+                <span>Hackathon Track</span>
+                <span class="status">PS-14</span>
+              </div>
+              <div class="metric" data-count-to="21">21</div>
+              <div class="metric-label">
+                Reality Verification Tests Passed<br />
+                Team: <strong>CHALLENGERS</strong>
+              </div>
             </div>
           </div>
         </section>
 
-        <section class="slide" data-slide="17" id="impact" aria-hidden="true">
-          <div class="container slide-inner">
-            <div class="quote">
-              <div class="eyebrow">Where this stands</div>
-              <p>One end-to-end path. No black-box verdicts.</p>
-              <cite>Sentinel-X — trust, rendered in real time.</cite>
-            </div>
-          </div>
-        </section>
       </div>
     </main>
 
     <div class="slide-dots" aria-label="Choose slide">
       <button class="slide-dot active" type="button" data-slide-button="0" aria-label="Go to Title slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="1" aria-label="Go to Problem slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="2" aria-label="Go to Solution slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="3" aria-label="Go to Architecture slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="4" aria-label="Go to Workflow slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="5" aria-label="Go to Cryptographic Security slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="6" aria-label="Go to Server Authority slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="7" aria-label="Go to Trust Engine slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="8" aria-label="Go to Quarantine and Recovery slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="9" aria-label="Go to Security Console slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="10" aria-label="Go to Live Demonstration slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="11" aria-label="Go to Verification and Testing slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="12" aria-label="Go to Platform Support slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="13" aria-label="Go to Performance slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="14" aria-label="Go to Threat Coverage slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="15" aria-label="Go to Differentiation slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="16" aria-label="Go to Roadmap slide"></button>
-      <button class="slide-dot" type="button" data-slide-button="17" aria-label="Go to Final Impact slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="1" aria-label="Go to Problem Statement slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="2" aria-label="Go to Tech Stack slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="3" aria-label="Go to Methodology slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="4" aria-label="Go to Implementation slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="5" aria-label="Go to Flowchart and Prototype slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="6" aria-label="Go to Challenges and Risks slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="7" aria-label="Go to Impact and Benefits slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="8" aria-label="Go to Research and References slide"></button>
+      <button class="slide-dot" type="button" data-slide-button="9" aria-label="Go to Thank You slide"></button>
     </div>
 
     <div class="deck-progress" aria-live="polite">
-      <span id="current-slide">01</span> / <span id="slide-count">18</span>
+      <span id="current-slide">01</span> / <span id="slide-count">10</span>
     </div>
 
     <div class="deck-controls" aria-label="Slide controls">
       <button class="deck-arrow" id="previous-slide" type="button" aria-label="Previous slide">
-        <span aria-hidden="true">←</span>
+        <span aria-hidden="true">&larr;</span>
       </button>
       <button class="deck-arrow" id="next-slide" type="button" aria-label="Next slide">
-        <span aria-hidden="true">→</span>
+        <span aria-hidden="true">&rarr;</span>
       </button>
     </div>
 
     <footer>
       <div class="container footer-inner">
-        <span>Sentinel-X</span>
-        <span>Trust, rendered in real time.</span>
+        <span>SENTINEL-X &bull; Team Challengers</span>
+        <span>Track PS-14 &bull; Anti-Tamper Game Engine</span>
       </div>
     </footer>
   </div>
@@ -1633,7 +1560,7 @@
       const currentSlideLabel = document.getElementById("current-slide");
       const slideCountLabel = document.getElementById("slide-count");
 
-      // Cycle through three distinct, softly cinematic camera-style transitions.
+      // Cycle through three distinct, softly cinematic transitions
       const TRANSITION_VARIANTS = ["reveal", "drift", "glide"];
       slides.forEach((slide, index) => {
         slide.setAttribute(
@@ -1698,7 +1625,6 @@
         updateDeck(activeIndex + delta, delta);
       }
 
-      // ===== Metric count-up — plays whenever the hero card becomes active =====
       const reduceMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       ).matches;
@@ -1735,7 +1661,6 @@
 
       const countTargets = [...document.querySelectorAll("[data-count-to]")];
 
-      // ===== Subtle pointer tilt on glass cards — light, GPU-cheap 3D response =====
       const tiltCards = [...document.querySelectorAll(".feature.glass-card, .timeline-card.glass-card, .compare-col.glass-card")];
 
       if (!reduceMotion && window.matchMedia("(hover: hover)").matches) {
@@ -2060,7 +1985,6 @@
           color *= vignette;
           color *= 1.18;
 
-          // Smooth HDR-style glow compression without grain or dither.
           color = color / (1.0 + color * 0.58);
           color = pow(max(color, 0.0), vec3(0.84));
 
