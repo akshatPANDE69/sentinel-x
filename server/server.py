@@ -135,6 +135,8 @@ class StandaloneHTTPHandler(SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(telemetry).encode('utf-8'))
             return
 
+        elif path == "/presentation" or path == "/ppt":
+            self.path = "/presentation.html"
         elif path == "/" or path == "":
             self.path = "/index.html"
 

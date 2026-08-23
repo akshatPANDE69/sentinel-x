@@ -176,7 +176,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 9px 20px;
+      padding: 9px 18px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-glass);
@@ -185,6 +185,7 @@
       font-weight: 600;
       font-size: 13px;
       cursor: pointer;
+      text-decoration: none;
       transition: all 0.2s ease;
     }
     .btn-apple-ghost:hover {
@@ -205,7 +206,7 @@
 
     /* Sidebar with Luminous Torch, 3D Movable Card & Infinity Widget */
     .app-sidebar {
-      width: 285px;
+      width: 290px;
       padding: 24px 16px;
       border-right: 1px solid var(--border-glass);
       background: rgba(0, 0, 0, 0.6);
@@ -261,7 +262,7 @@
     }
 
     /* ==========================================================================
-       LUMINOUS TORCH CARD (Uiverse.io by NK2552003 adapted)
+       LUMINOUS TORCH CARD (Increased Vertical Length & PS-14 Integration)
        ========================================================================== */
     .luminous-card-container {
       box-sizing: border-box;
@@ -281,10 +282,10 @@
         0 0 0 1px rgba(255,255,255,0.12),
         0 8px 24px 0 rgba(0,0,0,0.6);
       width: 100%;
-      height: 140px;
-      border-radius: 18px;
+      height: 205px; /* Increased vertical length */
+      border-radius: 20px;
       color: #fff;
-      padding: 12px 14px;
+      padding: 16px 14px;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
@@ -295,7 +296,7 @@
 
     .luminous-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.25), 0 12px 30px 0 rgba(0,0,0,0.8);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.25), 0 14px 34px 0 rgba(0,0,0,0.85);
     }
 
     .luminous-light-layer {
@@ -303,15 +304,15 @@
       left: 0; top: 0;
       height: 100%; width: 100%;
       transform-style: preserve-3d;
-      perspective: 300px;
+      perspective: 350px;
       pointer-events: none;
     }
 
     .luminous-slit {
       position: absolute;
-      left: 0; right: 0; top: 0; bottom: 0;
+      left: 0; right: 0; top: 0; bottom: 2rem;
       margin: auto;
-      width: 60%;
+      width: 65%;
       height: 6px;
       transform: rotateX(-76deg);
       background: #111;
@@ -325,38 +326,38 @@
       margin: auto;
       width: 100%; height: 100%;
       pointer-events: none;
-      perspective: 300px;
+      perspective: 350px;
       opacity: 0;
       transition: opacity 0.4s ease-in-out;
     }
 
     .luminous-lumen .min {
-      width: 65%; height: 2rem;
+      width: 65%; height: 3.5rem;
       background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.7));
-      position: absolute; left: 0; right: 0; top: 0; bottom: 1.5rem;
+      position: absolute; left: 0; right: 0; top: 0; bottom: 3rem;
       margin: auto;
       transform: rotateX(-42deg);
       opacity: 0.4;
     }
 
     .luminous-lumen .mid {
-      width: 70%; height: 6rem;
-      background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.8));
-      position: absolute; left: 0; right: 0; top: 0; bottom: 4rem;
+      width: 74%; height: 9.5rem;
+      background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.85));
+      position: absolute; left: 0; right: 0; top: 0; bottom: 6.5rem;
       margin: auto;
       transform: rotateX(-42deg);
-      filter: blur(10px);
+      filter: blur(12px);
       opacity: 0.8;
       border-radius: 100% 100% 0 0;
     }
 
     .luminous-lumen .hi {
-      width: 50%; height: 6rem;
-      background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.9));
-      position: absolute; left: 0; right: 0; top: 0; bottom: 5rem;
+      width: 55%; height: 9.5rem;
+      background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.95));
+      position: absolute; left: 0; right: 0; top: 0; bottom: 7.5rem;
       margin: auto;
       transform: rotateX(22deg);
-      filter: blur(10px);
+      filter: blur(12px);
       opacity: 0.6;
       border-radius: 100% 100% 0 0;
     }
@@ -365,7 +366,7 @@
       position: absolute; left: 0; right: 0; top: 0; bottom: 0;
       margin: auto; width: 100%; height: 100%;
       pointer-events: none;
-      perspective: 300px;
+      perspective: 350px;
       transition: opacity 0.4s ease-in-out;
       opacity: 0.5;
     }
@@ -377,28 +378,29 @@
 
     .luminous-icon {
       position: absolute;
-      top: -5.5rem;
+      top: -8.5rem;
       left: 0; right: 0;
       margin: auto;
       width: fit-content;
-      filter: drop-shadow(0 -8px 1px transparent);
+      filter: drop-shadow(0 -10px 1px transparent);
       transition: filter 0.4s ease-in-out;
     }
 
     .luminous-title {
-      margin: 0 0 2px 0;
-      font-size: 12.5px;
+      margin: 0 0 4px 0;
+      font-size: 13px;
       color: #fff;
       font-weight: 800;
       font-family: var(--font-display);
+      letter-spacing: -0.01em;
     }
 
     .luminous-description {
       margin: 0;
       color: var(--color-gray-400);
       font-size: 10.5px;
-      line-height: 1.3;
-      max-width: 65%;
+      line-height: 1.4;
+      max-width: 68%;
     }
 
     .luminous-toggle-input {
@@ -408,7 +410,7 @@
     .luminous-toggle {
       position: absolute;
       right: 0; bottom: 0;
-      height: 20px; width: 44px;
+      height: 22px; width: 46px;
       border-radius: 999px;
       background: #000;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
@@ -419,7 +421,7 @@
     .luminous-handle {
       position: absolute;
       top: 2px; left: 2px;
-      width: 16px; height: 16px;
+      width: 18px; height: 18px;
       background: #888;
       border-radius: 50%;
       box-shadow: 0 2px 4px rgba(0,0,0,0.5);
@@ -429,27 +431,27 @@
     .luminous-toggle-input:checked ~ .luminous-card .luminous-handle {
       transform: translateX(24px);
       background: #FFFFFF;
-      box-shadow: 0 0 8px #FFFFFF;
+      box-shadow: 0 0 10px #FFFFFF;
     }
 
     .luminous-toggle-input:checked ~ .luminous-card {
       box-shadow:
         inset 0 1.01rem 0.1rem -1rem rgba(255,255,255,0.7),
         0 0 0 1px rgba(255,255,255,0.4),
-        0 0 30px rgba(255,255,255,0.15);
+        0 0 35px rgba(255,255,255,0.18);
     }
 
     .luminous-toggle-input:checked ~ .luminous-card .luminous-slit {
       background: #fff;
-      box-shadow: 0 0 10px 1px #fff;
+      box-shadow: 0 0 12px 2px #fff;
     }
 
     .luminous-toggle-input:checked ~ .luminous-card .luminous-lumen {
-      opacity: 0.9;
+      opacity: 0.95;
     }
 
     .luminous-toggle-input:checked ~ .luminous-card .luminous-icon {
-      filter: drop-shadow(0 -8px 4px rgba(255,255,255,0.5)) brightness(1.8);
+      filter: drop-shadow(0 -10px 6px rgba(255,255,255,0.6)) brightness(1.9);
     }
 
     /* 3D Movable Parallax Card */
@@ -519,7 +521,7 @@
     .app-main {
       flex: 1;
       padding: 34px 44px;
-      max-width: 1155px;
+      max-width: 1150px;
     }
 
     .tab-content { display: none; }
@@ -756,6 +758,9 @@
 
     <!-- Active State & Actions -->
     <div class="header-actions">
+      <a href="/presentation.html" target="_blank" class="btn-apple-ghost" style="font-weight: 700;">
+        <span>SLIDES (PPT) &nearr;</span>
+      </a>
       <div class="status-pill" id="appStatusPill">
         <div class="status-dot"></div>
         <span id="appStatusText">AGENT ACTIVE</span>
@@ -802,7 +807,7 @@
       <!-- Bottom Cluster: Luminous Torch Card + 3D Parallax Card + Infinity Dither Widget -->
       <div>
         
-        <!-- 1. Luminous Torch Card (Uiverse.io chatty-eel-90 inspired) -->
+        <!-- 1. Luminous Torch Card (Increased Vertical Length & PS-14 Integration) -->
         <div class="luminous-card-container">
           <input type="checkbox" class="luminous-toggle-input" id="luminousToggle" checked />
           <label for="luminousToggle" class="luminous-card">
@@ -817,15 +822,15 @@
             </div>
             <div class="luminous-content">
               <div class="luminous-icon">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                   <circle cx="12" cy="11" r="3"/>
                 </svg>
               </div>
               <div class="luminous-bottom">
-                <div class="luminous-title">Kernel Torch Probe</div>
+                <div class="luminous-title">PS-14 Volumetric Probe</div>
                 <p class="luminous-description">
-                  Volumetric Page Table &amp; Memory Isolation Beam
+                  Asynchronous Page Auditing &bull; Hypervisor Shadow Table Trap
                 </p>
                 <div class="luminous-toggle">
                   <div class="luminous-handle"></div>
