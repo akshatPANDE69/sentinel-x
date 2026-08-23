@@ -203,10 +203,10 @@
       z-index: 2;
     }
 
-    /* Sidebar with Bottom-Left Square Widget */
+    /* Sidebar with 3D Movable Card & Infinity Widget */
     .app-sidebar {
-      width: 260px;
-      padding: 30px 18px;
+      width: 270px;
+      padding: 26px 18px;
       border-right: 1px solid var(--border-glass);
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(30px);
@@ -221,7 +221,7 @@
       letter-spacing: 0.1em;
       color: var(--color-gray-500);
       text-transform: uppercase;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       padding-left: 12px;
     }
 
@@ -230,8 +230,8 @@
       align-items: center;
       gap: 12px;
       width: 100%;
-      padding: 11px 16px;
-      margin-bottom: 5px;
+      padding: 10px 15px;
+      margin-bottom: 4px;
       border-radius: 12px;
       border: 1px solid transparent;
       background: transparent;
@@ -259,12 +259,62 @@
       stroke: #000000;
     }
 
+    /* 3D Movable Interactive Card (chatty-eel-90 inspired) */
+    .movable-card-container {
+      perspective: 800px;
+      margin-top: 18px;
+      margin-bottom: 12px;
+    }
+    .movable-3d-card {
+      position: relative;
+      width: 100%;
+      padding: 16px 14px;
+      border-radius: 18px;
+      background: rgba(18, 18, 22, 0.85);
+      border: 1px solid var(--border-glass);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out, border-color 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .movable-3d-card:hover {
+      border-color: rgba(255, 255, 255, 0.35);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+    .card-glare {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.12), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .movable-3d-card:hover .card-glare {
+      opacity: 1;
+    }
+    .dither-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 9.5px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      letter-spacing: 0.06em;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+      transform: translateZ(15px);
+    }
+
     /* Square Widget on Bottom-Left */
     .sidebar-bottom-square {
-      margin-top: 24px;
-      padding: 18px;
-      border-radius: 20px;
-      background: rgba(18, 18, 22, 0.85);
+      padding: 16px 14px;
+      border-radius: 18px;
+      background: rgba(14, 14, 18, 0.85);
       border: 1px solid var(--border-glass);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       display: flex;
@@ -280,8 +330,8 @@
 
     .infinity-canvas-box {
       width: 140px;
-      height: 70px;
-      margin: 8px 0 10px 0;
+      height: 60px;
+      margin: 6px 0 8px 0;
       position: relative;
     }
     #infinityCanvas {
@@ -292,7 +342,7 @@
     .app-main {
       flex: 1;
       padding: 34px 44px;
-      max-width: 1180px;
+      max-width: 1170px;
     }
 
     .tab-content { display: none; }
@@ -623,7 +673,7 @@
   <!-- Layout -->
   <div class="app-layout">
     
-    <!-- Sidebar with Bottom-Left Square Widget -->
+    <!-- Sidebar with 3D Movable Card & Bottom-Left Infinity Widget -->
     <nav class="app-sidebar">
       <div>
         <div class="nav-section-label">SECURITY ENGINE</div>
@@ -653,16 +703,42 @@
         </button>
       </div>
 
-      <!-- Square Widget with Continuous Dither Infinity Loop Animation -->
-      <div class="sidebar-bottom-square">
-        <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 0.1em; color: var(--color-gray-500); text-transform: uppercase;">KERNEL SYNC ENGINE</span>
-        <div class="infinity-canvas-box">
-          <canvas id="infinityCanvas" width="140" height="70"></canvas>
+      <!-- Bottom Container: 3D Movable Card + Infinity Dither Widget -->
+      <div>
+        <!-- 3D Movable Interactive Card (chatty-eel-90 inspired) -->
+        <div class="movable-card-container">
+          <div class="movable-3d-card" id="movable3DCard">
+            <div class="card-glare"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div class="dither-chip">
+                <span>:: SX-ENCLAVE</span>
+              </div>
+              <span style="font-size: 9px; font-family: var(--font-mono); color: var(--color-gray-500); font-weight: 700;">HARDWARE ATTEST</span>
+            </div>
+            <div style="font-size: 12.5px; font-weight: 800; color: #FFFFFF; font-family: var(--font-display); margin-bottom: 2px;">
+              Hardware Root of Trust
+            </div>
+            <p style="font-size: 11px; color: var(--color-gray-400); line-height: 1.4; margin: 0 0 8px 0;">
+              TPM 2.0 / VBS Ring 0 Driver Isolated Security Enclave
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 10px; color: var(--color-gray-400); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;">
+              <span>EPT HOOKS</span>
+              <strong style="color: #FFFFFF;">0 DETECTED</strong>
+            </div>
+          </div>
         </div>
-        <div style="font-family: var(--font-mono); font-size: 11px; color: #FFFFFF; font-weight: 700;">
-          <span>SYNCED &bull; 0.02ms</span>
+
+        <!-- Square Widget with Continuous Dither Infinity Loop Animation -->
+        <div class="sidebar-bottom-square">
+          <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 0.1em; color: var(--color-gray-500); text-transform: uppercase;">KERNEL SYNC ENGINE</span>
+          <div class="infinity-canvas-box">
+            <canvas id="infinityCanvas" width="140" height="60"></canvas>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: #FFFFFF; font-weight: 700;">
+            <span>SYNCED &bull; 0.02ms</span>
+          </div>
+          <span style="font-size: 10px; color: var(--color-gray-500); margin-top: 2px;">Dither State Machine</span>
         </div>
-        <span style="font-size: 10px; color: var(--color-gray-500); margin-top: 2px;">Dither State Machine</span>
       </div>
     </nav>
 
@@ -914,7 +990,34 @@
 
   <!-- Interactive Scripts -->
   <script>
-    // 1. Subdued Ambient Monochrome Background Shimmer
+    // 1. 3D Movable Interactive Card Physics (chatty-eel-90 style)
+    (function init3DMovableCard() {
+      const card = document.getElementById('movable3DCard');
+      if (!card) return;
+
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+        // 3D rotation based on mouse coordinates
+        const rotY = x * 26; // max 13 deg
+        const rotX = -y * 26; // max 13 deg
+        card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(8px)`;
+
+        // Update glare position
+        const gx = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+        const gy = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+        card.style.setProperty('--gx', `${gx}%`);
+        card.style.setProperty('--gy', `${gy}%`);
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+      });
+    })();
+
+    // 2. Subdued Ambient Monochrome Background Shimmer
     (function initAmbientGlow() {
       const cvs = document.getElementById('ambientCanvas');
       if (!cvs) return;
@@ -956,13 +1059,13 @@
       render();
     })();
 
-    // 2. Dither Lemniscate Infinity Loop Animation (Square Widget)
+    // 3. Dither Lemniscate Infinity Loop Animation (Square Widget)
     (function initDitherInfinity() {
       const cvs = document.getElementById('infinityCanvas');
       if (!cvs) return;
       const ctx = cvs.getContext('2d');
       const w = cvs.width = 140;
-      const h = cvs.height = 70;
+      const h = cvs.height = 60;
 
       const bayer = [
         [ 0, 32,  8, 40,  2, 34, 10, 42],
@@ -980,7 +1083,7 @@
         ctx.clearRect(0, 0, w, h);
         t += 0.025;
 
-        const a = 48; // Scale of infinity loop
+        const a = 46; // Scale of infinity loop
         const cx = w / 2;
         const cy = h / 2;
 
@@ -1009,7 +1112,7 @@
       renderInfinity();
     })();
 
-    // 3. Process Discovery & Protection Controller
+    // 4. Process Discovery & Protection Controller
     let allDetectedProcesses = [];
     let activeSelectedGame = "Roblox Player";
     let activeSessionId = null;
